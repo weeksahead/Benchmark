@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 
 const TylerAI = () => {
@@ -13,6 +13,16 @@ const TylerAI = () => {
       timestamp: new Date()
     }
   ]);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const CLAUDE_API_KEY = import.meta.env.VITE_CLAUDE_API_KEY;
 
@@ -108,28 +118,28 @@ const TylerAI = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3">
+          <div className="flex-1 p-4 overflow-y-auto space-y-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                  className={`max-w-xs px-4 py-3 rounded-lg text-sm leading-relaxed ${
                     msg.sender === 'user'
                       ? 'bg-red-600 text-white'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
                   {msg.text.split('\n').map((line, index) => (
-                    <span key={index}>
-                      {line}
-                      {index < msg.text.split('\n').length - 1 && <br />}
-                    </span>
+                    <div key={index} className={index > 0 ? 'mt-2' : ''}>
+                      {line || '\u00A0'}
+                    </div>
                   ))}
                 </div>
               </div>
             ))}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}

@@ -8,7 +8,7 @@ const TylerAI = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi! I'm Tyler from Benchmark Equipment.\n\nWhat type of project are you working on?",
+      text: "Hi! I'm Tyler from Benchmark Equipment.",
       sender: 'ai',
       timestamp: new Date()
     }

@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { message } = req.body;
+  const { message, history = [] } = req.body;
 
   if (!message) {
     return res.status(400).json({ error: 'Message is required' });
@@ -92,6 +92,7 @@ Remember: Be brief, helpful, and always ask one clear follow-up question.`;
         max_tokens: 300,
         system: systemPrompt,
         messages: [
+          ...history,
           {
             role: 'user',
             content: message

@@ -26,7 +26,7 @@ const TylerAI = () => {
 
   const CLAUDE_API_KEY = import.meta.env.VITE_CLAUDE_API_KEY;
 
-  const callClaudeAPI = async (userMessage: string) => {
+  const callClaudeAPI = async (userMessage: string, conversationHistory: any[]) => {
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -34,7 +34,8 @@ const TylerAI = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: userMessage
+          message: userMessage,
+          history: conversationHistory
         })
       });
 
@@ -67,7 +68,13 @@ const TylerAI = () => {
     setIsLoading(true);
 
     try {
-      const aiResponseText = await callClaudeAPI(currentMessage);
+      // Convert messages to Claude format (excluding the AI's initial greeting)
+      const conversationHistory = messages.slice(1).map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
+      const aiResponseText = await callClaudeAPI(currentMessage, conversationHistory);
       const aiResponse = {
         id: messages.length + 2,
         text: aiResponseText,
@@ -132,7 +139,7 @@ const TylerAI = () => {
                   }`}
                 >
                   {msg.text.split('\n').map((line, index) => (
-                    <div key={index} className={index > 0 ? 'mt-2' : ''}>
+                    <div key={index} className={index > 0 ? 'mt-1' : ''}>
                       {line || '\u00A0'}
                     </div>
                   ))}

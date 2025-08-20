@@ -138,7 +138,7 @@ Equipment with less than 8,000 operating hours exhibits superior maintenance pre
 ## Conclusion
 
 Heavy equipment safety requires a multifaceted approach combining thorough inspections, comprehensive training, advanced technology utilization, and rigorous maintenance practices. Organizations prioritizing these elements create safer work environments while improving operational efficiency. The strategic selection of low-hour equipment, particularly machines with less than 8,000 operating hours, provides measurable safety advantages through improved reliability, current safety technologies, and predictable performance characteristics. By implementing these essential safety tips and investing in quality equipment, construction companies protect their most valuable assets—their people—while maintaining productive, profitable operations that meet today's demanding project requirements.`,
-      image: "/src/assets/dynapac.webp",
+      image: "/assets/dynapac.webp",
       author: 'Tyler McClain',
       date: '2024-01-14',
       category: 'Safety',

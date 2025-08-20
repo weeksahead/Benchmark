@@ -8,7 +8,7 @@ const TylerAI = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi! I'm Tyler from Benchmark Equipment. How can I help you find the right equipment for your project today?",
+      text: "Hi! I'm Tyler from Benchmark Equipment.\n\nWhat type of project are you working on?",
       sender: 'ai',
       timestamp: new Date()
     }
@@ -121,7 +121,12 @@ const TylerAI = () => {
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >
-                  {msg.text}
+                  {msg.text.split('\n').map((line, index) => (
+                    <span key={index}>
+                      {line}
+                      {index < msg.text.split('\n').length - 1 && <br />}
+                    </span>
+                  ))}
                 </div>
               </div>
             ))}

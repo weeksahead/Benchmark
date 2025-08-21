@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
-import { MONDAY_CONFIG } from '../config/monday';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -27,72 +26,19 @@ const Contact = () => {
     setSubmitStatus('idle');
 
     try {
-      // First, create the item with just the name
-      const createItemQuery = {
-        query: `
-          mutation {
-            create_item (
-              board_id: ${MONDAY_CONFIG.BOARD_ID},
-              item_name: "${formData.fullName} - ${formData.business || 'Contact Form'}"
-            ) {
-              id
-            }
-          }
-        `
-      };
-
-      const createResponse = await fetch('https://api.monday.com/v2', {
+      // Use the serverless API endpoint
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': MONDAY_CONFIG.API_TOKEN
         },
-        body: JSON.stringify(createItemQuery)
+        body: JSON.stringify(formData)
       });
 
-      const createResult = await createResponse.json();
-      
-      if (createResult.errors) {
-        throw new Error('Failed to create item');
-      }
+      const result = await response.json();
 
-      const itemId = createResult.data.create_item.id;
-
-      // Then update the columns
-      const columnValues = JSON.stringify({
-        [MONDAY_CONFIG.COLUMNS.PHONE]: formData.phone,
-        [MONDAY_CONFIG.COLUMNS.EMAIL]: formData.email,
-        [MONDAY_CONFIG.COLUMNS.COMPANY]: formData.business,
-        [MONDAY_CONFIG.COLUMNS.REQUEST]: formData.request
-      });
-
-      const updateQuery = {
-        query: `
-          mutation {
-            change_multiple_column_values (
-              board_id: ${MONDAY_CONFIG.BOARD_ID},
-              item_id: ${itemId},
-              column_values: "${columnValues.replace(/"/g, '\\"')}"
-            ) {
-              id
-            }
-          }
-        `
-      };
-
-      const updateResponse = await fetch('https://api.monday.com/v2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': MONDAY_CONFIG.API_TOKEN
-        },
-        body: JSON.stringify(updateQuery)
-      });
-
-      const updateResult = await updateResponse.json();
-
-      if (updateResult.errors) {
-        throw new Error('Failed to update item details');
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit form');
       }
 
       setSubmitStatus('success');

@@ -99,12 +99,18 @@ const TylerAI = () => {
     <>
       {/* Chat Widget Button */}
       {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-red-600 hover:bg-red-700 text-white p-3 sm:p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-50"
-        >
-          <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-        </button>
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
+          {/* Tyler AI Label */}
+          <div className="bg-white text-gray-800 px-3 py-1 rounded-full text-sm font-medium shadow-lg mb-2 animate-pulse">
+            Tyler AI
+          </div>
+          <button
+            onClick={() => setIsOpen(true)}
+            className="w-full bg-red-600 hover:bg-red-700 text-white p-3 sm:p-4 rounded-full shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center"
+          >
+            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+          </button>
+        </div>
       )}
 
       {/* Chat Window */}

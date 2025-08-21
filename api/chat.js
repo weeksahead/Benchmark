@@ -1,3 +1,53 @@
+// Function to fetch current inventory from website
+async function fetchCurrentInventory() {
+  try {
+    const response = await fetch('https://rent.benchmarkequip.com/items');
+    const html = await response.text();
+    
+    // Simple parsing to extract equipment items
+    // This is a basic implementation - might need refinement based on actual HTML structure
+    const equipmentItems = [];
+    
+    // Look for patterns that indicate equipment listings
+    const patterns = [
+      /(\d{4}\s+\w+\s+\w+.*?(?:Truck|Excavator|Loader|Skidsteer|Smooth|Padfoot))/gi
+    ];
+    
+    patterns.forEach(pattern => {
+      const matches = html.match(pattern);
+      if (matches) {
+        equipmentItems.push(...matches);
+      }
+    });
+    
+    return equipmentItems.length > 0 ? equipmentItems : [
+      '2016 Ford F750 2,000 Gallon Water Truck',
+      '2017 Ford F750 2,000 Gallon Water Truck', 
+      '2019 CAT 336 Excavator',
+      '2021 CAT 336 Excavator',
+      '2022 CAT 313GC Excavator',
+      '2019 CAT 938M Wheel Loader',
+      '2023 CAT 299D3 Skidsteer w/Bucket',
+      '2025 Dynapac CA30D Smooth Drum',
+      '2025 Dynapac CA30PD Padfoot'
+    ]; // Fallback to current known inventory
+  } catch (error) {
+    console.error('Error fetching inventory:', error);
+    // Return fallback inventory if fetch fails
+    return [
+      '2016 Ford F750 2,000 Gallon Water Truck',
+      '2017 Ford F750 2,000 Gallon Water Truck', 
+      '2019 CAT 336 Excavator',
+      '2021 CAT 336 Excavator',
+      '2022 CAT 313GC Excavator',
+      '2019 CAT 938M Wheel Loader',
+      '2023 CAT 299D3 Skidsteer w/Bucket',
+      '2025 Dynapac CA30D Smooth Drum',
+      '2025 Dynapac CA30PD Padfoot'
+    ];
+  }
+}
+
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
@@ -26,6 +76,10 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Claude API key not configured' });
   }
 
+  // Fetch current inventory dynamically
+  const currentInventory = await fetchCurrentInventory();
+  const inventoryList = currentInventory.map(item => `- ${item}`).join('\n');
+
   const systemPrompt = `You are Tyler, a knowledgeable and friendly equipment rental specialist for Benchmark Equipment in Denton, Texas. Your role is to help customers find the right equipment for their construction, landscaping, and industrial projects.
 
 COMPANY INFORMATION:
@@ -44,27 +98,9 @@ YOUR MAIN GOALS:
 5. Encourage them to call (817) 403-4334 or email tyler@benchmarkequip.com for setup and shipping
 
 CURRENT INVENTORY - ONLY RECOMMEND THESE SPECIFIC ITEMS:
+${inventoryList}
 
-Water Trucks:
-- 2016 Ford F750 2,000 Gallon Water Truck 
-- 2017 Ford F750 2,000 Gallon Water Truck
-
-Excavators:
-- 2019 CAT 336 Excavator
-- 2021 CAT 336 Excavator  
-- 2022 CAT 313GC Excavator
-
-Wheel Loaders:
-- 2019 CAT 938M Wheel Loader
-
-Skid Steers:
-- 2023 CAT 299D3 Skidsteer w/Bucket
-
-Compaction Equipment:
-- 2025 Dynapac CA30D Smooth Drum
-- 2025 Dynapac CA30PD Padfoot
-
-IMPORTANT: Only recommend equipment from this specific inventory list. Never suggest equipment we don't have.
+IMPORTANT: Only recommend equipment from this specific inventory list. Never suggest equipment we don't have. This inventory is updated automatically from our website.
 
 CONVERSATION FLOW:
 1. Greet warmly and ask how you can help

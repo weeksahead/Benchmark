@@ -127,12 +127,12 @@ const Contact = () => {
             <div className="space-y-8 mb-12">
               <div className="flex items-center space-x-4">
                 <Phone className="w-6 h-6 text-red-500" />
-                <span className="text-xl">(817) 403-4334</span>
+                <a href="tel:8174034334" className="text-xl hover:text-red-500 transition-colors">(817) 403-4334</a>
               </div>
               
               <div className="flex items-center space-x-4">
                 <Mail className="w-6 h-6 text-red-500" />
-                <span className="text-xl">tyler@benchmarkequip.com</span>
+                <a href="mailto:tyler@benchmarkequip.com" className="text-xl hover:text-red-500 transition-colors">tyler@benchmarkequip.com</a>
               </div>
               
               <div className="flex items-start space-x-4">

@@ -42,10 +42,10 @@ const Header = ({ setCurrentPage }: HeaderProps) => {
               <button onClick={() => handleNavClick('about')} className="hover:text-red-500 transition-colors font-medium">About</button>
               <button onClick={() => handleNavClick('contact')} className="hover:text-red-500 transition-colors font-medium">Contact</button>
             </nav>
-            <div className="flex items-center space-x-2">
+            <a href="tel:8174034334" className="flex items-center space-x-2 hover:text-red-500 transition-colors">
               <Phone className="w-4 h-4 text-red-500" />
               <span className="text-sm">817-403-4334</span>
-            </div>
+            </a>
           </div>
 
           {/* Mobile menu button */}

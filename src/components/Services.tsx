@@ -62,9 +62,9 @@ const Services = () => {
               Contact us today for a free consultation and equipment quote
             </p>
             <div className="flex justify-center">
-              <button className="bg-white text-red-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
+              <a href="tel:8174034334" className="inline-block bg-white text-red-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
                 Call (817) 403-4334
-              </button>
+              </a>
             </div>
           </div>
         </div>

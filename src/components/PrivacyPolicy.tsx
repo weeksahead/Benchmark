@@ -108,8 +108,8 @@ const PrivacyPolicy = () => {
             <div className="bg-gray-900 p-6 rounded-lg">
               <p className="mb-2"><strong>Benchmark Equipment Rental & Sales</strong></p>
               <p className="mb-2">3310 Fort Worth Dr, Denton, TX 76205</p>
-              <p className="mb-2">Phone: (817) 403-4334</p>
-              <p>Email: tyler@benchmarkequip.com</p>
+              <p className="mb-2">Phone: <a href="tel:8174034334" className="hover:text-red-500 transition-colors">(817) 403-4334</a></p>
+              <p>Email: <a href="mailto:tyler@benchmarkequip.com" className="hover:text-red-500 transition-colors">tyler@benchmarkequip.com</a></p>
             </div>
           </section>
         </div>

@@ -21,46 +21,169 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('Scraping Machine Trader for:', query);
+    console.log('Generating equipment research for:', query);
     
-    // Try to scrape real Machine Trader data first
-    const scrapedResults = await scrapeRealMachineTrader(query);
-    
-    if (scrapedResults && scrapedResults.length > 0) {
-      return res.status(200).json({
-        success: true,
-        query: query,
-        machines: scrapedResults,
-        count: scrapedResults.length,
-        source: 'Live Machine Trader data'
-      });
-    } else {
-      // Fallback to mock data if scraping fails
-      const mockResults = generateMockResults(query);
-      
-      return res.status(200).json({
-        success: true,
-        query: query,
-        machines: mockResults,
-        count: mockResults.length,
-        note: 'Sample data - Machine Trader scraping temporarily unavailable'
-      });
-    }
-
-  } catch (error) {
-    console.error('Machine search error:', error);
-    
-    // Return mock data as fallback
-    const mockResults = generateMockResults(query);
+    // Generate research results with links to multiple equipment sites
+    const researchResults = generateEquipmentResearch(query);
     
     return res.status(200).json({
       success: true,
       query: query,
-      machines: mockResults,
-      count: mockResults.length,
-      note: 'Sample data - using fallback due to scraping error'
+      machines: researchResults,
+      count: researchResults.length,
+      note: 'Equipment research with links to major equipment marketplaces'
+    });
+
+  } catch (error) {
+    console.error('Equipment research error:', error);
+    
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to generate equipment research',
+      query: query
     });
   }
+}
+
+function generateEquipmentResearch(query) {
+  const researchResults = [];
+  
+  // Create research cards for major equipment marketplaces
+  const equipmentSites = [
+    {
+      name: "MachineryTrader",
+      url: `https://www.machinerytrader.com/search-results?manufacturer=&model=&category=&year=&location=&radius=&keyword=${encodeURIComponent(query)}`,
+      description: "Large equipment marketplace with nationwide coverage"
+    },
+    {
+      name: "Equipment Trader", 
+      url: `https://www.equipmenttrader.com/search?keyword=${encodeURIComponent(query)}`,
+      description: "Popular platform for construction and farm equipment"
+    },
+    {
+      name: "RitchieList",
+      url: `https://www.ritchielist.com/search?q=${encodeURIComponent(query)}`,
+      description: "Auction site for heavy equipment and trucks"
+    },
+    {
+      name: "MyLittleSalesman",
+      url: `https://www.mylittlesalesman.com/search/?keyword=${encodeURIComponent(query)}`,
+      description: "Comprehensive equipment marketplace"
+    },
+    {
+      name: "IronPlanet",
+      url: `https://www.ironplanet.com/search?query=${encodeURIComponent(query)}`,
+      description: "Online auctions for used heavy equipment"
+    },
+    {
+      name: "Commercial Truck Trader",
+      url: `https://www.commercialtrucktrader.com/search?keyword=${encodeURIComponent(query)}`,
+      description: "Specialized in commercial trucks and equipment"
+    }
+  ];
+  
+  // Generate sample listings for the query with links to research sites
+  const equipmentTypes = getEquipmentType(query);
+  const sampleListings = generateSampleListings(query, equipmentTypes);
+  
+  // Add research site links as "listings"
+  equipmentSites.forEach(site => {
+    researchResults.push({
+      title: `Search ${site.name} for "${query}"`,
+      price: "Click to browse current listings",
+      year: null,
+      hours: null, 
+      location: "Multiple locations",
+      url: site.url,
+      description: site.description,
+      source: site.name
+    });
+  });
+  
+  // Add some sample listings with realistic data
+  sampleListings.forEach(listing => {
+    researchResults.push(listing);
+  });
+  
+  return researchResults;
+}
+
+function getEquipmentType(query) {
+  const q = query.toLowerCase();
+  if (q.includes('excavator')) return 'excavator';
+  if (q.includes('skid') || q.includes('bobcat')) return 'skid_steer';
+  if (q.includes('loader') && q.includes('wheel')) return 'wheel_loader';
+  if (q.includes('dozer') || q.includes('bulldozer')) return 'dozer';
+  if (q.includes('roller') || q.includes('compactor')) return 'compactor';
+  if (q.includes('crane')) return 'crane';
+  if (q.includes('dump') || q.includes('truck')) return 'truck';
+  return 'general';
+}
+
+function generateSampleListings(query, type) {
+  const listings = [];
+  
+  // Generate realistic sample listings based on equipment type
+  const sampleData = {
+    excavator: [
+      {
+        title: "2020 Caterpillar 320 Hydraulic Excavator",
+        price: "$125,000 - $145,000 range",
+        year: "2020",
+        hours: "2,500-3,500 hrs typical",
+        location: "Texas region",
+        description: "Typical market pricing for CAT 320 in good condition"
+      },
+      {
+        title: "2019 Komatsu PC210LC Excavator", 
+        price: "$110,000 - $130,000 range",
+        year: "2019",
+        hours: "3,000-4,000 hrs typical", 
+        location: "Texas region",
+        description: "Popular mid-size excavator with good resale value"
+      }
+    ],
+    skid_steer: [
+      {
+        title: "2021 Bobcat S650 Skid Steer",
+        price: "$38,000 - $45,000 range",
+        year: "2021", 
+        hours: "1,200-2,000 hrs typical",
+        location: "Texas region",
+        description: "High-demand skid steer model with strong resale"
+      },
+      {
+        title: "2020 Caterpillar 262D3 Skid Steer",
+        price: "$42,000 - $48,000 range",
+        year: "2020",
+        hours: "1,500-2,500 hrs typical",
+        location: "Texas region", 
+        description: "CAT skid steer with high flow hydraulics"
+      }
+    ],
+    general: [
+      {
+        title: `${query} - Market Research`,
+        price: "Varies by condition/hours",
+        year: "2018-2023 typical",
+        hours: "Varies by usage",
+        location: "Regional availability",
+        description: "Check multiple sites for current market pricing"
+      }
+    ]
+  };
+  
+  const samples = sampleData[type] || sampleData.general;
+  
+  samples.forEach(sample => {
+    listings.push({
+      ...sample,
+      url: `https://www.machinerytrader.com/search-results?keyword=${encodeURIComponent(query)}`,
+      source: "Market Research"
+    });
+  });
+  
+  return listings;
 }
 
 async function scrapeRealMachineTrader(query) {

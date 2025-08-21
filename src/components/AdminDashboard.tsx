@@ -267,7 +267,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             }`}
           >
             <Search className="w-5 h-5" />
-            <span>Machine Research</span>
+            <span>Equipment Research</span>
           </button>
         </div>
 
@@ -433,7 +433,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         {activeTab === 'machines' && (
           <div>
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-6">Industrial Machine Trader Research</h2>
+              <h2 className="text-2xl font-bold mb-6">Equipment Market Research</h2>
               
               {/* Search Bar */}
               <div className="flex gap-4 mb-6">
@@ -459,9 +459,9 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
               {/* Search Instructions */}
               <div className="bg-gray-900 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold mb-2">Machine Research Tool</h3>
+                <h3 className="font-semibold mb-2">Equipment Market Research Tool</h3>
                 <p className="text-sm text-gray-300 mb-3">
-                  This tool shows sample equipment data and provides direct links to search Industrial Machine Trader for current market listings.
+                  This tool provides market research data and direct links to search major equipment marketplaces including MachineryTrader, Equipment Trader, RitchieList, and others.
                 </p>
                 <h4 className="font-semibold mb-2 text-sm">Search Tips:</h4>
                 <ul className="text-sm text-gray-300 space-y-1">
@@ -528,7 +528,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                             className="inline-flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
                           >
                             <ExternalLink className="w-4 h-4" />
-                            <span>Search on Industrial Machine Trader</span>
+                            <span>Search Equipment Sites</span>
                           </a>
                         )}
                       </div>

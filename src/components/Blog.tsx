@@ -306,7 +306,7 @@ Extending heavy equipment life requires commitment to comprehensive maintenance 
           <div className="mb-8">
             <div className="aspect-video mb-6 rounded-lg overflow-hidden">
               <img
-                src="/src/assets/wheel loader.jpg"
+                src={selectedPost.image}
                 alt={selectedPost.title}
                 className="w-full h-full object-cover"
               />
@@ -402,7 +402,6 @@ Extending heavy equipment life requires commitment to comprehensive maintenance 
             <input
               type="text"
               placeholder="Search articles..."
-              src="/src/assets/wheel loader copy.jpg"
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
             />

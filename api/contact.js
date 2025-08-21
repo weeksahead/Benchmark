@@ -64,27 +64,19 @@ export default async function handler(req, res) {
     const itemId = createResult.data.create_item.id;
     console.log('Created item with ID:', itemId);
 
-    // Try different column ID patterns that Monday.com commonly uses
-    // We'll try multiple formats to maximize compatibility
+    // Use the actual column IDs from the Monday.com board
     const columnValues = {
-      // Phone - try different possible column IDs
-      phone: phone,
-      phone__1: phone,
-      text__1: phone, // Sometimes phone is a text column
+      // Phone column
+      phone_mkv0nh94: phone,
       
-      // Email - Monday.com email columns need this format
-      email: { email: email, text: email },
-      email__1: { email: email, text: email },
+      // Email column - Monday.com email columns need this format
+      email_mkv06d0n: { email: email, text: email },
       
-      // Company/Business - usually a text column
-      text: business || 'N/A',
-      text__2: business || 'N/A',
-      company: business || 'N/A',
+      // Company/Business column
+      text_mkv0kyy4: business || 'N/A',
       
-      // Request - usually a long text column
-      long_text: request,
-      long_text__1: request,
-      text__3: request
+      // Request column
+      text_mkv07z2h: request
     };
 
     const updateQuery = {

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, ArrowLeft } from 'lucide-react';
 
 const TylerAI = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -109,30 +109,38 @@ const TylerAI = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-72 sm:w-80 h-80 sm:h-96 bg-white rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
+        <div className="fixed inset-0 sm:bottom-6 sm:right-6 sm:inset-auto sm:w-80 sm:h-96 bg-white sm:rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
           {/* Header */}
-          <div className="bg-red-600 text-white p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
+          <div className="bg-red-600 text-white p-4 sm:rounded-t-lg flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="font-semibold text-sm sm:text-base">Ask Tyler AI</span>
+              {/* Mobile back button */}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="sm:hidden hover:bg-red-700 p-1 rounded mr-1"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <MessageCircle className="w-5 h-5" />
+              <span className="font-semibold">Ask Tyler AI</span>
             </div>
+            {/* Desktop close button */}
             <button
               onClick={() => setIsOpen(false)}
-              className="hover:bg-red-700 p-1 rounded"
+              className="hidden sm:block hover:bg-red-700 p-1 rounded"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-3 sm:p-4 overflow-y-auto space-y-3 sm:space-y-4">
+          <div className="flex-1 p-4 overflow-y-auto space-y-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-60 sm:max-w-xs px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-xs sm:text-sm leading-relaxed ${
+                  className={`max-w-xs sm:max-w-xs px-4 py-3 rounded-lg text-sm leading-relaxed ${
                     msg.sender === 'user'
                       ? 'bg-red-600 text-white'
                       : 'bg-gray-100 text-gray-800'
@@ -150,21 +158,21 @@ const TylerAI = () => {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSendMessage} className="p-3 sm:p-4 border-t border-gray-200">
-            <div className="flex space-x-2">
+          <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white">
+            <div className="flex space-x-3">
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Ask about equipment..."
-                className="flex-1 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-xs sm:text-sm"
+                placeholder="Ask about equipment rentals..."
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white p-2 rounded-lg transition-colors"
+                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white p-3 rounded-lg transition-colors"
               >
-                {isLoading ? <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" /> : <Send className="w-3 h-3 sm:w-4 sm:h-4" />}
+                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </button>
             </div>
           </form>

@@ -64,44 +64,112 @@ export default async function handler(req, res) {
 }
 
 async function scrapeRealMachineTrader(query) {
+  let browser = null;
+  
   try {
-    // Machine Trader search URL format
-    const searchUrl = `https://www.machinetrader.com/listings/search?category=&manufacturer=&model=&keywords=${encodeURIComponent(query)}&condition=used&price_from=&price_to=&year_from=&year_to=&state=&within_miles=`;
+    // Import Puppeteer dynamically (since it's a serverless function)
+    const puppeteer = await import('puppeteer');
     
-    console.log('Fetching:', searchUrl);
+    console.log('Launching browser for Machine Trader scraping...');
     
-    const response = await fetch(searchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      },
-      timeout: 10000
+    // Launch browser with optimized settings for Vercel
+    browser = await puppeteer.default.launch({
+      headless: 'new',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu'
+      ]
     });
-
-    if (!response.ok) {
-      console.log(`Machine Trader returned ${response.status}`);
-      return null;
-    }
-
-    const html = await response.text();
-    console.log(`Received ${html.length} characters of HTML`);
     
-    // Parse the HTML for actual machine listings
-    const machines = parseRealMachineTraderHTML(html);
+    const page = await browser.newPage();
     
-    console.log(`Parsed ${machines.length} machines from Machine Trader`);
+    // Set viewport and user agent
+    await page.setViewport({ width: 1280, height: 720 });
+    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
+    // Navigate to Machine Trader search
+    const searchUrl = `https://www.machinetrader.com/search?keywords=${encodeURIComponent(query)}`;
+    console.log('Navigating to:', searchUrl);
+    
+    await page.goto(searchUrl, { 
+      waitUntil: 'networkidle2',
+      timeout: 30000 
+    });
+    
+    // Wait for search results to load
+    await page.waitForTimeout(3000);
+    
+    // Extract machine listings using browser JavaScript
+    const machines = await page.evaluate(() => {
+      const listings = [];
+      
+      // Look for common listing selectors on Machine Trader
+      const listingElements = document.querySelectorAll('[class*="listing"], [class*="result"], [class*="item"], .search-result');
+      
+      listingElements.forEach((element, index) => {
+        if (index >= 10) return; // Limit to 10 results
+        
+        try {
+          // Extract title
+          const titleEl = element.querySelector('h1, h2, h3, h4, [class*="title"], [class*="name"]');
+          const title = titleEl?.textContent?.trim();
+          
+          // Extract price
+          const priceEl = element.querySelector('[class*="price"], [class*="cost"]');
+          const priceText = priceEl?.textContent?.trim();
+          const price = priceText?.match(/\$[\d,]+/)?.[0];
+          
+          // Extract year
+          const yearMatch = element.textContent.match(/\b(19[7-9]\d|20[0-2]\d)\b/);
+          const year = yearMatch?.[0];
+          
+          // Extract hours
+          const hoursMatch = element.textContent.match(/(\d{1,3}(?:,\d{3})*)\s*(?:hrs?|hours?)/i);
+          const hours = hoursMatch ? `${hoursMatch[1]} hrs` : null;
+          
+          // Extract location
+          const locationMatch = element.textContent.match(/\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*([A-Z]{2})\b/);
+          const location = locationMatch ? `${locationMatch[1]}, ${locationMatch[2]}` : null;
+          
+          // Extract link
+          const linkEl = element.querySelector('a[href]');
+          const relativeUrl = linkEl?.getAttribute('href');
+          const url = relativeUrl ? (relativeUrl.startsWith('http') ? relativeUrl : `https://www.machinetrader.com${relativeUrl}`) : null;
+          
+          if (title && title.length > 10) {
+            listings.push({
+              title: title,
+              price: price,
+              year: year,
+              hours: hours,
+              location: location || 'Location not specified',
+              url: url || `https://www.machinetrader.com/search?keywords=${encodeURIComponent(title)}`,
+              description: `Used equipment for sale - ${title}`
+            });
+          }
+        } catch (err) {
+          console.log('Error processing listing:', err);
+        }
+      });
+      
+      return listings;
+    });
+    
+    console.log(`Successfully scraped ${machines.length} machines from Machine Trader`);
     return machines;
     
   } catch (error) {
-    console.error('Error scraping Machine Trader:', error.message);
+    console.error('Error with Puppeteer scraping:', error.message);
     return null;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
   }
 }
 
@@ -136,7 +204,7 @@ function parseRealMachineTraderHTML(html) {
     const urlRegex = /href="([^"]*(?:listing|equipment|machine)[^"]*\d+[^"]*)"/gi;
     const urls = [...html.matchAll(urlRegex)].map(match => {
       const url = match[1];
-      return url.startsWith('http') ? url : `https://www.machinetrader.com${url}`;
+      return url.startsWith('http') ? url : `https://machinetrader.com${url}`;
     });
     
     // Combine the extracted data
@@ -150,7 +218,7 @@ function parseRealMachineTraderHTML(html) {
           year: years[i] || null,
           hours: hours[i] || null,
           location: locations[i] || 'Location not specified',
-          url: urls[i] || 'https://www.machinetrader.com',
+          url: `https://machinetrader.com/search?q=${encodeURIComponent(query)}`,
           description: `Used ${titles[i].toLowerCase().includes('excavator') ? 'excavator' : 
                                 titles[i].toLowerCase().includes('loader') ? 'loader' :
                                 titles[i].toLowerCase().includes('skid') ? 'skid steer' : 'equipment'} for sale`
@@ -228,7 +296,7 @@ function generateMockResults(query) {
         hours: "3,200",
         location: "Dallas, TX",
         description: "Excellent condition, recent service, ready to work",
-        url: "https://www.machinetrader.com/listing/2019-caterpillar-320-hydraulic-excavator"
+        url: "https://machinetrader.com/search?q=caterpillar%20320%20excavator"
       },
       {
         title: "2020 Komatsu PC210LC-11 Excavator",
@@ -237,7 +305,7 @@ function generateMockResults(query) {
         hours: "2,800",
         location: "Houston, TX",
         description: "Low hours, one owner, full maintenance records",
-        url: "https://www.machinetrader.com/listing/2020-komatsu-pc210lc-11-excavator"
+        url: "https://machinetrader.com/search?q=komatsu%20excavator"
       },
       {
         title: "2018 John Deere 350G LC Excavator",
@@ -246,7 +314,7 @@ function generateMockResults(query) {
         hours: "4,100",
         location: "Austin, TX",
         description: "Well maintained, new tracks, hydraulic system serviced",
-        url: "https://www.machinetrader.com/listing/2018-john-deere-350g-lc-excavator"
+        url: "https://machinetrader.com/search?q=john%20deere%20excavator"
       }
     );
   } else if (isSkidSteer) {
@@ -258,7 +326,7 @@ function generateMockResults(query) {
         hours: "1,200",
         location: "Denton, TX",
         description: "Like new condition, low hours, includes bucket",
-        url: "https://www.machinetrader.com/listing/2021-bobcat-s650-skid-steer"
+        url: "https://machinetrader.com/search?q=bobcat%20skid%20steer"
       },
       {
         title: "2020 Caterpillar 262D3 Skid Steer",
@@ -267,7 +335,7 @@ function generateMockResults(query) {
         hours: "1,800",
         location: "Fort Worth, TX",
         description: "Excellent condition, high flow hydraulics",
-        url: "https://www.machinetrader.com/listing/2020-caterpillar-262d3-skid-steer"
+        url: "https://machinetrader.com/search?q=caterpillar%20skid%20steer"
       },
       {
         title: "2019 Case SV340 Skid Steer",
@@ -276,7 +344,7 @@ function generateMockResults(query) {
         hours: "2,100",
         location: "Plano, TX",
         description: "Well maintained, new tires, ready to work",
-        url: "https://www.machinetrader.com/listing/2019-case-sv340-skid-steer"
+        url: "https://machinetrader.com/search?q=case%20skid%20steer"
       }
     );
   } else if (isRoller) {
@@ -288,7 +356,7 @@ function generateMockResults(query) {
         hours: "1,500",
         location: "Arlington, TX",
         description: "Low hours, excellent condition, recent service",
-        url: "https://www.machinetrader.com/listing/2020-dynapac-ca2500d-compactor"
+        url: "https://machinetrader.com/search?q=dynapac%20compactor"
       },
       {
         title: "2019 Caterpillar CS44B Vibratory Roller",
@@ -297,7 +365,7 @@ function generateMockResults(query) {
         hours: "2,200",
         location: "Irving, TX",
         description: "Well maintained, smooth drum, ready for work",
-        url: "https://www.machinetrader.com/listing/2019-caterpillar-cs44b-roller"
+        url: "https://machinetrader.com/search?q=caterpillar%20roller"
       }
     );
   } else if (isLoader) {
@@ -309,7 +377,7 @@ function generateMockResults(query) {
         hours: "1,800",
         location: "Dallas, TX",
         description: "Low hours, excellent condition, includes bucket",
-        url: "https://www.machinetrader.com/listing/2021-caterpillar-950m-wheel-loader"
+        url: "https://machinetrader.com/search?q=caterpillar%20wheel%20loader"
       },
       {
         title: "2020 John Deere 544L Wheel Loader",
@@ -318,7 +386,7 @@ function generateMockResults(query) {
         hours: "2,400",
         location: "Garland, TX",
         description: "Well maintained, new tires, hydraulic system serviced",
-        url: "https://www.machinetrader.com/listing/2020-john-deere-544l-wheel-loader"
+        url: "https://machinetrader.com/search?q=john%20deere%20wheel%20loader"
       }
     );
   } else {
@@ -331,7 +399,7 @@ function generateMockResults(query) {
         hours: "2,800",
         location: "Dallas, TX",
         description: "Excellent condition, well maintained, ready to work",
-        url: "https://www.machinetrader.com/listing/2020-caterpillar-320-excavator"
+        url: "https://machinetrader.com/search?q=caterpillar%20excavator"
       },
       {
         title: "2021 Bobcat S650 Skid Steer Loader", 
@@ -340,7 +408,7 @@ function generateMockResults(query) {
         hours: "1,200",
         location: "Fort Worth, TX",
         description: "Low hours, like new condition, includes standard bucket",
-        url: "https://www.machinetrader.com/listing/2021-bobcat-s650-skid-steer"
+        url: "https://machinetrader.com/search?q=bobcat%20skid%20steer"
       },
       {
         title: "2019 John Deere 544L Wheel Loader",
@@ -349,7 +417,7 @@ function generateMockResults(query) {
         hours: "2,100",
         location: "Houston, TX",
         description: "Well maintained, new tires, excellent hydraulics",
-        url: "https://www.machinetrader.com/listing/2019-john-deere-544l-wheel-loader"
+        url: "https://machinetrader.com/search?q=john%20deere%20wheel%20loader"
       }
     ];
     

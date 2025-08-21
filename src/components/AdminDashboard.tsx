@@ -459,7 +459,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
               {/* Search Instructions */}
               <div className="bg-gray-900 rounded-lg p-4 mb-6">
-                <h3 className="font-semibold mb-2">Search Tips:</h3>
+                <h3 className="font-semibold mb-2">Machine Research Tool</h3>
+                <p className="text-sm text-gray-300 mb-3">
+                  This tool shows sample equipment data and provides direct links to search Machine Trader for current market listings.
+                </p>
+                <h4 className="font-semibold mb-2 text-sm">Search Tips:</h4>
                 <ul className="text-sm text-gray-300 space-y-1">
                   <li>• Be specific: "Caterpillar 320 excavator" works better than just "excavator"</li>
                   <li>• Include model numbers: "Bobcat S650", "CAT 336", "Dynapac CA250"</li>
@@ -524,7 +528,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                             className="inline-flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
                           >
                             <ExternalLink className="w-4 h-4" />
-                            <span>View on Machine Trader</span>
+                            <span>Search on Machine Trader</span>
                           </a>
                         )}
                       </div>

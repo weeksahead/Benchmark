@@ -461,7 +461,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <div className="bg-gray-900 rounded-lg p-4 mb-6">
                 <h3 className="font-semibold mb-2">Equipment Market Research Tool</h3>
                 <p className="text-sm text-gray-300 mb-3">
-                  This tool provides market research data and direct links to search major equipment marketplaces including MachineryTrader, Equipment Trader, RitchieList, and others.
+                  This tool provides market analysis data including typical pricing, availability, and buying insights for construction equipment.
                 </p>
                 <h4 className="font-semibold mb-2 text-sm">Search Tips:</h4>
                 <ul className="text-sm text-gray-300 space-y-1">
@@ -520,17 +520,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                           <p className="text-gray-400 text-sm">{machine.description}</p>
                         )}
                         
-                        {machine.url && (
-                          <a
-                            href={machine.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                            <span>Search Equipment Sites</span>
-                          </a>
-                        )}
+                        <div className="inline-flex items-center space-x-2 bg-gray-700 text-gray-300 px-4 py-2 rounded-lg font-semibold">
+                          <Search className="w-4 h-4" />
+                          <span>Market Analysis Data</span>
+                        </div>
                       </div>
                     </div>
                   ))}

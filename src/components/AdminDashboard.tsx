@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link } from 'lucide-react';
+import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink } from 'lucide-react';
 import slidesData from '../config/slides.json';
 import photosData from '../config/photos.json';
 
@@ -24,13 +24,18 @@ interface PhotoGalleryImage {
 }
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
-  const [activeTab, setActiveTab] = useState<'slider' | 'gallery'>('slider');
+  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines'>('slider');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   
   // Load from JSON configs
   const [sliderImages, setSliderImages] = useState<SlideImage[]>(slidesData);
   const [galleryImages, setGalleryImages] = useState<PhotoGalleryImage[]>(photosData);
+  
+  // Machine Trader search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'slider' | 'gallery') => {
     const files = e.target.files;
@@ -122,6 +127,32 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
   const deleteGalleryImage = (id: number) => {
     setGalleryImages(prev => prev.filter(image => image.id !== id));
+  };
+
+  const handleMachineSearch = async () => {
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    try {
+      const response = await fetch('/api/machine-search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery })
+      });
+      
+      if (response.ok) {
+        const results = await response.json();
+        setSearchResults(results.machines || []);
+      } else {
+        console.error('Search failed');
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleSave = async () => {
@@ -226,6 +257,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           >
             <Camera className="w-5 h-5" />
             <span>Photo Gallery</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('machines')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
+              activeTab === 'machines' 
+                ? 'bg-red-600 text-white' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <Search className="w-5 h-5" />
+            <span>Machine Research</span>
           </button>
         </div>
 
@@ -384,6 +426,121 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Machine Research */}
+        {activeTab === 'machines' && (
+          <div>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-6">Machine Trader Research</h2>
+              
+              {/* Search Bar */}
+              <div className="flex gap-4 mb-6">
+                <div className="flex-1">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for machines (e.g., Caterpillar 320 excavator, Bobcat S650 skid steer)"
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
+                    onKeyPress={(e) => e.key === 'Enter' && handleMachineSearch()}
+                  />
+                </div>
+                <button
+                  onClick={handleMachineSearch}
+                  disabled={isSearching || !searchQuery.trim()}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                >
+                  <Search className="w-5 h-5" />
+                  <span>{isSearching ? 'Searching...' : 'Search'}</span>
+                </button>
+              </div>
+
+              {/* Search Instructions */}
+              <div className="bg-gray-900 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold mb-2">Search Tips:</h3>
+                <ul className="text-sm text-gray-300 space-y-1">
+                  <li>• Be specific: "Caterpillar 320 excavator" works better than just "excavator"</li>
+                  <li>• Include model numbers: "Bobcat S650", "CAT 336", "Dynapac CA250"</li>
+                  <li>• Try different variations: "skid steer", "skid loader", "compact loader"</li>
+                  <li>• Use manufacturer names: Caterpillar, Bobcat, John Deere, Dynapac, etc.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div>
+                <h3 className="text-xl font-bold mb-4">
+                  Found {searchResults.length} machine{searchResults.length !== 1 ? 's' : ''}
+                </h3>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {searchResults.map((machine, index) => (
+                    <div key={index} className="bg-gray-900 rounded-lg p-6">
+                      {machine.image && (
+                        <div className="aspect-video mb-4 rounded-lg overflow-hidden bg-gray-800">
+                          <img
+                            src={machine.image}
+                            alt={machine.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+                      
+                      <div className="space-y-3">
+                        <h4 className="font-bold text-lg">{machine.title}</h4>
+                        
+                        {machine.price && (
+                          <p className="text-red-400 font-semibold text-xl">{machine.price}</p>
+                        )}
+                        
+                        {machine.location && (
+                          <p className="text-gray-300">📍 {machine.location}</p>
+                        )}
+                        
+                        {machine.year && (
+                          <p className="text-gray-300">📅 Year: {machine.year}</p>
+                        )}
+                        
+                        {machine.hours && (
+                          <p className="text-gray-300">⏱️ Hours: {machine.hours}</p>
+                        )}
+                        
+                        {machine.description && (
+                          <p className="text-gray-400 text-sm">{machine.description}</p>
+                        )}
+                        
+                        {machine.url && (
+                          <a
+                            href={machine.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            <span>View on Machine Trader</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {searchResults.length === 0 && searchQuery && !isSearching && (
+              <div className="text-center py-12 text-gray-400">
+                <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No machines found for "{searchQuery}"</p>
+                <p className="text-sm mt-2">Try a different search term or check the tips above</p>
+              </div>
+            )}
           </div>
         )}
       </div>

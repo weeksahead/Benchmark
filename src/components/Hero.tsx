@@ -56,11 +56,11 @@ const Hero = () => {
 
             {/* Content Overlay */}
             <div className="relative z-10 flex items-center justify-center h-full">
-              <div className="text-center max-w-4xl mx-auto px-4 pb-20">
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg">
+              <div className="text-center max-w-4xl mx-auto px-6 sm:px-8 pb-20">
+                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg leading-tight">
                   {slide.title}
                 </h1>
-                <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-8 sm:mb-12 text-white drop-shadow-lg">
+                <p className="text-base sm:text-xl md:text-2xl lg:text-3xl mb-8 sm:mb-12 text-white drop-shadow-lg">
                   {slide.subtitle}
                 </p>
                 <a 
@@ -92,8 +92,8 @@ const Hero = () => {
           <ChevronRight className="w-6 h-6" />
         </button>
 
-        {/* Slide Indicators */}
-        <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3">
+        {/* Slide Indicators - Hidden on mobile */}
+        <div className="hidden sm:flex absolute bottom-32 left-1/2 transform -translate-x-1/2 z-20 space-x-3">
           {slides.map((_, index) => (
             <button
               key={index}

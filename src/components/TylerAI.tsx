@@ -109,7 +109,11 @@ const TylerAI = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed inset-0 sm:bottom-6 sm:right-6 sm:inset-auto sm:w-80 sm:h-96 bg-white sm:rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
+        <>
+          {/* Desktop overlay */}
+          <div className="hidden sm:block fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setIsOpen(false)}></div>
+          
+          <div className="fixed inset-0 sm:top-1/2 sm:left-1/2 sm:transform sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-[500px] sm:h-[600px] bg-white sm:rounded-lg shadow-2xl border border-gray-200 flex flex-col z-50">
           {/* Header */}
           <div className="bg-red-600 text-white p-4 sm:rounded-t-lg flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -133,14 +137,14 @@ const TylerAI = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4">
+          <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs sm:max-w-xs px-4 py-3 rounded-lg text-sm leading-relaxed ${
+                  className={`max-w-xs sm:max-w-md px-4 py-3 rounded-lg text-sm sm:text-base leading-relaxed ${
                     msg.sender === 'user'
                       ? 'bg-red-600 text-white'
                       : 'bg-gray-100 text-gray-800'
@@ -154,18 +158,32 @@ const TylerAI = () => {
                 </div>
               </div>
             ))}
+            
+            {/* Loading indicator with bouncing dots */}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 px-4 py-3 rounded-lg">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <div ref={messagesEndRef} />
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 bg-white">
+          <form onSubmit={handleSendMessage} className="p-4 sm:p-6 border-t border-gray-200 bg-white sm:rounded-b-lg">
             <div className="flex space-x-3">
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Ask about equipment rentals..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm sm:text-base"
               />
               <button
                 type="submit"
@@ -176,7 +194,8 @@ const TylerAI = () => {
               </button>
             </div>
           </form>
-        </div>
+          </div>
+        </>
       )}
     </>
   );

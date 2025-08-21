@@ -19,20 +19,8 @@
   },
   {
     "id": 4,
-    "src": "/assets/water truck.jpg",
-    "alt": "Water Truck",
-    "category": "Water Trucks"
-  },
-  {
-    "id": 5,
     "src": "/assets/dynapac.webp",
     "alt": "Dynapac CA30D",
     "category": "Rollers"
-  },
-  {
-    "id": 6,
-    "src": "/assets/313gc.webp",
-    "alt": "Cat 313GC",
-    "category": "Excavators"
   }
 ]

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Upload, Image, Trash2, Save, LogOut, Home, Camera } from 'lucide-react';
+import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link } from 'lucide-react';
+import slidesData from '../config/slides.json';
+import photosData from '../config/photos.json';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -11,6 +13,7 @@ interface SlideImage {
   title: string;
   subtitle: string;
   buttonText: string;
+  buttonUrl?: string;
 }
 
 interface PhotoGalleryImage {
@@ -22,46 +25,12 @@ interface PhotoGalleryImage {
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'slider' | 'gallery'>('slider');
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
   
-  // Current slider images (you'll want to make this dynamic later)
-  const [sliderImages, setSliderImages] = useState<SlideImage[]>([
-    {
-      id: 1,
-      image: '/assets/Cat 336.jpeg',
-      title: 'Driven by Relationships',
-      subtitle: 'Powered By Reliability',
-      buttonText: 'View Our Fleet'
-    },
-    {
-      id: 2,
-      image: '/assets/cat skid steer.jpeg',
-      title: 'Professional Equipment Rental',
-      subtitle: '& Sales',
-      buttonText: 'Browse Equipment'
-    }
-  ]);
-
-  // Sample gallery images (you'll want to make this dynamic later)
-  const [galleryImages, setGalleryImages] = useState<PhotoGalleryImage[]>([
-    {
-      id: 1,
-      src: '/assets/Cat 336.jpeg',
-      alt: 'Cat 336 Excavator',
-      category: 'Excavators'
-    },
-    {
-      id: 2,
-      src: '/assets/cat skid steer.jpeg',
-      alt: 'Cat Skid Steer',
-      category: 'Skid Steers'
-    },
-    {
-      id: 3,
-      src: '/assets/wheel loader.jpg',
-      alt: 'Cat Wheel Loader',
-      category: 'Wheel Loaders'
-    }
-  ]);
+  // Load from JSON configs
+  const [sliderImages, setSliderImages] = useState<SlideImage[]>(slidesData);
+  const [galleryImages, setGalleryImages] = useState<PhotoGalleryImage[]>(photosData);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'slider' | 'gallery') => {
     const files = e.target.files;
@@ -155,9 +124,48 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     setGalleryImages(prev => prev.filter(image => image.id !== id));
   };
 
-  const handleSave = () => {
-    // In a real implementation, you'd save to a database
-    alert('Changes saved! (In production, this would save to your database)');
+  const handleSave = async () => {
+    const password = prompt('Enter admin password:');
+    if (!password) return;
+    
+    setIsSaving(true);
+    setSaveMessage('');
+    
+    try {
+      // Save slider images
+      const slidesResponse = await fetch('/api/admin-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'slides',
+          data: sliderImages,
+          password: password
+        })
+      });
+      
+      // Save gallery images
+      const photosResponse = await fetch('/api/admin-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'photos',
+          data: galleryImages,
+          password: password
+        })
+      });
+      
+      if (slidesResponse.ok && photosResponse.ok) {
+        setSaveMessage('✅ Changes saved! They will be live in 1-2 minutes.');
+        setTimeout(() => setSaveMessage(''), 5000);
+      } else {
+        const error = !slidesResponse.ok ? await slidesResponse.json() : await photosResponse.json();
+        setSaveMessage('❌ Error: ' + (error.error || 'Failed to save'));
+      }
+    } catch (error) {
+      setSaveMessage('❌ Error: Failed to connect to server');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -171,12 +179,16 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <h1 className="text-xl font-bold">Benchmark Admin</h1>
             </div>
             <div className="flex items-center space-x-4">
+              {saveMessage && (
+                <span className="text-sm">{saveMessage}</span>
+              )}
               <button
                 onClick={handleSave}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                disabled={isSaving}
+                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
               >
                 <Save className="w-4 h-4" />
-                <span>Save Changes</span>
+                <span>{isSaving ? 'Saving...' : 'Save Changes'}</span>
               </button>
               <button
                 onClick={onLogout}
@@ -275,6 +287,20 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                         onChange={(e) => updateSliderImage(slide.id, 'buttonText', e.target.value)}
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
                       />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Button URL</label>
+                      <div className="flex items-center space-x-2">
+                        <Link className="w-4 h-4 text-gray-400" />
+                        <input
+                          type="text"
+                          value={slide.buttonUrl || ''}
+                          onChange={(e) => updateSliderImage(slide.id, 'buttonUrl', e.target.value)}
+                          placeholder="https://rent.benchmarkequip.com/items/..."
+                          className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
+                        />
+                      </div>
                     </div>
                     
                     <button

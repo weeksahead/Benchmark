@@ -1,29 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowRight, Wrench, Truck, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import slidesData from '../config/slides.json';
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   
-  const slides = [
-    {
-      image: '/assets/Cat 336.jpeg',
-      title: 'Driven by Relationships',
-      subtitle: 'Powered By Reliability',
-      buttonText: 'View Our Fleet'
-    },
-    {
-      image: '/assets/cat-skid-steer-action.jpeg',
-      title: 'Professional Equipment Rental',
-      subtitle: '& Sales',
-      buttonText: 'Browse Equipment'
-    },
-    {
-      image: '/assets/dynapac-hero.webp',
-      title: 'Premium Compaction Equipment',
-      subtitle: 'Smooth & Padfoot Rollers',
-      buttonText: 'Check Availability'
-    }
-  ];
+  const slides = slidesData;
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -70,7 +52,7 @@ const Hero = () => {
                   {slide.subtitle}
                 </p>
                 <a 
-                  href="https://rent.benchmarkequip.com/items" 
+                  href={slide.buttonUrl || "https://rent.benchmarkequip.com/items"} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-colors inline-flex items-center group"

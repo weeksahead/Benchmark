@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Camera, Filter } from 'lucide-react';
+import photosData from '../config/photos.json';
 
 interface PhotoGalleryImage {
   id: number;
@@ -9,27 +10,8 @@ interface PhotoGalleryImage {
 }
 
 const Photos = () => {
-  // Sample gallery images (in production, this would come from your database)
-  const [galleryImages] = useState<PhotoGalleryImage[]>([
-    {
-      id: 1,
-      src: '/assets/Cat 336.jpeg',
-      alt: 'Cat 336 Excavator',
-      category: 'Excavators'
-    },
-    {
-      id: 2,
-      src: '/assets/cat-skid-steer-action.jpeg',
-      alt: 'Cat Skid Steer',
-      category: 'Skid Steers'
-    },
-    {
-      id: 3,
-      src: '/assets/wheel loader.jpg',
-      alt: 'Cat Wheel Loader',
-      category: 'Wheel Loaders'
-    }
-  ]);
+  // Gallery images from configuration
+  const [galleryImages] = useState<PhotoGalleryImage[]>(photosData);
 
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedImage, setSelectedImage] = useState<PhotoGalleryImage | null>(null);

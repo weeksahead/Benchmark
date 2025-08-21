@@ -15,11 +15,42 @@ import Admin from './components/Admin';
 import Blog from './components/Blog';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  // Check URL path on initial load
+  const getInitialPage = () => {
+    const path = window.location.pathname.toLowerCase();
+    if (path === '/admin') return 'admin';
+    if (path === '/photos') return 'photos';
+    if (path === '/blog') return 'blog';
+    if (path === '/about') return 'about';
+    if (path === '/contact') return 'contact';
+    if (path === '/privacy') return 'privacy';
+    if (path === '/terms') return 'terms';
+    return 'home';
+  };
+  
+  const [currentPage, setCurrentPage] = useState(getInitialPage());
 
   // Auto-scroll to top when page changes
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [currentPage]);
+  
+  // Handle browser back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentPage(getInitialPage());
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+  
+  // Update URL when page changes
+  useEffect(() => {
+    const path = currentPage === 'home' ? '/' : `/${currentPage}`;
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
   }, [currentPage]);
 
   const renderPage = () => {

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "image": "/assets/Cat 336.jpeg",
+    "title": "Driven by Relationships",
+    "subtitle": "Powered By Reliability",
+    "buttonText": "View Our Fleet",
+    "buttonUrl": "https://rent.benchmarkequip.com/items"
+  },
+  {
+    "id": 2,
+    "image": "/assets/cat-skid-steer-action.jpeg",
+    "title": "Professional Equipment Rental",
+    "subtitle": "& Sales",
+    "buttonText": "Browse Equipment",
+    "buttonUrl": "https://rent.benchmarkequip.com/items"
+  },
+  {
+    "id": 3,
+    "image": "/assets/dynapac-hero.webp",
+    "title": "Premium Compaction Equipment",
+    "subtitle": "Smooth & Padfoot Rollers",
+    "buttonText": "Check Availability",
+    "buttonUrl": "https://rent.benchmarkequip.com/items"
+  }
+]

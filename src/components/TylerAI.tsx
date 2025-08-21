@@ -193,14 +193,14 @@ const TylerAI = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
+          <div className="flex-1 p-4 sm:p-6 overflow-y-auto overflow-x-hidden space-y-4">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs sm:max-w-md px-4 py-3 rounded-lg text-sm sm:text-base leading-relaxed ${
+                  className={`max-w-[85%] sm:max-w-md px-3 sm:px-4 py-2 sm:py-3 rounded-lg text-sm sm:text-base leading-relaxed break-words ${
                     msg.sender === 'user'
                       ? 'bg-red-600 text-white'
                       : 'bg-gray-100 text-gray-800'
@@ -233,18 +233,19 @@ const TylerAI = () => {
 
           {/* Input */}
           <form onSubmit={handleSendMessage} className="p-4 sm:p-6 border-t border-gray-200 bg-white sm:rounded-b-lg">
-            <div className="flex space-x-3">
+            <div className="flex space-x-2 sm:space-x-3">
               <input
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Ask about equipment rentals..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-sm sm:text-base"
+                className="flex-1 min-w-0 px-3 sm:px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-base"
+                style={{ fontSize: '16px' }} // Prevents zoom on iOS
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white p-3 rounded-lg transition-colors"
+                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-3 sm:px-4 py-3 rounded-lg transition-colors flex-shrink-0"
               >
                 {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </button>

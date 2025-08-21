@@ -21,10 +21,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('Searching for machines:', query);
+    console.log('Scraping Machine Trader for:', query);
     
-    // Generate mock results that look like real Machine Trader data
-    // This provides reliable demo functionality for machine research
+    // Try to scrape real Machine Trader data first
+    const scrapedResults = await scrapeRealMachineTrader(query);
+    
+    if (scrapedResults && scrapedResults.length > 0) {
+      return res.status(200).json({
+        success: true,
+        query: query,
+        machines: scrapedResults,
+        count: scrapedResults.length,
+        source: 'Live Machine Trader data'
+      });
+    } else {
+      // Fallback to mock data if scraping fails
+      const mockResults = generateMockResults(query);
+      
+      return res.status(200).json({
+        success: true,
+        query: query,
+        machines: mockResults,
+        count: mockResults.length,
+        note: 'Sample data - Machine Trader scraping temporarily unavailable'
+      });
+    }
+
+  } catch (error) {
+    console.error('Machine search error:', error);
+    
+    // Return mock data as fallback
     const mockResults = generateMockResults(query);
     
     return res.status(200).json({
@@ -32,18 +58,113 @@ export default async function handler(req, res) {
       query: query,
       machines: mockResults,
       count: mockResults.length,
-      note: 'Demo data - showing sample machines available for purchase'
-    });
-
-  } catch (error) {
-    console.error('Machine search error:', error);
-    
-    return res.status(500).json({
-      success: false,
-      error: 'Failed to search for machines',
-      query: query
+      note: 'Sample data - using fallback due to scraping error'
     });
   }
+}
+
+async function scrapeRealMachineTrader(query) {
+  try {
+    // Machine Trader search URL format
+    const searchUrl = `https://www.machinetrader.com/listings/search?category=&manufacturer=&model=&keywords=${encodeURIComponent(query)}&condition=used&price_from=&price_to=&year_from=&year_to=&state=&within_miles=`;
+    
+    console.log('Fetching:', searchUrl);
+    
+    const response = await fetch(searchUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': '1',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      },
+      timeout: 10000
+    });
+
+    if (!response.ok) {
+      console.log(`Machine Trader returned ${response.status}`);
+      return null;
+    }
+
+    const html = await response.text();
+    console.log(`Received ${html.length} characters of HTML`);
+    
+    // Parse the HTML for actual machine listings
+    const machines = parseRealMachineTraderHTML(html);
+    
+    console.log(`Parsed ${machines.length} machines from Machine Trader`);
+    return machines;
+    
+  } catch (error) {
+    console.error('Error scraping Machine Trader:', error.message);
+    return null;
+  }
+}
+
+function parseRealMachineTraderHTML(html) {
+  const machines = [];
+  
+  try {
+    // Look for listing containers - Machine Trader uses various patterns
+    // Try multiple selectors that commonly contain equipment listings
+    
+    // Extract titles - look for common patterns in equipment listings
+    const titleRegex = /<h[2-4][^>]*>([^<]*(?:excavator|loader|dozer|roller|compactor|skid|steer|tractor|truck|crane)[^<]*)<\/h[2-4]>/gi;
+    const titles = [...html.matchAll(titleRegex)].map(match => match[1].trim());
+    
+    // Extract prices - look for dollar amounts
+    const priceRegex = /\$[\d,]+(?:\.\d{2})?/g;
+    const prices = [...html.matchAll(priceRegex)].map(match => match[0]);
+    
+    // Extract years - 4 digit years between 1970-2025
+    const yearRegex = /\b(19[7-9]\d|20[0-2]\d)\b/g;
+    const years = [...html.matchAll(yearRegex)].map(match => match[0]);
+    
+    // Extract hours - pattern like "1,234 hrs" or "1234 hours"
+    const hoursRegex = /(\d{1,3}(?:,\d{3})*)\s*(?:hrs?|hours?)/gi;
+    const hours = [...html.matchAll(hoursRegex)].map(match => `${match[1]} hrs`);
+    
+    // Extract locations - City, ST format
+    const locationRegex = /\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*([A-Z]{2})\b/g;
+    const locations = [...html.matchAll(locationRegex)].map(match => `${match[1]}, ${match[2]}`);
+    
+    // Extract listing URLs - look for equipment listing links
+    const urlRegex = /href="([^"]*(?:listing|equipment|machine)[^"]*\d+[^"]*)"/gi;
+    const urls = [...html.matchAll(urlRegex)].map(match => {
+      const url = match[1];
+      return url.startsWith('http') ? url : `https://www.machinetrader.com${url}`;
+    });
+    
+    // Combine the extracted data
+    const maxItems = Math.min(titles.length, 10); // Limit to 10 results
+    
+    for (let i = 0; i < maxItems; i++) {
+      if (titles[i] && titles[i].length > 10) { // Ensure we have a real title
+        const machine = {
+          title: titles[i].replace(/\s+/g, ' ').trim(),
+          price: prices[i] || null,
+          year: years[i] || null,
+          hours: hours[i] || null,
+          location: locations[i] || 'Location not specified',
+          url: urls[i] || 'https://www.machinetrader.com',
+          description: `Used ${titles[i].toLowerCase().includes('excavator') ? 'excavator' : 
+                                titles[i].toLowerCase().includes('loader') ? 'loader' :
+                                titles[i].toLowerCase().includes('skid') ? 'skid steer' : 'equipment'} for sale`
+        };
+        
+        machines.push(machine);
+      }
+    }
+    
+  } catch (error) {
+    console.error('Error parsing Machine Trader HTML:', error);
+  }
+  
+  return machines;
 }
 
 function parseMachineTraderResults(html) {

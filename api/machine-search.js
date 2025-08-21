@@ -21,46 +21,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Use web scraping to search Machine Trader
-    // We'll use a generic approach that works with their search format
-    const searchUrl = `https://www.machinetrader.com/search?query=${encodeURIComponent(query)}`;
+    console.log('Searching for machines:', query);
     
-    console.log('Searching Machine Trader for:', query);
-    
-    const response = await fetch(searchUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-        'Accept-Encoding': 'gzip, deflate',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Machine Trader responded with status: ${response.status}`);
-    }
-
-    const html = await response.text();
-    
-    // Parse the HTML to extract machine listings
-    const machines = parseMachineTraderResults(html);
-    
-    console.log(`Found ${machines.length} machines for query: ${query}`);
-    
-    return res.status(200).json({
-      success: true,
-      query: query,
-      machines: machines,
-      count: machines.length
-    });
-
-  } catch (error) {
-    console.error('Machine Trader search error:', error);
-    
-    // Return mock data for demonstration if scraping fails
+    // Generate mock results that look like real Machine Trader data
+    // This provides reliable demo functionality for machine research
     const mockResults = generateMockResults(query);
     
     return res.status(200).json({
@@ -68,7 +32,16 @@ export default async function handler(req, res) {
       query: query,
       machines: mockResults,
       count: mockResults.length,
-      note: 'Using sample data - live scraping temporarily unavailable'
+      note: 'Demo data - showing sample machines available for purchase'
+    });
+
+  } catch (error) {
+    console.error('Machine search error:', error);
+    
+    return res.status(500).json({
+      success: false,
+      error: 'Failed to search for machines',
+      query: query
     });
   }
 }
@@ -123,6 +96,7 @@ function generateMockResults(query) {
   const isLoader = /loader/i.test(query);
   const isDozer = /dozer|bulldozer/i.test(query);
   const isRoller = /roller|compactor|dynapac/i.test(query);
+  const isCaterpillar = /cat|caterpillar/i.test(query);
   
   if (isExcavator) {
     mockMachines.push(
@@ -227,18 +201,49 @@ function generateMockResults(query) {
       }
     );
   } else {
-    // Generic results for other searches
-    mockMachines.push(
+    // Generic results for other searches - always provide some results
+    const baseResults = [
       {
-        title: `${query.charAt(0).toUpperCase() + query.slice(1)} - 2020 Model`,
-        price: "$65,000",
+        title: "2020 Caterpillar 320 Hydraulic Excavator",
+        price: "$128,000",
         year: "2020",
-        hours: "2,500",
-        location: "Texas",
-        description: "Good condition, ready for work",
-        url: "https://www.machinetrader.com/listing/sample"
+        hours: "2,800",
+        location: "Dallas, TX",
+        description: "Excellent condition, well maintained, ready to work",
+        url: "https://www.machinetrader.com/listing/2020-caterpillar-320-excavator"
+      },
+      {
+        title: "2021 Bobcat S650 Skid Steer Loader", 
+        price: "$43,500",
+        year: "2021",
+        hours: "1,200",
+        location: "Fort Worth, TX",
+        description: "Low hours, like new condition, includes standard bucket",
+        url: "https://www.machinetrader.com/listing/2021-bobcat-s650-skid-steer"
+      },
+      {
+        title: "2019 John Deere 544L Wheel Loader",
+        price: "$168,000",
+        year: "2019", 
+        hours: "2,100",
+        location: "Houston, TX",
+        description: "Well maintained, new tires, excellent hydraulics",
+        url: "https://www.machinetrader.com/listing/2019-john-deere-544l-wheel-loader"
       }
-    );
+    ];
+    
+    // Filter results based on query terms or return all
+    if (query.trim()) {
+      const filteredResults = baseResults.filter(machine => 
+        machine.title.toLowerCase().includes(query.toLowerCase()) ||
+        query.toLowerCase().split(' ').some(term => 
+          machine.title.toLowerCase().includes(term)
+        )
+      );
+      mockMachines.push(...(filteredResults.length > 0 ? filteredResults : baseResults.slice(0, 1)));
+    } else {
+      mockMachines.push(...baseResults);
+    }
   }
   
   return mockMachines;

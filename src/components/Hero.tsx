@@ -16,6 +16,12 @@ const Hero = () => {
       title: 'Professional Equipment Rental',
       subtitle: '& Sales',
       buttonText: 'Browse Equipment'
+    },
+    {
+      image: '/assets/dynapac-hero.webp',
+      title: 'Premium Compaction Equipment',
+      subtitle: 'Smooth & Padfoot Rollers',
+      buttonText: 'Check Availability'
     }
   ];
 

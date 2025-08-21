@@ -204,7 +204,7 @@ Cat skid steer versatility transcends traditional equipment boundaries, offering
       author: 'Tyler McClain',
       date: '2024-01-09',
       category: 'Equipment Guide',
-      image: '/assets/cat skid steer.jpeg',
+      image: '/assets/cat-skid-steer-action.jpeg',
       readTime: '12 min read'
     },
     {

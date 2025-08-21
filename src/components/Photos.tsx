@@ -19,7 +19,7 @@ const Photos = () => {
     },
     {
       id: 2,
-      src: '/assets/cat skid steer.jpeg',
+      src: '/assets/cat-skid-steer-action.jpeg',
       alt: 'Cat Skid Steer',
       category: 'Skid Steers'
     },

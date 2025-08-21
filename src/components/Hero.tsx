@@ -12,7 +12,7 @@ const Hero = () => {
       buttonText: 'View Our Fleet'
     },
     {
-      image: '/assets/cat skid steer.jpeg',
+      image: '/assets/cat-skid-steer-action.jpeg',
       title: 'Professional Equipment Rental',
       subtitle: '& Sales',
       buttonText: 'Browse Equipment'

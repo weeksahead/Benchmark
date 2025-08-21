@@ -92,8 +92,8 @@ async function scrapeRealMachineTrader(query) {
     await page.setViewport({ width: 1280, height: 720 });
     await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
     
-    // Navigate to Machine Trader search
-    const searchUrl = `https://www.machinetrader.com/search?keywords=${encodeURIComponent(query)}`;
+    // Navigate to Industrial Machine Trader search
+    const searchUrl = `https://www.industrialmachinetrader.com/listings/search?keywords=${encodeURIComponent(query)}`;
     console.log('Navigating to:', searchUrl);
     
     await page.goto(searchUrl, { 
@@ -139,7 +139,7 @@ async function scrapeRealMachineTrader(query) {
           // Extract link
           const linkEl = element.querySelector('a[href]');
           const relativeUrl = linkEl?.getAttribute('href');
-          const url = relativeUrl ? (relativeUrl.startsWith('http') ? relativeUrl : `https://www.machinetrader.com${relativeUrl}`) : null;
+          const url = relativeUrl ? (relativeUrl.startsWith('http') ? relativeUrl : `https://www.industrialmachinetrader.com${relativeUrl}`) : null;
           
           if (title && title.length > 10) {
             listings.push({
@@ -148,7 +148,7 @@ async function scrapeRealMachineTrader(query) {
               year: year,
               hours: hours,
               location: location || 'Location not specified',
-              url: url || `https://www.machinetrader.com/search?keywords=${encodeURIComponent(title)}`,
+              url: url || `https://www.industrialmachinetrader.com/listings/search?keywords=${encodeURIComponent(title)}`,
               description: `Used equipment for sale - ${title}`
             });
           }
@@ -204,7 +204,7 @@ function parseRealMachineTraderHTML(html) {
     const urlRegex = /href="([^"]*(?:listing|equipment|machine)[^"]*\d+[^"]*)"/gi;
     const urls = [...html.matchAll(urlRegex)].map(match => {
       const url = match[1];
-      return url.startsWith('http') ? url : `https://machinetrader.com${url}`;
+      return url.startsWith('http') ? url : `https://www.industrialmachinetrader.com${url}`;
     });
     
     // Combine the extracted data
@@ -218,7 +218,7 @@ function parseRealMachineTraderHTML(html) {
           year: years[i] || null,
           hours: hours[i] || null,
           location: locations[i] || 'Location not specified',
-          url: `https://machinetrader.com/search?q=${encodeURIComponent(query)}`,
+          url: `https://www.industrialmachinetrader.com/listings/search?keywords=${encodeURIComponent(query)}`,
           description: `Used ${titles[i].toLowerCase().includes('excavator') ? 'excavator' : 
                                 titles[i].toLowerCase().includes('loader') ? 'loader' :
                                 titles[i].toLowerCase().includes('skid') ? 'skid steer' : 'equipment'} for sale`
@@ -296,7 +296,7 @@ function generateMockResults(query) {
         hours: "3,200",
         location: "Dallas, TX",
         description: "Excellent condition, recent service, ready to work",
-        url: "https://machinetrader.com/search?q=caterpillar%20320%20excavator"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=caterpillar%20320%20excavator"
       },
       {
         title: "2020 Komatsu PC210LC-11 Excavator",
@@ -305,7 +305,7 @@ function generateMockResults(query) {
         hours: "2,800",
         location: "Houston, TX",
         description: "Low hours, one owner, full maintenance records",
-        url: "https://machinetrader.com/search?q=komatsu%20excavator"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=komatsu%20excavator"
       },
       {
         title: "2018 John Deere 350G LC Excavator",
@@ -314,7 +314,7 @@ function generateMockResults(query) {
         hours: "4,100",
         location: "Austin, TX",
         description: "Well maintained, new tracks, hydraulic system serviced",
-        url: "https://machinetrader.com/search?q=john%20deere%20excavator"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=john%20deere%20excavator"
       }
     );
   } else if (isSkidSteer) {
@@ -326,7 +326,7 @@ function generateMockResults(query) {
         hours: "1,200",
         location: "Denton, TX",
         description: "Like new condition, low hours, includes bucket",
-        url: "https://machinetrader.com/search?q=bobcat%20skid%20steer"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=bobcat%20skid%20steer"
       },
       {
         title: "2020 Caterpillar 262D3 Skid Steer",
@@ -335,7 +335,7 @@ function generateMockResults(query) {
         hours: "1,800",
         location: "Fort Worth, TX",
         description: "Excellent condition, high flow hydraulics",
-        url: "https://machinetrader.com/search?q=caterpillar%20skid%20steer"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=caterpillar%20skid%20steer"
       },
       {
         title: "2019 Case SV340 Skid Steer",
@@ -344,7 +344,7 @@ function generateMockResults(query) {
         hours: "2,100",
         location: "Plano, TX",
         description: "Well maintained, new tires, ready to work",
-        url: "https://machinetrader.com/search?q=case%20skid%20steer"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=case%20skid%20steer"
       }
     );
   } else if (isRoller) {
@@ -356,7 +356,7 @@ function generateMockResults(query) {
         hours: "1,500",
         location: "Arlington, TX",
         description: "Low hours, excellent condition, recent service",
-        url: "https://machinetrader.com/search?q=dynapac%20compactor"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=dynapac%20compactor"
       },
       {
         title: "2019 Caterpillar CS44B Vibratory Roller",
@@ -365,7 +365,7 @@ function generateMockResults(query) {
         hours: "2,200",
         location: "Irving, TX",
         description: "Well maintained, smooth drum, ready for work",
-        url: "https://machinetrader.com/search?q=caterpillar%20roller"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=caterpillar%20roller"
       }
     );
   } else if (isLoader) {
@@ -377,7 +377,7 @@ function generateMockResults(query) {
         hours: "1,800",
         location: "Dallas, TX",
         description: "Low hours, excellent condition, includes bucket",
-        url: "https://machinetrader.com/search?q=caterpillar%20wheel%20loader"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=caterpillar%20wheel%20loader"
       },
       {
         title: "2020 John Deere 544L Wheel Loader",
@@ -386,7 +386,7 @@ function generateMockResults(query) {
         hours: "2,400",
         location: "Garland, TX",
         description: "Well maintained, new tires, hydraulic system serviced",
-        url: "https://machinetrader.com/search?q=john%20deere%20wheel%20loader"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=john%20deere%20wheel%20loader"
       }
     );
   } else {
@@ -399,7 +399,7 @@ function generateMockResults(query) {
         hours: "2,800",
         location: "Dallas, TX",
         description: "Excellent condition, well maintained, ready to work",
-        url: "https://machinetrader.com/search?q=caterpillar%20excavator"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=caterpillar%20excavator"
       },
       {
         title: "2021 Bobcat S650 Skid Steer Loader", 
@@ -408,7 +408,7 @@ function generateMockResults(query) {
         hours: "1,200",
         location: "Fort Worth, TX",
         description: "Low hours, like new condition, includes standard bucket",
-        url: "https://machinetrader.com/search?q=bobcat%20skid%20steer"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=bobcat%20skid%20steer"
       },
       {
         title: "2019 John Deere 544L Wheel Loader",
@@ -417,7 +417,7 @@ function generateMockResults(query) {
         hours: "2,100",
         location: "Houston, TX",
         description: "Well maintained, new tires, excellent hydraulics",
-        url: "https://machinetrader.com/search?q=john%20deere%20wheel%20loader"
+        url: "https://www.industrialmachinetrader.com/listings/search?keywords=john%20deere%20wheel%20loader"
       }
     ];
     

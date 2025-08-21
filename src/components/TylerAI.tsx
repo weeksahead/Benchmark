@@ -16,6 +16,61 @@ const TylerAI = () => {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Function to make URLs and phone numbers clickable
+  const renderMessageWithLinks = (text: string, isUserMessage: boolean) => {
+    // Regex patterns for URLs, email, and phone
+    const urlPattern = /(https?:\/\/[^\s]+)/g;
+    const emailPattern = /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+    const phonePattern = /\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g;
+    
+    // Split text by patterns and create elements
+    let parts = text.split(/(\bhttps?:\/\/[^\s]+\b|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}|\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g);
+    
+    return parts.map((part, index) => {
+      // Check if part is a URL
+      if (urlPattern.test(part)) {
+        return (
+          <a 
+            key={index}
+            href={part} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={isUserMessage ? "underline text-white" : "underline text-blue-600 hover:text-blue-800"}
+          >
+            {part}
+          </a>
+        );
+      }
+      // Check if part is an email
+      else if (emailPattern.test(part)) {
+        return (
+          <a 
+            key={index}
+            href={`mailto:${part}`}
+            className={isUserMessage ? "underline text-white" : "underline text-blue-600 hover:text-blue-800"}
+          >
+            {part}
+          </a>
+        );
+      }
+      // Check if part is a phone number
+      else if (phonePattern.test(part)) {
+        const cleanPhone = part.replace(/\D/g, '');
+        return (
+          <a 
+            key={index}
+            href={`tel:${cleanPhone}`}
+            className={isUserMessage ? "underline text-white" : "underline text-blue-600 hover:text-blue-800"}
+          >
+            {part}
+          </a>
+        );
+      }
+      // Regular text
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -153,7 +208,7 @@ const TylerAI = () => {
                 >
                   {msg.text.split('\n').map((line, index) => (
                     <div key={index} className={index > 0 ? 'mt-1' : ''}>
-                      {line || '\u00A0'}
+                      {line ? renderMessageWithLinks(line, msg.sender === 'user') : '\u00A0'}
                     </div>
                   ))}
                 </div>

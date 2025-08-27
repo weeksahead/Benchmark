@@ -92,11 +92,6 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm text-gray-400">
-          <p>Default credentials:</p>
-          <p>Username: admin</p>
-          <p>Password: benchmark2024</p>
-        </div>
       </div>
     </div>
   );

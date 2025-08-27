@@ -108,7 +108,6 @@ const Footer = ({ setCurrentPage }: FooterProps) => {
               © 2024 Benchmark Equipment Rental & Sales. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <button onClick={() => handleNavClick('admin')} className="text-gray-400 hover:text-red-500 text-sm transition-colors">Admin</button>
               <button onClick={() => handleNavClick('privacy')} className="text-gray-400 hover:text-red-500 text-sm transition-colors">Privacy Policy</button>
               <button onClick={() => handleNavClick('terms')} className="text-gray-400 hover:text-red-500 text-sm transition-colors">Terms of Service</button>
             </div>

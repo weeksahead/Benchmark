@@ -1,8 +1,21 @@
 import React, { useState } from 'react';
-import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator } from 'lucide-react';
+import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive } from 'lucide-react';
 import slidesData from '../config/slides.json';
 import photosData from '../config/photos.json';
 import PurchaseCalculator from './PurchaseCalculator';
+import SavedCalculations from './SavedCalculations';
+
+interface SavedCalculation {
+  id: string;
+  equipmentName: string;
+  price: number;
+  rental: number;
+  utilization: number;
+  monthlyROI: number;
+  effectiveMonthlyRevenue: number;
+  meetsTarget: boolean;
+  timestamp: string;
+}
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -25,7 +38,8 @@ interface PhotoGalleryImage {
 }
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
-  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines' | 'calculator'>('slider');
+  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines' | 'calculator' | 'saved'>('slider');
+  const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   
@@ -37,6 +51,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Handle saving calculations
+  const handleSaveCalculation = (calculation: SavedCalculation) => {
+    setSavedCalculations(prev => [calculation, ...prev]); // Add to beginning for newest first
+    setSaveMessage('✅ Calculation saved successfully!');
+    setTimeout(() => setSaveMessage(''), 3000);
+  };
+
+  // Handle deleting calculations
+  const handleDeleteCalculation = (id: string) => {
+    setSavedCalculations(prev => prev.filter(calc => calc.id !== id));
+  };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'slider' | 'gallery') => {
     const files = e.target.files;
@@ -280,6 +306,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           >
             <Calculator className="w-5 h-5" />
             <span>Purchase Calculator</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('saved')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
+              activeTab === 'saved' 
+                ? 'bg-red-600 text-white' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <Archive className="w-5 h-5" />
+            <span>Saved Calculations</span>
           </button>
         </div>
 
@@ -556,7 +593,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         {/* Purchase Calculator */}
         {activeTab === 'calculator' && (
           <div>
-            <PurchaseCalculator />
+            <PurchaseCalculator onSaveCalculation={handleSaveCalculation} />
+          </div>
+        )}
+
+        {/* Saved Calculations */}
+        {activeTab === 'saved' && (
+          <div>
+            <SavedCalculations 
+              calculations={savedCalculations}
+              onDeleteCalculation={handleDeleteCalculation}
+            />
           </div>
         )}
       </div>

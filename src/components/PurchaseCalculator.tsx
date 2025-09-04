@@ -1,6 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { Save } from 'lucide-react';
 
-const PurchaseCalculator = () => {
+interface SavedCalculation {
+  id: string;
+  equipmentName: string;
+  price: number;
+  rental: number;
+  utilization: number;
+  monthlyROI: number;
+  effectiveMonthlyRevenue: number;
+  meetsTarget: boolean;
+  timestamp: string;
+}
+
+interface PurchaseCalculatorProps {
+  onSaveCalculation?: (calculation: SavedCalculation) => void;
+}
+
+const PurchaseCalculator = ({ onSaveCalculation }: PurchaseCalculatorProps) => {
+  const [equipmentName, setEquipmentName] = useState<string>('');
   const [price, setPrice] = useState<string>('');
   const [priceDisplay, setPriceDisplay] = useState<string>('');
   const [rental, setRental] = useState<string>('');
@@ -34,6 +52,33 @@ const PurchaseCalculator = () => {
       setRental(rawValue);
       setRentalDisplay(rawValue ? formatWithCommas(rawValue) : '');
     }
+  };
+
+  const handleSaveCalculation = () => {
+    if (!equipmentName.trim() || !results || !onSaveCalculation) return;
+    
+    const calculation: SavedCalculation = {
+      id: Date.now().toString(),
+      equipmentName: equipmentName.trim(),
+      price: parseFloat(price),
+      rental: parseFloat(rental),
+      utilization: parseFloat(utilization),
+      monthlyROI: results.monthlyROI,
+      effectiveMonthlyRevenue: results.effectiveMonthlyRevenue,
+      meetsTarget: results.meetsTarget,
+      timestamp: new Date().toISOString()
+    };
+    
+    onSaveCalculation(calculation);
+    
+    // Clear form after saving
+    setEquipmentName('');
+    setPrice('');
+    setPriceDisplay('');
+    setRental('');
+    setRentalDisplay('');
+    setUtilization('');
+    setResults(null);
   };
 
   useEffect(() => {
@@ -97,6 +142,20 @@ const PurchaseCalculator = () => {
         </div>
         
         <div className="space-y-6">
+          {/* Equipment Name Input */}
+          <div>
+            <label htmlFor="equipmentName" className="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">
+              Equipment Name
+            </label>
+            <input
+              type="text"
+              id="equipmentName"
+              value={equipmentName}
+              onChange={(e) => setEquipmentName(e.target.value)}
+              placeholder="Enter equipment name (e.g., CAT 336 Excavator)"
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-lg transition-all duration-300"
+            />
+          </div>
           {/* Equipment Price Input */}
           <div>
             <label htmlFor="price" className="block text-sm font-semibold mb-2 text-gray-300 uppercase tracking-wider">
@@ -158,6 +217,19 @@ const PurchaseCalculator = () => {
           </div>
         </div>
 
+        {/* Save Button */}
+        {results && equipmentName.trim() && onSaveCalculation && (
+          <div className="flex justify-center mt-6">
+            <button
+              onClick={handleSaveCalculation}
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+            >
+              <Save className="w-5 h-5" />
+              <span>Save Calculation</span>
+            </button>
+          </div>
+        )}
+
         {/* Results Section */}
         <div className="mt-8">
           {!results ? (
@@ -208,7 +280,7 @@ const PurchaseCalculator = () => {
                     <strong>Excellent!</strong> You're exceeding the target by{' '}
                     <strong>{results.roiDifference.toFixed(2)}%</strong>.
                     At current utilization, you're earning{' '}
-                    <strong>${Math.abs(results.rentalDifference).toFixed(2)}/mo</strong>{' '}
+                    <strong>${Math.abs(results.rentalDifference).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/mo</strong>{' '}
                     more than the minimum required.
                     <div className="mt-2 text-green-200 font-bold">🔥 Terry Approves! 🔥</div>
                   </div>
@@ -216,8 +288,8 @@ const PurchaseCalculator = () => {
                   <div>
                     <span className="text-xl mr-2">⚠️</span>
                     <strong>Below Target!</strong> You need to increase your monthly rental rate to{' '}
-                    <strong>${results.requiredRentalRate.toFixed(2)}</strong>{' '}
-                    (an increase of <strong>${Math.abs(results.rentalDifference).toFixed(2)}/mo</strong>) to achieve{' '}
+                    <strong>${results.requiredRentalRate.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>{' '}
+                    (an increase of <strong>${Math.abs(results.rentalDifference).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/mo</strong>) to achieve{' '}
                     <strong>{TARGET_ROI}% ROI</strong> at <strong>{utilization}% utilization</strong>.
                     <div className="mt-2 text-red-200 font-bold">🌡️ Terry is heating up! 🌡️</div>
                   </div>

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink } from 'lucide-react';
+import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator } from 'lucide-react';
 import slidesData from '../config/slides.json';
 import photosData from '../config/photos.json';
+import PurchaseCalculator from './PurchaseCalculator';
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -24,7 +25,7 @@ interface PhotoGalleryImage {
 }
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
-  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines'>('slider');
+  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines' | 'calculator'>('slider');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   
@@ -268,6 +269,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           >
             <Search className="w-5 h-5" />
             <span>Equipment Research</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('calculator')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
+              activeTab === 'calculator' 
+                ? 'bg-red-600 text-white' 
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <Calculator className="w-5 h-5" />
+            <span>Purchase Calculator</span>
           </button>
         </div>
 
@@ -538,6 +550,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 <p className="text-sm mt-2">Try a different search term or check the tips above</p>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Purchase Calculator */}
+        {activeTab === 'calculator' && (
+          <div>
+            <PurchaseCalculator />
           </div>
         )}
       </div>

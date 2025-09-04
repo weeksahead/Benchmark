@@ -11,16 +11,16 @@ const PurchaseCalculator = () => {
   const TARGET_ROI = 4.5;
   const TARGET_UTILIZATION = 90;
 
-  // Format number with commas
+  // Format number with commas and dollar sign
   const formatWithCommas = (value: string): string => {
-    const num = value.replace(/,/g, '');
+    const num = value.replace(/[,$]/g, '');
     if (!num || isNaN(Number(num))) return '';
-    return Number(num).toLocaleString();
+    return '$' + Number(num).toLocaleString();
   };
 
   // Handle price input with comma formatting
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/,/g, '');
+    const rawValue = e.target.value.replace(/[,$]/g, '');
     if (rawValue === '' || !isNaN(Number(rawValue))) {
       setPrice(rawValue);
       setPriceDisplay(rawValue ? formatWithCommas(rawValue) : '');
@@ -29,7 +29,7 @@ const PurchaseCalculator = () => {
 
   // Handle rental input with comma formatting
   const handleRentalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const rawValue = e.target.value.replace(/,/g, '');
+    const rawValue = e.target.value.replace(/[,$]/g, '');
     if (rawValue === '' || !isNaN(Number(rawValue))) {
       setRental(rawValue);
       setRentalDisplay(rawValue ? formatWithCommas(rawValue) : '');
@@ -86,11 +86,11 @@ const PurchaseCalculator = () => {
         
         {/* Target Dashboard */}
         <div className="grid grid-cols-2 gap-4 mb-8">
-          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-center">
             <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Target ROI</div>
             <div className="text-2xl font-bold text-red-400">{TARGET_ROI}%</div>
           </div>
-          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700 text-center">
             <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Target Utilization</div>
             <div className="text-2xl font-bold text-red-400">{TARGET_UTILIZATION}%</div>
           </div>
@@ -111,9 +111,6 @@ const PurchaseCalculator = () => {
                 placeholder="Enter purchase price"
                 className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-lg transition-all duration-300"
               />
-              <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium">
-                $
-              </span>
             </div>
           </div>
 
@@ -132,7 +129,7 @@ const PurchaseCalculator = () => {
                 className="w-full px-4 py-3 pr-16 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-lg transition-all duration-300"
               />
               <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium">
-                $/mo
+                /mo
               </span>
             </div>
           </div>
@@ -213,6 +210,7 @@ const PurchaseCalculator = () => {
                     At current utilization, you're earning{' '}
                     <strong>${Math.abs(results.rentalDifference).toFixed(2)}/mo</strong>{' '}
                     more than the minimum required.
+                    <div className="mt-2 text-green-200 font-bold">🔥 Terry Approves! 🔥</div>
                   </div>
                 ) : (
                   <div>
@@ -221,6 +219,7 @@ const PurchaseCalculator = () => {
                     <strong>${results.requiredRentalRate.toFixed(2)}</strong>{' '}
                     (an increase of <strong>${Math.abs(results.rentalDifference).toFixed(2)}/mo</strong>) to achieve{' '}
                     <strong>{TARGET_ROI}% ROI</strong> at <strong>{utilization}% utilization</strong>.
+                    <div className="mt-2 text-red-200 font-bold">🌡️ Terry is heating up! 🌡️</div>
                   </div>
                 )}
               </div>

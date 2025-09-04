@@ -2,11 +2,39 @@ import React, { useState, useEffect } from 'react';
 
 const PurchaseCalculator = () => {
   const [price, setPrice] = useState<string>('');
+  const [priceDisplay, setPriceDisplay] = useState<string>('');
   const [rental, setRental] = useState<string>('');
+  const [rentalDisplay, setRentalDisplay] = useState<string>('');
   const [utilization, setUtilization] = useState<string>('');
   const [results, setResults] = useState<any>(null);
 
   const TARGET_ROI = 4.5;
+  const TARGET_UTILIZATION = 90;
+
+  // Format number with commas
+  const formatWithCommas = (value: string): string => {
+    const num = value.replace(/,/g, '');
+    if (!num || isNaN(Number(num))) return '';
+    return Number(num).toLocaleString();
+  };
+
+  // Handle price input with comma formatting
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/,/g, '');
+    if (rawValue === '' || !isNaN(Number(rawValue))) {
+      setPrice(rawValue);
+      setPriceDisplay(rawValue ? formatWithCommas(rawValue) : '');
+    }
+  };
+
+  // Handle rental input with comma formatting
+  const handleRentalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawValue = e.target.value.replace(/,/g, '');
+    if (rawValue === '' || !isNaN(Number(rawValue))) {
+      setRental(rawValue);
+      setRentalDisplay(rawValue ? formatWithCommas(rawValue) : '');
+    }
+  };
 
   useEffect(() => {
     calculateROI();
@@ -56,6 +84,18 @@ const PurchaseCalculator = () => {
           🏗️ Equipment ROI Calculator
         </h2>
         
+        {/* Target Dashboard */}
+        <div className="grid grid-cols-2 gap-4 mb-8">
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Target ROI</div>
+            <div className="text-2xl font-bold text-red-400">{TARGET_ROI}%</div>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className="text-sm text-gray-400 uppercase tracking-wider mb-1">Target Utilization</div>
+            <div className="text-2xl font-bold text-red-400">{TARGET_UTILIZATION}%</div>
+          </div>
+        </div>
+        
         <div className="space-y-6">
           {/* Equipment Price Input */}
           <div>
@@ -64,12 +104,11 @@ const PurchaseCalculator = () => {
             </label>
             <div className="relative">
               <input
-                type="number"
+                type="text"
                 id="price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                value={priceDisplay}
+                onChange={handlePriceChange}
                 placeholder="Enter purchase price"
-                step="100"
                 className="w-full px-4 py-3 pr-12 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-lg transition-all duration-300"
               />
               <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium">
@@ -85,12 +124,11 @@ const PurchaseCalculator = () => {
             </label>
             <div className="relative">
               <input
-                type="number"
+                type="text"
                 id="rental"
-                value={rental}
-                onChange={(e) => setRental(e.target.value)}
+                value={rentalDisplay}
+                onChange={handleRentalChange}
                 placeholder="Enter monthly rental"
-                step="10"
                 className="w-full px-4 py-3 pr-16 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-lg transition-all duration-300"
               />
               <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 font-medium">

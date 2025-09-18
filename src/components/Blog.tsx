@@ -74,7 +74,7 @@ Consider future project phases when making your selection. While it might seem e
 
 Selecting the appropriate Cat excavator for your project demands careful consideration of numerous factors, from technical specifications to rental partner selection. By focusing on properly sized equipment, prioritizing low-hour machines under 8,000 hours, and partnering with knowledgeable owner-operator rental companies, you position your project for success. Remember that the lowest rental rate rarely translates to the lowest project cost – investing in the right equipment with reliable support ultimately delivers superior value through improved productivity, reduced downtime, and successful project completion.`,
       author: 'Tyler McClain',
-      date: '2024-01-20',
+      date: '2025-05-17',
       category: 'Equipment Guide',
       image: '/assets/Cat 336.jpeg',
       readTime: '12 min read'
@@ -140,7 +140,7 @@ Equipment with less than 8,000 operating hours exhibits superior maintenance pre
 Heavy equipment safety requires a multifaceted approach combining thorough inspections, comprehensive training, advanced technology utilization, and rigorous maintenance practices. Organizations prioritizing these elements create safer work environments while improving operational efficiency. The strategic selection of low-hour equipment, particularly machines with less than 8,000 operating hours, provides measurable safety advantages through improved reliability, current safety technologies, and predictable performance characteristics. By implementing these essential safety tips and investing in quality equipment, construction companies protect their most valuable assets—their people—while maintaining productive, profitable operations that meet today's demanding project requirements.`,
       image: "/assets/dynapac.webp",
       author: 'Tyler McClain',
-      date: '2024-01-14',
+      date: '2025-06-17',
       category: 'Safety',
       readTime: '8 min read'
     },
@@ -202,7 +202,7 @@ Control responsiveness remains crucial for precision work, particularly in lands
 
 Cat skid steer versatility transcends traditional equipment boundaries, offering contractors, landscapers, and farmers a single platform capable of replacing entire equipment fleets. From construction sites requiring everything from demolition to precision grading, to agricultural operations demanding year-round functionality, these remarkable machines adapt to meet diverse challenges efficiently. The strategic selection of low-hour equipment, particularly machines under 8,000 hours, ensures optimal performance across all applications while maintaining the reliability necessary for professional operations. As attachment technology continues advancing and operational demands evolve, Cat skid steers remain positioned as the ultimate multi-tool for modern equipment fleets, delivering unmatched versatility that transforms how work gets accomplished across every industry sector.`,
       author: 'Tyler McClain',
-      date: '2024-01-09',
+      date: '2025-07-17',
       category: 'Equipment Guide',
       image: '/assets/cat-skid-steer-action.jpeg',
       readTime: '12 min read'
@@ -265,7 +265,7 @@ Climate control dramatically impacts storage effectiveness. When possible, store
 
 Extending heavy equipment life requires commitment to comprehensive maintenance practices that address all aspects of machine care. From establishing robust preventive maintenance programs to leveraging advanced monitoring technologies, each element contributes to maximizing equipment longevity and return on investment. Organizations that prioritize fluid management, component-specific care, and proper storage practices consistently achieve equipment life spans exceeding industry averages while maintaining superior reliability and resale value. When combined with the inherent advantages of low-hour equipment featuring less than 8,000 operating hours—including better initial condition, current technology, and established maintenance histories—these practices create a maintenance framework that transforms equipment from depreciating assets into long-term value generators that support business growth and profitability.`,
       author: 'Tyler McClain',
-      date: '2024-01-04',
+      date: '2025-08-17',
       category: 'Maintenance',
       image: '/assets/dynapac.webp',
       readTime: '15 min read'
@@ -330,7 +330,7 @@ Flexible rental terms accommodate project timeline variations without penalty. O
 
 Construction site efficiency and timeline achievement depend fundamentally on strategic equipment selection and management. The right equipment, properly sized and reliably maintained, transforms from a cost center into a profit enabler that drives competitive advantage. Low-hour equipment, particularly machines with less than 8,000 operating hours, provides the reliability, performance, and technological capabilities necessary for consistent schedule achievement. When combined with owner-operator partnerships that deliver responsive support and operational expertise, contractors position themselves for timeline success that enhances profitability, strengthens client relationships, and builds reputation for reliable project delivery. In an industry where time literally equals money, investing in the right equipment strategy represents the difference between merely completing projects and building a thriving construction business.`,
       author: 'Tyler McClain',
-      date: '2024-09-17',
+      date: '2025-09-17',
       category: 'Efficiency',
       image: '/assets/CAT Wheel loader blog.jpg',
       readTime: '18 min read'

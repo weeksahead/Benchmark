@@ -1,0 +1,67 @@
+# robots.txt for Benchmark Equipment Rental & Sales
+# https://benchmarkequip.com
+
+User-agent: *
+Allow: /
+
+# Allow all major search engines to crawl
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+# Disallow admin areas and private pages
+Disallow: /admin
+Disallow: /admin/
+Disallow: /private/
+Disallow: *.json$
+Disallow: /api/
+
+# Crawl delay (in seconds) - reasonable for equipment rental site
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://benchmarkequip.com/sitemap.xml
+
+# Additional sitemaps for specific content types
+Sitemap: https://benchmarkequip.com/blog-sitemap.xml
+Sitemap: https://benchmarkequip.com/images-sitemap.xml
+
+# Clean param for analytics tracking
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&gclid&fbclid
+
+# Allow access to important assets
+Allow: /assets/
+Allow: *.css
+Allow: *.js
+Allow: *.jpg
+Allow: *.jpeg
+Allow: *.png
+Allow: *.webp
+Allow: *.svg
+Allow: *.pdf
+
+# Host directive (helps with canonicalization)
+Host: https://benchmarkequip.com

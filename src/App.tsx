@@ -83,7 +83,9 @@ function App() {
   return (
     <div className="min-h-screen bg-black">
       <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      {renderPage()}
+      <main role="main" aria-label="Main content">
+        {renderPage()}
+      </main>
       <Footer setCurrentPage={setCurrentPage} />
       <TylerAI />
     </div>

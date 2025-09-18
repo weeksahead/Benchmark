@@ -20,7 +20,7 @@ function App() {
     const path = window.location.pathname.toLowerCase();
     if (path === '/admin') return 'admin';
     if (path === '/photos') return 'photos';
-    if (path === '/blog') return 'blog';
+    if (path === '/blog' || path.startsWith('/blog/')) return 'blog';
     if (path === '/about') return 'about';
     if (path === '/contact') return 'contact';
     if (path === '/privacy') return 'privacy';
@@ -48,7 +48,7 @@ function App() {
   // Update URL when page changes
   useEffect(() => {
     const path = currentPage === 'home' ? '/' : `/${currentPage}`;
-    if (window.location.pathname !== path) {
+    if (window.location.pathname !== path && !window.location.pathname.startsWith('/blog/')) {
       window.history.pushState({}, '', path);
     }
   }, [currentPage]);

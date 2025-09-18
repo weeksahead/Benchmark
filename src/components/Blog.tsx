@@ -11,6 +11,7 @@ interface BlogPost {
   category: string;
   image: string;
   readTime: string;
+  slug: string;
 }
 
 const Blog = () => {
@@ -77,7 +78,8 @@ Selecting the appropriate Cat excavator for your project demands careful conside
       date: '2025-05-17',
       category: 'Equipment Guide',
       image: '/assets/Cat 336.jpeg',
-      readTime: '12 min read'
+      readTime: '12 min read',
+      slug: 'complete-guide-choosing-right-cat-excavator'
     },
     {
       id: 2,
@@ -142,7 +144,8 @@ Heavy equipment safety requires a multifaceted approach combining thorough inspe
       author: 'Tyler McClain',
       date: '2025-06-17',
       category: 'Safety',
-      readTime: '8 min read'
+      readTime: '8 min read',
+      slug: 'essential-safety-tips-heavy-equipment-operation'
     },
     {
       id: 3,
@@ -205,7 +208,8 @@ Cat skid steer versatility transcends traditional equipment boundaries, offering
       date: '2025-07-17',
       category: 'Equipment Guide',
       image: '/assets/cat-skid-steer-action.jpeg',
-      readTime: '12 min read'
+      readTime: '12 min read',
+      slug: 'ultimate-guide-cat-skid-steer-versatility'
     },
     {
       id: 4,
@@ -268,7 +272,8 @@ Extending heavy equipment life requires commitment to comprehensive maintenance 
       date: '2025-08-17',
       category: 'Maintenance',
       image: '/assets/dynapac.webp',
-      readTime: '15 min read'
+      readTime: '15 min read',
+      slug: 'essential-maintenance-tips-extend-heavy-equipment-life'
     },
     {
       id: 5,
@@ -333,18 +338,56 @@ Construction site efficiency and timeline achievement depend fundamentally on st
       date: '2025-09-17',
       category: 'Efficiency',
       image: '/assets/CAT Wheel loader blog.jpg',
-      readTime: '18 min read'
+      readTime: '18 min read',
+      slug: 'construction-site-efficiency-right-equipment-reduces-timelines'
     }
   ]);
 
+  // Check URL for blog post slug on component mount and handle back/forward navigation
+  React.useEffect(() => {
+    const handleUrlChange = () => {
+      const path = window.location.pathname;
+      if (path.startsWith('/blog/')) {
+        const slug = path.replace('/blog/', '');
+        const post = blogPosts.find(p => p.slug === slug);
+        if (post) {
+          setSelectedPost(post);
+        }
+      } else if (path === '/blog') {
+        setSelectedPost(null);
+      }
+    };
+
+    // Handle initial load
+    handleUrlChange();
+
+    // Handle browser back/forward
+    window.addEventListener('popstate', handleUrlChange);
+    return () => window.removeEventListener('popstate', handleUrlChange);
+  }, [blogPosts]);
+
+  // Function to navigate to blog post
+  const navigateToPost = (post: BlogPost) => {
+    setSelectedPost(post);
+    window.history.pushState({}, '', `/blog/${post.slug}`);
+  };
+
+  // Function to navigate back to blog list
+  const navigateBackToBlog = () => {
+    setSelectedPost(null);
+    window.history.pushState({}, '', '/blog');
+  };
+
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))];
 
-  const filteredPosts = blogPosts.filter(post => {
-    const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const filteredPosts = blogPosts
+    .filter(post => {
+      const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
+      const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCategory && matchesSearch;
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -360,7 +403,7 @@ Construction site efficiency and timeline achievement depend fundamentally on st
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button
-            onClick={() => setSelectedPost(null)}
+            onClick={navigateBackToBlog}
             className="mb-8 text-red-500 hover:text-red-400 transition-colors flex items-center space-x-2"
           >
             <ArrowRight className="w-4 h-4 rotate-180" />
@@ -496,7 +539,7 @@ Construction site efficiency and timeline achievement depend fundamentally on st
               <article
                 key={post.id}
                 className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-all duration-300 cursor-pointer group"
-                onClick={() => setSelectedPost(post)}
+                onClick={() => navigateToPost(post)}
               >
                 <div className="aspect-video overflow-hidden">
                   <img

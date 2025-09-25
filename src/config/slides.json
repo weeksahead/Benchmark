@@ -9,7 +9,7 @@
   },
   {
     "id": 2,
-    "image": "/assets/cat-skid-steer-action.jpeg",
+    "image": "/assets/Benchmark-water-truck.jpeg",
     "title": "Professional Equipment Rental",
     "subtitle": "& Sales",
     "buttonText": "Browse Equipment",
@@ -17,7 +17,23 @@
   },
   {
     "id": 3,
-    "image": "/assets/dynapac-hero.webp",
+    "image": "/assets/Benchmark-wheel-loader.jpg",
+    "title": "Heavy-Duty Wheel Loaders",
+    "subtitle": "Maximum Performance & Efficiency",
+    "buttonText": "View Equipment",
+    "buttonUrl": "https://rent.benchmarkequip.com/items"
+  },
+  {
+    "id": 4,
+    "image": "/assets/Benchmark-skid-steer.jpg",
+    "title": "Versatile Skid Steer Loaders",
+    "subtitle": "Compact Power for Every Job",
+    "buttonText": "View Equipment",
+    "buttonUrl": "https://rent.benchmarkequip.com/items"
+  },
+  {
+    "id": 5,
+    "image": "/assets/Benchmark-Dynapac-Roller.jpg",
     "title": "Premium Compaction Equipment",
     "subtitle": "Smooth & Padfoot Rollers",
     "buttonText": "Check Availability",

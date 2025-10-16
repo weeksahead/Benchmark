@@ -42,21 +42,77 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
-  
+  const [isLoadingCalculations, setIsLoadingCalculations] = useState(false);
+
   // Load from JSON configs
   const [sliderImages, setSliderImages] = useState<SlideImage[]>(slidesData);
   const [galleryImages, setGalleryImages] = useState<PhotoGalleryImage[]>(photosData);
-  
+
   // Machine Trader search state
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Handle saving calculations
-  const handleSaveCalculation = (calculation: SavedCalculation) => {
-    setSavedCalculations(prev => [calculation, ...prev]); // Add to beginning for newest first
-    setSaveMessage('✅ Calculation saved successfully!');
-    setTimeout(() => setSaveMessage(''), 3000);
+  // Load calculations from Monday.com when component mounts
+  useEffect(() => {
+    fetchCalculations();
+  }, []);
+
+  // Fetch calculations from Monday.com
+  const fetchCalculations = async () => {
+    setIsLoadingCalculations(true);
+    try {
+      const response = await fetch('/api/roi-calculation-fetch');
+      if (response.ok) {
+        const data = await response.json();
+        setSavedCalculations(data.calculations || []);
+      } else {
+        console.error('Failed to fetch calculations');
+      }
+    } catch (error) {
+      console.error('Error fetching calculations:', error);
+    } finally {
+      setIsLoadingCalculations(false);
+    }
+  };
+
+  // Handle saving calculations to Monday.com
+  const handleSaveCalculation = async (calculation: SavedCalculation) => {
+    setIsSaving(true);
+    setSaveMessage('Saving to Monday.com...');
+
+    try {
+      const response = await fetch('/api/roi-calculation-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          equipmentName: calculation.equipmentName,
+          price: calculation.price,
+          rental: calculation.rental,
+          utilization: calculation.utilization,
+          monthlyROI: calculation.monthlyROI,
+          effectiveMonthlyRevenue: calculation.effectiveMonthlyRevenue,
+          meetsTarget: calculation.meetsTarget
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSaveMessage('✅ Calculation saved to Monday.com successfully!');
+
+        // Refresh calculations from Monday.com
+        await fetchCalculations();
+      } else {
+        const error = await response.json();
+        setSaveMessage('❌ Error: ' + (error.error || 'Failed to save'));
+      }
+    } catch (error) {
+      console.error('Error saving calculation:', error);
+      setSaveMessage('❌ Error: Failed to connect to server');
+    } finally {
+      setIsSaving(false);
+      setTimeout(() => setSaveMessage(''), 5000);
+    }
   };
 
   // Handle deleting calculations
@@ -600,10 +656,16 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         {/* Saved Calculations */}
         {activeTab === 'saved' && (
           <div>
-            <SavedCalculations 
-              calculations={savedCalculations}
-              onDeleteCalculation={handleDeleteCalculation}
-            />
+            {isLoadingCalculations ? (
+              <div className="text-center py-12">
+                <p className="text-gray-400">Loading calculations from Monday.com...</p>
+              </div>
+            ) : (
+              <SavedCalculations
+                calculations={savedCalculations}
+                onDeleteCalculation={handleDeleteCalculation}
+              />
+            )}
           </div>
         )}
       </div>

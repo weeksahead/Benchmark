@@ -141,8 +141,8 @@ export default async function handler(req, res) {
     const statusColumn = columns.find(col => col.type === 'color' || col.title.toLowerCase() === 'status');
     if (statusColumn) {
       // Set status based on meetsTarget
-      // "Terry Approves" for meets target, "Terry is Pissed" for doesn't meet target
-      const statusLabel = meetsTarget ? "Terry Approves" : "Terry is Pissed";
+      // "Terry Approves" for meets target, "Terry is heating up" for doesn't meet target
+      const statusLabel = meetsTarget ? "Terry Approves" : "Terry is heating up";
       columnValues[statusColumn.id] = { label: statusLabel };
     }
 

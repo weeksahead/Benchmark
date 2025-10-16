@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive } from 'lucide-react';
 import slidesData from '../config/slides.json';
 import photosData from '../config/photos.json';

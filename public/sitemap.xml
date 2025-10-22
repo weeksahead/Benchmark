@@ -52,8 +52,20 @@
 
   <!-- Individual Blog Posts -->
   <url>
-    <loc>https://benchmarkequip.com/blog/construction-site-efficiency</loc>
-    <lastmod>2024-09-17</lastmod>
+    <loc>https://benchmarkequip.com/blog/technology-modern-construction-equipment-gps-telematics-grade-control</loc>
+    <lastmod>2025-10-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://benchmarkequip.com/assets/Cat%20Blog.jpg</image:loc>
+      <image:title>Technology in Modern Construction Equipment: GPS, Telematics, and Grade Control</image:title>
+      <image:caption>How GPS, telematics, and grade control technology transform construction productivity</image:caption>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://benchmarkequip.com/blog/construction-site-efficiency-right-equipment-reduces-timelines</loc>
+    <lastmod>2025-09-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -64,20 +76,32 @@
   </url>
 
   <url>
-    <loc>https://benchmarkequip.com/blog/cat-excavator-guide</loc>
-    <lastmod>2024-01-20</lastmod>
+    <loc>https://benchmarkequip.com/blog/essential-maintenance-tips-extend-heavy-equipment-life</loc>
+    <lastmod>2025-08-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
-      <image:loc>https://benchmarkequip.com/assets/Cat%20336.jpeg</image:loc>
-      <image:title>Complete Guide to Choosing the Right Cat Excavator</image:title>
-      <image:caption>Professional guide to selecting Caterpillar excavators for your project</image:caption>
+      <image:loc>https://benchmarkequip.com/assets/dynapac.webp</image:loc>
+      <image:title>Essential Maintenance Tips to Extend Heavy Equipment Life</image:title>
+      <image:caption>Professional maintenance strategies for heavy equipment longevity</image:caption>
     </image:image>
   </url>
 
   <url>
-    <loc>https://benchmarkequip.com/blog/heavy-equipment-safety</loc>
-    <lastmod>2024-01-14</lastmod>
+    <loc>https://benchmarkequip.com/blog/ultimate-guide-cat-skid-steer-versatility</loc>
+    <lastmod>2025-07-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://benchmarkequip.com/assets/cat-skid-steer-action.jpeg</image:loc>
+      <image:title>The Ultimate Guide to Cat Skid Steer Versatility: One Machine, Endless Possibilities</image:title>
+      <image:caption>Exploring the versatility of Caterpillar skid steer loaders</image:caption>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://benchmarkequip.com/blog/essential-safety-tips-heavy-equipment-operation</loc>
+    <lastmod>2025-06-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
@@ -88,26 +112,14 @@
   </url>
 
   <url>
-    <loc>https://benchmarkequip.com/blog/cat-skid-steer-versatility</loc>
-    <lastmod>2024-01-09</lastmod>
+    <loc>https://benchmarkequip.com/blog/complete-guide-choosing-right-cat-excavator</loc>
+    <lastmod>2025-05-17</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
-      <image:loc>https://benchmarkequip.com/assets/cat-skid-steer-action.jpeg</image:loc>
-      <image:title>Cat Skid Steer Versatility: One Machine, Endless Possibilities</image:title>
-      <image:caption>Exploring the versatility of Caterpillar skid steer loaders</image:caption>
-    </image:image>
-  </url>
-
-  <url>
-    <loc>https://benchmarkequip.com/blog/equipment-maintenance-tips</loc>
-    <lastmod>2024-01-04</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-    <image:image>
-      <image:loc>https://benchmarkequip.com/assets/dynapac.webp</image:loc>
-      <image:title>Essential Maintenance Tips to Extend Heavy Equipment Life</image:title>
-      <image:caption>Professional maintenance strategies for heavy equipment longevity</image:caption>
+      <image:loc>https://benchmarkequip.com/assets/Cat%20336.jpeg</image:loc>
+      <image:title>The Complete Guide to Choosing the Right Cat Excavator for Your Project</image:title>
+      <image:caption>Professional guide to selecting Caterpillar excavators for your project</image:caption>
     </image:image>
   </url>
 

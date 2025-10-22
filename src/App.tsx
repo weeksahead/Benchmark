@@ -48,7 +48,15 @@ function App() {
   // Update URL when page changes
   useEffect(() => {
     const path = currentPage === 'home' ? '/' : `/${currentPage}`;
-    if (window.location.pathname !== path && !window.location.pathname.startsWith('/blog/')) {
+    // Update URL unless we're staying within blog post navigation
+    const isOnBlogPost = window.location.pathname.startsWith('/blog/');
+    const isNavigatingToBlog = currentPage === 'blog';
+
+    if (window.location.pathname !== path) {
+      // Let Blog component handle its own navigation between posts and listing
+      if (isNavigatingToBlog && isOnBlogPost) {
+        return;
+      }
       window.history.pushState({}, '', path);
     }
   }, [currentPage]);

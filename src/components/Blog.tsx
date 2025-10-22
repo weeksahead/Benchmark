@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Calendar, User, ArrowRight, Search, Tag } from 'lucide-react';
 
 interface BlogPost {
@@ -466,8 +467,66 @@ Technology integration in modern construction equipment represents a fundamental
   };
 
   if (selectedPost) {
+    const postUrl = `https://benchmarkequip.com/blog/${selectedPost.slug}`;
+    const postImageUrl = `https://benchmarkequip.com${selectedPost.image}`;
+
     return (
       <section className="bg-black text-white min-h-screen py-20">
+        <Helmet>
+          {/* Primary Meta Tags */}
+          <title>{selectedPost.title} | Benchmark Equipment Blog</title>
+          <meta name="title" content={`${selectedPost.title} | Benchmark Equipment Blog`} />
+          <meta name="description" content={selectedPost.excerpt} />
+          <link rel="canonical" href={postUrl} />
+
+          {/* Open Graph / Facebook */}
+          <meta property="og:type" content="article" />
+          <meta property="og:url" content={postUrl} />
+          <meta property="og:title" content={selectedPost.title} />
+          <meta property="og:description" content={selectedPost.excerpt} />
+          <meta property="og:image" content={postImageUrl} />
+          <meta property="article:published_time" content={selectedPost.date} />
+          <meta property="article:author" content={selectedPost.author} />
+          <meta property="article:section" content={selectedPost.category} />
+
+          {/* Twitter */}
+          <meta property="twitter:card" content="summary_large_image" />
+          <meta property="twitter:url" content={postUrl} />
+          <meta property="twitter:title" content={selectedPost.title} />
+          <meta property="twitter:description" content={selectedPost.excerpt} />
+          <meta property="twitter:image" content={postImageUrl} />
+
+          {/* BlogPosting Schema */}
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BlogPosting",
+              "headline": selectedPost.title,
+              "description": selectedPost.excerpt,
+              "image": postImageUrl,
+              "datePublished": selectedPost.date,
+              "dateModified": selectedPost.date,
+              "author": {
+                "@type": "Person",
+                "name": selectedPost.author
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Benchmark Equipment Rental & Sales",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://benchmarkequip.com/assets/Benchmark%20Logo%20(RGB%20Color%20Reverse).png"
+                }
+              },
+              "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": postUrl
+              },
+              "articleSection": selectedPost.category,
+              "keywords": "construction equipment, heavy equipment, equipment rental, Cat equipment, " + selectedPost.category.toLowerCase()
+            })}
+          </script>
+        </Helmet>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button
@@ -562,6 +621,27 @@ Technology integration in modern construction equipment represents a fundamental
 
   return (
     <section className="bg-black text-white min-h-screen py-20">
+      <Helmet>
+        {/* Primary Meta Tags */}
+        <title>Equipment & Industry Blog | Benchmark Equipment</title>
+        <meta name="title" content="Equipment & Industry Blog | Benchmark Equipment" />
+        <meta name="description" content="Expert insights, safety tips, and industry knowledge from the Benchmark Equipment team. Learn about construction equipment, maintenance, safety, and efficiency." />
+        <link rel="canonical" href="https://benchmarkequip.com/blog" />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://benchmarkequip.com/blog" />
+        <meta property="og:title" content="Equipment & Industry Blog | Benchmark Equipment" />
+        <meta property="og:description" content="Expert insights, safety tips, and industry knowledge from the Benchmark Equipment team." />
+        <meta property="og:image" content="https://benchmarkequip.com/assets/CAT%20Wheel%20loader%20blog.jpg" />
+
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://benchmarkequip.com/blog" />
+        <meta property="twitter:title" content="Equipment & Industry Blog | Benchmark Equipment" />
+        <meta property="twitter:description" content="Expert insights, safety tips, and industry knowledge from the Benchmark Equipment team." />
+        <meta property="twitter:image" content="https://benchmarkequip.com/assets/CAT%20Wheel%20loader%20blog.jpg" />
+      </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">

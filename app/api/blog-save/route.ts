@@ -106,9 +106,15 @@ export async function POST(request: NextRequest) {
     // Build column values object dynamically based on found columns
     const columnValues: Record<string, any> = {}
 
-    // Map our data to the board columns
+    // Helper function to get column type
+    const getColumnType = (columnTitle: string) => {
+      const col = columns.find((c: any) => c.title.toLowerCase().trim() === columnTitle.toLowerCase())
+      return col?.type
+    }
+
+    // Map our data to the board columns with proper formatting
     if (columnMap['topic'] && topic) {
-      columnValues[columnMap['topic']] = topic.substring(0, 2000) // Text limit
+      columnValues[columnMap['topic']] = topic.substring(0, 5000) // Text columns can handle more
     }
 
     if (columnMap['equipment model'] && equipmentModel) {
@@ -124,11 +130,13 @@ export async function POST(request: NextRequest) {
     }
 
     if (columnMap['target keywords'] && keywords) {
-      columnValues[columnMap['target keywords']] = Array.isArray(keywords) ? keywords.join(', ') : keywords
+      const keywordString = Array.isArray(keywords) ? keywords.join(', ') : keywords
+      columnValues[columnMap['target keywords']] = keywordString
     }
 
     if (columnMap['word count'] && wordCount) {
-      columnValues[columnMap['word count']] = wordCount
+      // Number columns need to be sent as strings
+      columnValues[columnMap['word count']] = String(wordCount)
     }
 
     if (columnMap['slug'] && slug) {
@@ -140,6 +148,8 @@ export async function POST(request: NextRequest) {
     if (statusColumn) {
       columnValues[statusColumn.id] = { label: "Draft" }
     }
+
+    console.log('Column values to update:', JSON.stringify(columnValues, null, 2))
 
     // Update the item with all column values
     const updateQuery = {

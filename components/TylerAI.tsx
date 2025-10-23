@@ -81,8 +81,6 @@ const TylerAI = () => {
     scrollToBottom();
   }, [messages]);
 
-  const CLAUDE_API_KEY = process.env.NEXT_PUBLIC_CLAUDE_API_KEY;
-
   const callClaudeAPI = async (userMessage: string, conversationHistory: any[]) => {
     try {
       const response = await fetch('/api/chat', {
@@ -92,7 +90,7 @@ const TylerAI = () => {
         },
         body: JSON.stringify({
           message: userMessage,
-          history: conversationHistory
+          conversationHistory: conversationHistory
         })
       });
 

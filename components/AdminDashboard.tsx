@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive } from 'lucide-react';
+import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive, Wand2 } from 'lucide-react';
 import slidesData from '../config/slides.json';
 import photosData from '../config/photos.json';
 import PurchaseCalculator from './PurchaseCalculator';
 import SavedCalculations from './SavedCalculations';
+import ContentFactory from './ContentFactory';
 
 interface SavedCalculation {
   id: string;
@@ -40,7 +41,7 @@ interface PhotoGalleryImage {
 }
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
-  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines' | 'calculator' | 'saved'>('slider');
+  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines' | 'calculator' | 'saved' | 'content'>('slider');
   const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
@@ -368,13 +369,24 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           <button
             onClick={() => setActiveTab('saved')}
             className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
-              activeTab === 'saved' 
-                ? 'bg-red-600 text-white' 
+              activeTab === 'saved'
+                ? 'bg-red-600 text-white'
                 : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
             }`}
           >
             <Archive className="w-5 h-5" />
             <span>Saved Calculations</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('content')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
+              activeTab === 'content'
+                ? 'bg-red-600 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            <Wand2 className="w-5 h-5" />
+            <span>Content Factory</span>
           </button>
         </div>
 
@@ -668,6 +680,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 onDeleteCalculation={handleDeleteCalculation}
               />
             )}
+          </div>
+        )}
+
+        {/* Content Factory */}
+        {activeTab === 'content' && (
+          <div>
+            <ContentFactory />
           </div>
         )}
       </div>

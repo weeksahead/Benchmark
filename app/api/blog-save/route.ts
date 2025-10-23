@@ -144,9 +144,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Set status to "Draft"
+    // Status/color columns need to be JSON stringified because the entire columnValues object gets double-stringified
     const statusColumn = columns.find((col: any) => col.type === 'color' || col.title.toLowerCase() === 'status')
     if (statusColumn) {
-      columnValues[statusColumn.id] = { label: "Draft" }
+      columnValues[statusColumn.id] = JSON.stringify({ label: "Draft" })
     }
 
     console.log('Column values to update:', JSON.stringify(columnValues, null, 2))

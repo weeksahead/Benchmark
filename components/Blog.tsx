@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Calendar, User, ArrowRight, Search, Tag } from 'lucide-react';
 
 interface BlogPost {

@@ -38,6 +38,7 @@
   "exclude": [
     "node_modules",
     "src",
-    "dist"
+    "dist",
+    "components/Blog.tsx"
   ]
 }

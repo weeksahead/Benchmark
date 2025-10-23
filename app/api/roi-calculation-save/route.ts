@@ -127,7 +127,8 @@ export async function POST(request: NextRequest) {
     // Handle Status column - find the status column
     const statusColumn = columns.find((col: any) => col.type === 'color' || col.title.toLowerCase() === 'status')
     if (statusColumn) {
-      // Set status based on meetsTarget
+      // Set status based on meetsTarget (>= 4.5% ROI)
+      // Green = "Terry Approves", Red = "Terry is heating up"
       const statusLabel = meetsTarget ? "Terry Approves" : "Terry is heating up"
       columnValues[statusColumn.id] = { label: statusLabel }
     }

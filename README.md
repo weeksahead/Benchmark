@@ -14,9 +14,9 @@ Modern construction equipment rental website with AI-powered chat support and CR
 
 ## 🛠️ Tech Stack
 
-**Frontend:** React 18, TypeScript, Vite, Tailwind CSS  
-**Backend:** Vercel Serverless Functions  
-**APIs:** Claude AI, Monday.com CRM, GitHub (CMS)  
+**Framework:** Next.js 15 (App Router), React 19, TypeScript
+**Styling:** Tailwind CSS
+**APIs:** Claude AI (Sonnet 4), Monday.com CRM
 **Deployment:** Vercel
 
 ## 🚀 Quick Start
@@ -29,20 +29,27 @@ npm run dev
 ```
 
 **Environment Variables:**
+Create a `.env.local` file:
 ```env
-VITE_MONDAY_API_TOKEN=your_token
-VITE_MONDAY_BOARD_ID=your_board_id
-VITE_CLAUDE_API_KEY=your_key
-GITHUB_TOKEN=your_token
+CLAUDE_API_KEY=your_claude_api_key
+MONDAY_API_TOKEN=your_monday_token
+MONDAY_BOARD_ID=your_board_id
 ```
+
+For production, add these in Vercel Dashboard → Settings → Environment Variables
 
 ## 📁 Project Structure
 
 ```
-src/components/          # React components (Hero, Contact, TylerAI, Admin)
-src/config/             # Configuration files (slides, photos, Monday.com)
-api/                    # Serverless functions (chat, contact, admin)
-public/assets/          # Images and static files
+app/                    # Next.js app directory
+  api/chat/            # Claude AI API route (server-side)
+  api/contact/         # Monday.com API route (server-side)
+  blog/                # Blog pages and posts
+  layout.tsx           # Root layout with SEO
+  page.tsx             # Homepage
+components/            # React components (Hero, Contact, TylerAI, etc.)
+data/                  # Blog posts and content
+public/assets/         # Images and static files
 ```
 
 ## 🔧 Admin Dashboard

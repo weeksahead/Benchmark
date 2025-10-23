@@ -37,7 +37,9 @@ IMPORTANT: Respond with plain text only. Do NOT include any asterisks, stage dir
     })
 
     if (!response.ok) {
-      throw new Error(`Claude API error: ${response.statusText}`)
+      const errorData = await response.json()
+      console.error('Claude API error:', response.status, errorData)
+      throw new Error(`Claude API error: ${response.status} - ${JSON.stringify(errorData)}`)
     }
 
     const data = await response.json()

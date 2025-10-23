@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Wand2, FileText, Eye, Save, Loader2 } from 'lucide-react';
+import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw } from 'lucide-react';
 
 interface GeneratedContent {
   title: string;
@@ -22,6 +22,8 @@ const ContentFactory = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const [suggestion, setSuggestion] = useState<any>(null);
 
   const equipmentModels = [
     'Cat 301.7 (Mini Excavator)',
@@ -131,6 +133,35 @@ const ContentFactory = () => {
     }
   };
 
+  const handleSuggestTopic = async () => {
+    setIsSuggesting(true);
+    setSaveMessage('AI is analyzing existing blogs and suggesting a topic...');
+    setSuggestion(null);
+
+    try {
+      const response = await fetch('/api/blog-suggest-topic');
+
+      if (!response.ok) {
+        throw new Error('Failed to get topic suggestion');
+      }
+
+      const data = await response.json();
+      setSuggestion(data.suggestion);
+
+      // Auto-fill the form with the suggestion
+      setTopic(data.suggestion.topic);
+      setEquipmentModel(data.suggestion.equipmentModel);
+      setContentAngle(data.suggestion.contentAngle);
+
+      setSaveMessage('✅ Topic suggested! Click "Generate Blog Post" or refresh for a new idea.');
+    } catch (error) {
+      console.error('Suggestion error:', error);
+      setSaveMessage('❌ Failed to suggest topic. Please try again.');
+    } finally {
+      setIsSuggesting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-gray-900 p-6 rounded-lg">
@@ -140,10 +171,54 @@ const ContentFactory = () => {
         </div>
 
         <div className="space-y-4">
+          {/* AI Topic Suggester */}
+          <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-6 rounded-lg border border-purple-500/30">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <Lightbulb className="w-6 h-6 text-yellow-400 mr-3" />
+                <h3 className="text-lg font-bold">AI Topic Suggester</h3>
+              </div>
+              {suggestion && (
+                <button
+                  onClick={handleSuggestTopic}
+                  disabled={isSuggesting}
+                  className="text-sm text-blue-400 hover:text-blue-300 flex items-center"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-2 ${isSuggesting ? 'animate-spin' : ''}`} />
+                  Refresh
+                </button>
+              )}
+            </div>
+
+            {suggestion && (
+              <div className="mb-4 p-4 bg-gray-800/50 rounded-lg">
+                <p className="text-sm text-gray-300 mb-2"><span className="font-semibold text-white">AI Reasoning:</span> {suggestion.reasoning}</p>
+              </div>
+            )}
+
+            <button
+              onClick={handleSuggestTopic}
+              disabled={isSuggesting}
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:from-gray-600 disabled:to-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center justify-center"
+            >
+              {isSuggesting ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  AI Analyzing Existing Blogs...
+                </>
+              ) : (
+                <>
+                  <Lightbulb className="w-5 h-5 mr-2" />
+                  {suggestion ? 'Get New Suggestion' : 'Suggest Blog Topic with AI'}
+                </>
+              )}
+            </button>
+          </div>
+
           {/* Topic Input */}
           <div>
             <label className="block text-sm font-medium mb-2">
-              Blog Topic *
+              Blog Topic {suggestion && <span className="text-purple-400">(AI Suggested)</span>}
             </label>
             <input
               type="text"

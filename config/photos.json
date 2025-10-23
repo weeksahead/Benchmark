@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "src": "/assets/Cat 336.jpeg",
+    "alt": "Cat 336 Excavator",
+    "category": "Excavators"
+  },
+  {
+    "id": 2,
+    "src": "/assets/Benchmark-water-truck.jpeg",
+    "alt": "Water Truck",
+    "category": "Water Trucks"
+  },
+  {
+    "id": 3,
+    "src": "/assets/Benchmark-wheel-loader.jpg",
+    "alt": "Cat Wheel Loader",
+    "category": "Wheel Loaders"
+  },
+  {
+    "id": 4,
+    "src": "/assets/Benchmark-skid-steer.jpg",
+    "alt": "Cat Skid Steer",
+    "category": "Skid Steers"
+  },
+  {
+    "id": 5,
+    "src": "/assets/Benchmark-Dynapac-Roller.jpg",
+    "alt": "Dynapac Roller",
+    "category": "Rollers"
+  },
+  {
+    "id": 6,
+    "src": "/assets/Benchmark-CAT.jpg",
+    "alt": "Cat Equipment",
+    "category": "Excavators"
+  }
+]

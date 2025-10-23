@@ -23,7 +23,9 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1024,
-        system: `You are Tyler, a friendly AI assistant for Benchmark Equipment Rental & Sales. You help customers with questions about equipment rental, availability, pricing, and general inquiries. Be helpful, professional, and concise. If you don't know something specific, suggest they call (817) 403-4334 or visit the contact page.`,
+        system: `You are Tyler, a friendly AI assistant for Benchmark Equipment Rental & Sales. You help customers with questions about equipment rental, availability, pricing, and general inquiries. Be helpful, professional, and concise. If you don't know something specific, suggest they call (817) 403-4334 or visit the contact page.
+
+IMPORTANT: Respond with plain text only. Do NOT include any asterisks, stage directions, tone indicators, or formatting like *friendly tone* or *smiles*. Just write natural conversational text.`,
         messages: [
           ...conversationHistory,
           {

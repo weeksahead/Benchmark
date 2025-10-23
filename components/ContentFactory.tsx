@@ -21,6 +21,7 @@ const ContentFactory = () => {
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const equipmentModels = [
     'Cat 301.7 (Mini Excavator)',
@@ -92,12 +93,42 @@ const ContentFactory = () => {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!generatedContent) return;
 
-    // TODO: Save to Monday.com or blogPosts.ts
-    setSaveMessage('✅ Content saved as draft!');
-    console.log('Saving content:', generatedContent);
+    setIsSaving(true);
+    setSaveMessage('Saving draft to Monday.com...');
+
+    try {
+      const response = await fetch('/api/blog-save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: generatedContent.title,
+          topic,
+          equipmentModel,
+          contentAngle,
+          category: generatedContent.category,
+          keywords: generatedContent.keywords,
+          wordCount: generatedContent.content.split(/\s+/).length,
+          slug: generatedContent.slug,
+          excerpt: generatedContent.excerpt,
+          content: generatedContent.content
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save draft');
+      }
+
+      const data = await response.json();
+      setSaveMessage('✅ Draft saved to Monday.com! Check your Blog Workflow board.');
+    } catch (error) {
+      console.error('Save error:', error);
+      setSaveMessage('❌ Failed to save draft. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -256,10 +287,20 @@ const ContentFactory = () => {
               <div className="flex gap-4">
                 <button
                   onClick={handleSave}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                  disabled={isSaving}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
                 >
-                  <Save className="w-5 h-5 mr-2" />
-                  Save as Draft
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5 mr-2" />
+                      Save to Monday.com
+                    </>
+                  )}
                 </button>
                 <button
                   onClick={() => {

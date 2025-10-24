@@ -143,11 +143,20 @@ export async function POST(request: NextRequest) {
       columnValues[columnMap['slug']] = slug
     }
 
-    // Set status to "Draft"
-    // Status/color columns need to be JSON stringified because the entire columnValues object gets double-stringified
-    const statusColumn = columns.find((col: any) => col.type === 'color' || col.title.toLowerCase() === 'status')
-    if (statusColumn) {
-      columnValues[statusColumn.id] = JSON.stringify({ label: "Draft" })
+    // Map excerpt to overview column
+    if (columnMap['overview'] && excerpt) {
+      columnValues[columnMap['overview']] = excerpt.substring(0, 5000)
+    }
+
+    // Set created date to current date (date columns need YYYY-MM-DD format)
+    if (columnMap['created date']) {
+      const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+      columnValues[columnMap['created date']] = JSON.stringify({ date: today })
+    }
+
+    // Set status to "Draft" - use column map to get the right status column
+    if (columnMap['status']) {
+      columnValues[columnMap['status']] = JSON.stringify({ label: "Draft" })
     }
 
     console.log('Column values to update:', JSON.stringify(columnValues, null, 2))

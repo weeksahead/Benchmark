@@ -120,7 +120,7 @@ const ContentFactory = () => {
           slug: generatedContent.slug,
           excerpt: generatedContent.excerpt,
           content: generatedContent.content,
-          featuredImage: featuredImage
+          featuredImage: featuredImage ? 'image-included' : null // Don't send base64 data, just indicate presence
         })
       });
 

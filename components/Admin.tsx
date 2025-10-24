@@ -5,7 +5,8 @@ import AdminLogin from './AdminLogin';
 import AdminDashboard from './AdminDashboard';
 
 const Admin = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Temporarily disabled login - set to true to skip authentication
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   const handleLogin = (success: boolean) => {
     setIsAuthenticated(success);

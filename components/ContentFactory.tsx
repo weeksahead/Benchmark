@@ -353,9 +353,10 @@ const ContentFactory = () => {
               {/* Content */}
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">Full Content</label>
-                <div className="px-4 py-3 bg-gray-800 rounded-lg text-white max-h-96 overflow-y-auto whitespace-pre-wrap">
-                  {generatedContent.content}
-                </div>
+                <div
+                  className="px-4 py-3 bg-gray-800 rounded-lg text-white max-h-96 overflow-y-auto prose prose-invert"
+                  dangerouslySetInnerHTML={{ __html: generatedContent.content }}
+                />
               </div>
 
               {/* Action Buttons */}

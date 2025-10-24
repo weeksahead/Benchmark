@@ -57,12 +57,14 @@ Return a JSON object with the following structure:
 {
   "title": "SEO-optimized title (60-70 characters)",
   "excerpt": "Compelling 2-3 sentence summary (150-160 characters)",
-  "content": "Full blog post content in markdown format with ## headings",
+  "content": "Full blog post content as clean HTML paragraphs. Use <h2> for section headings, <p> for paragraphs, <ul>/<li> for lists. NO markdown syntax (no **, ##, etc). Ensure proper paragraph breaks between sections.",
   "category": "Equipment Guides | Industry Insights | Operator Tips | Equipment Comparisons",
   "readTime": "X min read",
   "slug": "url-friendly-slug",
   "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]
 }
+
+IMPORTANT: The content field must be clean HTML only - no markdown formatting. Use proper HTML tags and ensure paragraphs are separated with </p><p> tags.
 
 Make the content authoritative, detailed, and valuable for contractors researching equipment.`
 

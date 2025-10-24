@@ -12,7 +12,8 @@ export async function POST(request: NextRequest) {
       wordCount,
       slug,
       excerpt,
-      content
+      content,
+      featuredImage
     } = await request.json()
 
     if (!title) {
@@ -197,12 +198,13 @@ export async function POST(request: NextRequest) {
 
     // Store the full content in a note or update
     // Note: Full blog content (excerpt + content) will be stored in the item's updates/notes
+    const imageNote = featuredImage ? '\\n\\n✅ Featured image uploaded' : '\\n\\n⚠️ No featured image'
     const addUpdateQuery = {
       query: `
         mutation {
           create_update (
             item_id: ${itemId},
-            body: "BLOG CONTENT:\\n\\nEXCERPT:\\n${excerpt?.substring(0, 500) || ''}\\n\\nFULL CONTENT (stored separately):\\nView in Content Factory or click 'Publish' to add to site"
+            body: "BLOG CONTENT:\\n\\nEXCERPT:\\n${excerpt?.substring(0, 500) || ''}${imageNote}\\n\\nFULL CONTENT (stored separately):\\nView in Content Factory or click 'Publish' to add to site"
           ) {
             id
           }

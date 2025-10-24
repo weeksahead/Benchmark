@@ -106,18 +106,32 @@ Make the content authoritative, detailed, and valuable for contractors researchi
     const data = await response.json()
     const rawContent = data.content[0].text
 
+    console.log('Raw Claude response (first 200 chars):', rawContent.substring(0, 200))
+
     // Try to parse JSON from Claude's response
     let generatedContent
+    let jsonString = rawContent
     try {
       // Claude sometimes wraps JSON in markdown code blocks
-      const jsonMatch = rawContent.match(/```json\n?([\s\S]*?)\n?```/) ||
-                        rawContent.match(/```\n?([\s\S]*?)\n?```/) ||
-                        [null, rawContent]
+      // Try multiple patterns to extract JSON
 
-      const jsonString = jsonMatch[1] || rawContent
-      generatedContent = JSON.parse(jsonString.trim())
+      // Remove markdown code blocks if present
+      if (rawContent.includes('```')) {
+        const codeBlockMatch = rawContent.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/)
+        if (codeBlockMatch && codeBlockMatch[1]) {
+          jsonString = codeBlockMatch[1]
+        }
+      }
+
+      // Trim whitespace and parse
+      jsonString = jsonString.trim()
+      console.log('Attempting to parse JSON (first 200 chars):', jsonString.substring(0, 200))
+
+      generatedContent = JSON.parse(jsonString)
+      console.log('Successfully parsed JSON, title:', generatedContent.title)
     } catch (parseError) {
       console.error('Failed to parse Claude response as JSON:', parseError)
+      console.error('JSON string that failed:', jsonString?.substring(0, 500))
       // Return a fallback structure
       generatedContent = {
         title: topic,

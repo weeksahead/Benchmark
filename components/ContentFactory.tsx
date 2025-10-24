@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw } from 'lucide-react';
+import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw, Upload, Image as ImageIcon } from 'lucide-react';
 
 interface GeneratedContent {
   title: string;
@@ -24,6 +24,8 @@ const ContentFactory = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [suggestion, setSuggestion] = useState<any>(null);
+  const [featuredImage, setFeaturedImage] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const equipmentModels = [
     'Cat 301.7 (Mini Excavator)',
@@ -115,7 +117,8 @@ const ContentFactory = () => {
           wordCount: generatedContent.content.split(/\s+/).length,
           slug: generatedContent.slug,
           excerpt: generatedContent.excerpt,
-          content: generatedContent.content
+          content: generatedContent.content,
+          featuredImage: featuredImage
         })
       });
 
@@ -160,6 +163,25 @@ const ContentFactory = () => {
     } finally {
       setIsSuggesting(false);
     }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setSaveMessage('❌ Please upload an image file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageData = event.target?.result as string;
+      setFeaturedImage(imageData);
+      setImagePreview(imageData);
+      setSaveMessage('✅ Image uploaded! It will be included when you save.');
+    };
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -350,6 +372,38 @@ const ContentFactory = () => {
                 </div>
               </div>
 
+              {/* Featured Image Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Featured Image</label>
+                {imagePreview ? (
+                  <div className="space-y-2">
+                    <img src={imagePreview} alt="Featured" className="w-full max-h-64 object-cover rounded-lg" />
+                    <button
+                      onClick={() => {
+                        setFeaturedImage(null);
+                        setImagePreview(null);
+                      }}
+                      className="text-sm text-red-400 hover:text-red-300"
+                    >
+                      Remove Image
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-800 hover:bg-gray-700 transition-colors">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-400">Click to upload featured image</p>
+                    </div>
+                    <input
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                    />
+                  </label>
+                )}
+              </div>
+
               {/* Content */}
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">Full Content</label>
@@ -386,6 +440,8 @@ const ContentFactory = () => {
                     setGeneratedContent(null);
                     setShowPreview(false);
                     setSaveMessage('');
+                    setFeaturedImage(null);
+                    setImagePreview(null);
                   }}
                   className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                 >

@@ -53,25 +53,28 @@ Brand Integration:
 ${equipmentModel ? `\nFocus on equipment model: ${equipmentModel}` : ''}
 ${contentAngle ? `\nContent angle: ${contentAngle}` : ''}
 
-Return a JSON object with the following structure:
+Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
 {
   "title": "SEO-optimized title (60-70 characters)",
   "excerpt": "Compelling 2-3 sentence summary (150-160 characters)",
-  "content": "Full blog post content as clean HTML. IMPORTANT FORMAT REQUIREMENTS:
-    - Use <h2 style='font-weight: bold; font-size: 1.5em; margin-top: 2em; margin-bottom: 1em;'>Section Heading</h2> for section headings
-    - Use <p style='margin-bottom: 1.5em; line-height: 1.8;'>Paragraph text here.</p> for EVERY paragraph
-    - Each paragraph must be wrapped in its own <p> tag with the style attribute
-    - Add blank space between sections by using the margin styles
+  "content": "Full blog post content as clean HTML. Use DOUBLE QUOTES for all HTML attributes. Format:
+    - <h2 style=\"font-weight: bold; font-size: 1.5em; margin-top: 2em; margin-bottom: 1em;\">Section Heading</h2>
+    - <p style=\"margin-bottom: 1.5em; line-height: 1.8;\">Paragraph text here.</p>
+    - Each paragraph in its own <p> tag
     - Use <ul><li>items</li></ul> for lists
-    - NO markdown syntax (no **, ##, etc)
-    - Make section headings BOLD and larger than body text",
-  "category": "Equipment Guides | Industry Insights | Operator Tips | Equipment Comparisons",
+    - NO markdown syntax",
+  "category": "Equipment Guides",
   "readTime": "X min read",
   "slug": "url-friendly-slug",
   "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]
 }
 
-CRITICAL: Every paragraph MUST have its own <p style='margin-bottom: 1.5em; line-height: 1.8;'> tag. Section headings MUST be bold and have top/bottom spacing. The content should be easy to read with clear visual separation between paragraphs and sections.
+CRITICAL REQUIREMENTS:
+1. Return ONLY the JSON object - no markdown code blocks, no backticks, just pure JSON
+2. Use DOUBLE QUOTES for HTML attributes (not single quotes)
+3. Escape any quotes within content with backslash
+4. Keep content under 15000 characters total
+5. Ensure valid JSON - test it mentally before responding
 
 Make the content authoritative, detailed, and valuable for contractors researching equipment.`
 
@@ -121,20 +124,30 @@ Make the content authoritative, detailed, and valuable for contractors researchi
         jsonString = jsonString.replace(/\n?```\s*$/i, '')
       }
 
-      // Trim whitespace and parse
+      // Trim whitespace
       jsonString = jsonString.trim()
-      console.log('Attempting to parse JSON (first 200 chars):', jsonString.substring(0, 200))
+
+      // Validate JSON structure before parsing
+      if (!jsonString.startsWith('{') || !jsonString.endsWith('}')) {
+        throw new Error('JSON does not start with { or end with }')
+      }
+
+      console.log('Attempting to parse JSON (first 300 chars):', jsonString.substring(0, 300))
+      console.log('JSON ends with (last 100 chars):', jsonString.substring(jsonString.length - 100))
 
       generatedContent = JSON.parse(jsonString)
-      console.log('Successfully parsed JSON, title:', generatedContent.title)
+      console.log('✅ Successfully parsed JSON, title:', generatedContent.title)
     } catch (parseError) {
-      console.error('Failed to parse Claude response as JSON:', parseError)
-      console.error('JSON string that failed:', jsonString?.substring(0, 500))
+      console.error('❌ Failed to parse Claude response as JSON:', parseError)
+      console.error('JSON length:', jsonString?.length)
+      console.error('First 500 chars:', jsonString?.substring(0, 500))
+      console.error('Last 500 chars:', jsonString?.substring(jsonString.length - 500))
+
       // Return a fallback structure
       generatedContent = {
         title: topic,
-        excerpt: rawContent.substring(0, 160),
-        content: rawContent,
+        excerpt: 'AI-generated content for ' + topic,
+        content: '<p style="margin-bottom: 1.5em; line-height: 1.8;">Content generation failed. Please try again.</p>',
         category: 'Equipment Guides',
         readTime: '8 min read',
         slug: topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),

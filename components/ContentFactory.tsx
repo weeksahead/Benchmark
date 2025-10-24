@@ -13,7 +13,11 @@ interface GeneratedContent {
   keywords: string[];
 }
 
-const ContentFactory = () => {
+interface ContentFactoryProps {
+  onSaveComplete?: () => void;
+}
+
+const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
   const [topic, setTopic] = useState('');
   const [equipmentModel, setEquipmentModel] = useState('');
   const [contentAngle, setContentAngle] = useState('');
@@ -26,8 +30,6 @@ const ContentFactory = () => {
   const [suggestion, setSuggestion] = useState<any>(null);
   const [featuredImage, setFeaturedImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [savedToMonday, setSavedToMonday] = useState(false);
-  const [isPublishing, setIsPublishing] = useState(false);
 
   const equipmentModels = [
     'Cat 301.7 (Mini Excavator)',
@@ -129,8 +131,14 @@ const ContentFactory = () => {
       }
 
       const data = await response.json();
-      setSavedToMonday(true);
-      setSaveMessage('✅ Draft saved to Monday.com! Ready to publish to site.');
+      setSaveMessage('✅ Draft saved to Monday.com! Redirecting to drafts...');
+
+      // Redirect to drafts page after a short delay
+      if (onSaveComplete) {
+        setTimeout(() => {
+          onSaveComplete();
+        }, 1500);
+      }
     } catch (error) {
       console.error('Save error:', error);
       setSaveMessage('❌ Failed to save draft. Please try again.');
@@ -185,41 +193,6 @@ const ContentFactory = () => {
       setSaveMessage('✅ Image uploaded! It will be included when you save.');
     };
     reader.readAsDataURL(file);
-  };
-
-  const handlePublish = async () => {
-    if (!generatedContent) return;
-
-    setIsPublishing(true);
-    setSaveMessage('Publishing blog post to site...');
-
-    try {
-      const response = await fetch('/api/blog-publish', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: generatedContent.title,
-          excerpt: generatedContent.excerpt,
-          content: generatedContent.content,
-          category: generatedContent.category,
-          readTime: generatedContent.readTime,
-          slug: generatedContent.slug,
-          featuredImage: featuredImage
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to publish blog post');
-      }
-
-      const data = await response.json();
-      setSaveMessage(`🎉 Blog post published successfully! View at /blog/${data.post.slug}`);
-    } catch (error) {
-      console.error('Publish error:', error);
-      setSaveMessage('❌ Failed to publish blog post. Please try again.');
-    } finally {
-      setIsPublishing(false);
-    }
   };
 
   return (
@@ -454,43 +427,23 @@ const ContentFactory = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-4">
-                {!savedToMonday ? (
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
-                  >
-                    {isSaving ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-5 h-5 mr-2" />
-                        Save to Monday.com
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    onClick={handlePublish}
-                    disabled={isPublishing}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
-                  >
-                    {isPublishing ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Publishing...
-                      </>
-                    ) : (
-                      <>
-                        <FileText className="w-5 h-5 mr-2" />
-                        Publish to Site
-                      </>
-                    )}
-                  </button>
-                )}
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-5 h-5 mr-2" />
+                      Save Draft
+                    </>
+                  )}
+                </button>
                 <button
                   onClick={() => {
                     setTopic('');

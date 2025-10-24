@@ -286,10 +286,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white flex flex-col">
       {/* Header */}
-      <header className="bg-gray-900 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="bg-gray-900 border-b border-gray-800 flex-shrink-0">
+        <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
               <Home className="w-6 h-6 text-red-500" />
@@ -319,76 +319,83 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tab Navigation */}
-        <div className="flex space-x-4 mb-8">
-          <button
-            onClick={() => setActiveTab('slider')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
-              activeTab === 'slider' 
-                ? 'bg-red-600 text-white' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <Image className="w-5 h-5" />
-            <span>Hero Slider</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('gallery')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
-              activeTab === 'gallery' 
-                ? 'bg-red-600 text-white' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <Camera className="w-5 h-5" />
-            <span>Photo Gallery</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('machines')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
-              activeTab === 'machines' 
-                ? 'bg-red-600 text-white' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <Search className="w-5 h-5" />
-            <span>Equipment Research</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('calculator')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
-              activeTab === 'calculator' 
-                ? 'bg-red-600 text-white' 
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <Calculator className="w-5 h-5" />
-            <span>Purchase Calculator</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('saved')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
-              activeTab === 'saved'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <Archive className="w-5 h-5" />
-            <span>Saved Calculations</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('content')}
-            className={`px-6 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${
-              activeTab === 'content'
-                ? 'bg-red-600 text-white'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            <Wand2 className="w-5 h-5" />
-            <span>Content Factory</span>
-          </button>
-        </div>
+      {/* Main Content Area with Sidebar */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar Navigation */}
+        <aside className="w-64 bg-gray-900 border-r border-gray-800 flex-shrink-0 overflow-y-auto">
+          <nav className="p-4 space-y-2">
+            <button
+              onClick={() => setActiveTab('slider')}
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-3 ${
+                activeTab === 'slider'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <Image className="w-5 h-5" />
+              <span>Hero Slider</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('gallery')}
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-3 ${
+                activeTab === 'gallery'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <Camera className="w-5 h-5" />
+              <span>Photo Gallery</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('machines')}
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-3 ${
+                activeTab === 'machines'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <Search className="w-5 h-5" />
+              <span>Equipment Research</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('calculator')}
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-3 ${
+                activeTab === 'calculator'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <Calculator className="w-5 h-5" />
+              <span>Purchase Calculator</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('saved')}
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-3 ${
+                activeTab === 'saved'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <Archive className="w-5 h-5" />
+              <span>Saved Calculations</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('content')}
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-3 ${
+                activeTab === 'content'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <Wand2 className="w-5 h-5" />
+              <span>Content Factory</span>
+            </button>
+          </nav>
+        </aside>
+
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-8">
 
         {/* Slider Management */}
         {activeTab === 'slider' && (
@@ -689,6 +696,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             <ContentFactory />
           </div>
         )}
+          </div>
+        </main>
       </div>
     </div>
   );

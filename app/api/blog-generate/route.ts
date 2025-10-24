@@ -113,14 +113,12 @@ Make the content authoritative, detailed, and valuable for contractors researchi
     let jsonString = rawContent
     try {
       // Claude sometimes wraps JSON in markdown code blocks
-      // Try multiple patterns to extract JSON
-
-      // Remove markdown code blocks if present
+      // Remove all markdown code block markers
       if (rawContent.includes('```')) {
-        const codeBlockMatch = rawContent.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/)
-        if (codeBlockMatch && codeBlockMatch[1]) {
-          jsonString = codeBlockMatch[1]
-        }
+        // Remove opening ```json or ```
+        jsonString = rawContent.replace(/^```(?:json)?\s*\n?/i, '')
+        // Remove closing ```
+        jsonString = jsonString.replace(/\n?```\s*$/i, '')
       }
 
       // Trim whitespace and parse

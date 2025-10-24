@@ -149,14 +149,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Set created date to current date (date columns need YYYY-MM-DD format)
+    // Note: Don't JSON.stringify - the entire columnValues gets stringified later
     if (columnMap['created date']) {
       const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
-      columnValues[columnMap['created date']] = JSON.stringify({ date: today })
+      columnValues[columnMap['created date']] = { date: today }
     }
 
     // Set status to "Draft" - use column map to get the right status column
+    // Note: Don't JSON.stringify - the entire columnValues gets stringified later
     if (columnMap['status']) {
-      columnValues[columnMap['status']] = JSON.stringify({ label: "Draft" })
+      columnValues[columnMap['status']] = { label: "Draft" }
     }
 
     console.log('Column values to update:', JSON.stringify(columnValues, null, 2))

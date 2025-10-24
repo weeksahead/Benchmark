@@ -57,14 +57,21 @@ Return a JSON object with the following structure:
 {
   "title": "SEO-optimized title (60-70 characters)",
   "excerpt": "Compelling 2-3 sentence summary (150-160 characters)",
-  "content": "Full blog post content as clean HTML paragraphs. Use <h2> for section headings, <p> for paragraphs, <ul>/<li> for lists. NO markdown syntax (no **, ##, etc). Ensure proper paragraph breaks between sections.",
+  "content": "Full blog post content as clean HTML. IMPORTANT FORMAT REQUIREMENTS:
+    - Use <h2 style='font-weight: bold; font-size: 1.5em; margin-top: 2em; margin-bottom: 1em;'>Section Heading</h2> for section headings
+    - Use <p style='margin-bottom: 1.5em; line-height: 1.8;'>Paragraph text here.</p> for EVERY paragraph
+    - Each paragraph must be wrapped in its own <p> tag with the style attribute
+    - Add blank space between sections by using the margin styles
+    - Use <ul><li>items</li></ul> for lists
+    - NO markdown syntax (no **, ##, etc)
+    - Make section headings BOLD and larger than body text",
   "category": "Equipment Guides | Industry Insights | Operator Tips | Equipment Comparisons",
   "readTime": "X min read",
   "slug": "url-friendly-slug",
   "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]
 }
 
-IMPORTANT: The content field must be clean HTML only - no markdown formatting. Use proper HTML tags and ensure paragraphs are separated with </p><p> tags.
+CRITICAL: Every paragraph MUST have its own <p style='margin-bottom: 1.5em; line-height: 1.8;'> tag. Section headings MUST be bold and have top/bottom spacing. The content should be easy to read with clear visual separation between paragraphs and sections.
 
 Make the content authoritative, detailed, and valuable for contractors researching equipment.`
 

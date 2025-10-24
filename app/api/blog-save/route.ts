@@ -70,6 +70,13 @@ export async function POST(request: NextRequest) {
 
     console.log('Available columns:', Object.keys(columnMap))
 
+    // Check for files column
+    const hasFilesColumn = columnMap['files'] || columnMap['file']
+    if (hasFilesColumn && featuredImage) {
+      console.log('Files column detected, but file upload requires Monday.com Asset API')
+      console.log('Image will be included in updates section instead')
+    }
+
     // Create the item with blog title
     const createItemQuery = {
       query: `
@@ -199,12 +206,17 @@ export async function POST(request: NextRequest) {
     // Store the full content in a note or update
     // Note: Full blog content (excerpt + content) will be stored in the item's updates/notes
     const imageNote = featuredImage ? '\\n\\n✅ Featured image uploaded' : '\\n\\n⚠️ No featured image'
+
+    // Escape the content for GraphQL (replace quotes and newlines)
+    const escapedContent = (content || '').replace(/"/g, '\\\\"').replace(/\n/g, '\\n').substring(0, 8000) // Limit to 8000 chars
+    const escapedExcerpt = (excerpt || '').replace(/"/g, '\\\\"').replace(/\n/g, '\\n')
+
     const addUpdateQuery = {
       query: `
         mutation {
           create_update (
             item_id: ${itemId},
-            body: "BLOG CONTENT:\\n\\nEXCERPT:\\n${excerpt?.substring(0, 500) || ''}${imageNote}\\n\\nFULL CONTENT (stored separately):\\nView in Content Factory or click 'Publish' to add to site"
+            body: "FULL BLOG POST\\n\\n━━━━━━━━━━━━━━━━━━━━━━\\n\\nEXCERPT:\\n${escapedExcerpt}${imageNote}\\n\\n━━━━━━━━━━━━━━━━━━━━━━\\n\\nFULL CONTENT:\\n\\n${escapedContent}\\n\\n━━━━━━━━━━━━━━━━━━━━━━\\n\\nReady to publish!"
           ) {
             id
           }

@@ -70,13 +70,6 @@ export async function POST(request: NextRequest) {
 
     console.log('Available columns:', Object.keys(columnMap))
 
-    // Check for files column
-    const hasFilesColumn = columnMap['files'] || columnMap['file']
-    if (hasFilesColumn && featuredImage) {
-      console.log('Files column detected, but file upload requires Monday.com Asset API')
-      console.log('Image will be included in updates section instead')
-    }
-
     // Create the item with blog title
     const createItemQuery = {
       query: `
@@ -169,47 +162,6 @@ export async function POST(request: NextRequest) {
       columnValues[columnMap['status']] = { label: "Draft" }
     }
 
-    // Upload featured image to Monday.com file column if present
-    const filesColumnId = columnMap['files'] || columnMap['file']
-    if (filesColumnId && featuredImage) {
-      try {
-        console.log('Uploading featured image to Monday.com...')
-
-        // Convert base64 to binary
-        const base64Data = featuredImage.split(',')[1] // Remove data:image/...;base64, prefix
-        const buffer = Buffer.from(base64Data, 'base64')
-
-        // Create form data for file upload
-        const FormData = require('form-data')
-        const form = new FormData()
-        form.append('query', `mutation { add_file_to_column (item_id: ${itemId}, column_id: "${filesColumnId}", file: null) { id } }`)
-        form.append('variables[file]', buffer, {
-          filename: 'featured-image.jpg',
-          contentType: 'image/jpeg'
-        })
-
-        const uploadResponse = await fetch('https://api.monday.com/v2', {
-          method: 'POST',
-          headers: {
-            'Authorization': MONDAY_API_TOKEN,
-            ...form.getHeaders()
-          },
-          body: form
-        })
-
-        const uploadResult = await uploadResponse.json()
-
-        if (uploadResult.errors) {
-          console.error('Monday.com file upload error:', uploadResult.errors)
-        } else {
-          console.log('Featured image uploaded successfully to Monday.com file column')
-        }
-      } catch (uploadError) {
-        console.error('Error uploading image to Monday.com:', uploadError)
-        // Don't fail the whole operation if image upload fails
-      }
-    }
-
     console.log('Column values to update:', JSON.stringify(columnValues, null, 2))
 
     // Update the item with all column values
@@ -246,7 +198,7 @@ export async function POST(request: NextRequest) {
 
     // Store the full content in a note or update
     // Note: Full blog content (excerpt + content) will be stored in the item's updates/notes
-    const imageNote = featuredImage ? '\\n\\n✅ Featured image uploaded' : '\\n\\n⚠️ No featured image'
+    const imageNote = featuredImage ? '\\n\\n✅ Featured image included' : '\\n\\n⚠️ No featured image'
 
     // Escape the content for GraphQL (replace quotes and newlines)
     const escapedContent = (content || '').replace(/"/g, '\\\\"').replace(/\n/g, '\\n').substring(0, 8000) // Limit to 8000 chars

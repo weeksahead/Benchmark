@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useMemo } from 'react';
-import { Calculator, DollarSign, TrendingDown, Clock } from 'lucide-react';
+import { Calculator, DollarSign, TrendingUp, Clock } from 'lucide-react';
+import Link from 'next/link';
 
 const RentVsBuyCalculator = () => {
   const [equipmentType, setEquipmentType] = useState<string>('Excavator');
@@ -477,10 +478,10 @@ const RentVsBuyCalculator = () => {
         <div className="max-w-4xl mx-auto mb-8">
           <div className="bg-green-900/30 border border-green-700 rounded-xl p-8">
             <div className="flex items-center gap-3 mb-4">
-              <TrendingDown className="w-8 h-8 text-green-400" />
+              <TrendingUp className="w-8 h-8 text-green-400" />
               <h3 className="text-2xl font-bold text-green-300">Benefits of Renting</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="flex items-start gap-2">
                 <span className="text-green-400 text-xl">✓</span>
                 <div>
@@ -523,6 +524,16 @@ const RentVsBuyCalculator = () => {
                   <p className="text-green-300/70 text-sm">Access to newest technology</p>
                 </div>
               </div>
+            </div>
+
+            {/* Contact Button */}
+            <div className="text-center pt-4 border-t border-green-700">
+              <Link
+                href="/contact"
+                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105 shadow-lg"
+              >
+                Contact Us for a Quote
+              </Link>
             </div>
           </div>
         </div>

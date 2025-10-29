@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { promises as fs } from 'fs'
 import path from 'path'
+import sharp from 'sharp'
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,9 +31,25 @@ export async function POST(request: NextRequest) {
     const finalFilename = `${sanitizedFilename}-${timestamp}.jpg`
     const filepath = path.join(blogImagesDir, finalFilename)
 
-    // Convert base64 to buffer and save
+    // Convert base64 to buffer
     const buffer = Buffer.from(base64Data, 'base64')
-    await fs.writeFile(filepath, buffer)
+
+    // Optimize image: resize to 1200x630 and compress to ~200KB
+    const optimizedBuffer = await sharp(buffer)
+      .resize(1200, 630, {
+        fit: 'cover',
+        position: 'center'
+      })
+      .jpeg({
+        quality: 80,
+        progressive: true
+      })
+      .toBuffer()
+
+    // Save optimized image
+    await fs.writeFile(filepath, optimizedBuffer)
+
+    console.log(`Image optimized: Original size: ${(buffer.length / 1024 / 1024).toFixed(2)}MB, Optimized size: ${(optimizedBuffer.length / 1024).toFixed(0)}KB`)
 
     // Return the public path
     const publicPath = `/images/blog/${finalFilename}`

@@ -1,257 +1,218 @@
-# SEO Optimization Plan for Benchmark Equipment
+# Rent/buy Calculator Implementation Plan
 
-## Problem Summary
-- Site is built with **Vite + React** (Single Page Application, not Next.js)
-- Uses **client-side rendering (CSR)** - blog content only loads in browser
-- Search engines cannot properly index blog posts because content is JavaScript-rendered
-- Static meta tags mean all blog posts appear identical to search engines
-- Sitemap URLs don't match actual blog post slugs (404 errors for Google)
-- No dynamic meta tags for individual blog posts
+## Overview
+Add a "Rent/buy calculator" section to the homepage to help users determine whether it's more cost-effective to rent or purchase equipment over a given time period.
 
-## Key SEO Issues Found:
-1. ❌ Sitemap has wrong URLs (e.g., `/blog/cat-excavator-guide` but actual slug is `/blog/complete-guide-choosing-right-cat-excavator`)
-2. ❌ No dynamic `<title>` or `<meta description>` for blog posts
-3. ❌ No BlogPosting schema.org markup
-4. ❌ Client-side rendering means search bots see empty HTML
-5. ❌ Missing 6th blog post in sitemap entirely
-6. ❌ No canonical tags for blog posts
+## Todo List
+
+- [ ] Create `/components/RentVsBuyCalculator.tsx` component
+- [ ] Add calculator to homepage between Services and Footer sections
+- [ ] Test calculations and styling
+- [ ] Run build to verify no errors
 
 ---
 
-## Solution Options
+## Component Design
 
-### Option A: Quick Fixes + Prerendering ⭐ RECOMMENDED
-Keep Vite, add dynamic meta tags, fix sitemap, implement prerendering
-- **Pros**: Fast to implement, keeps existing tech stack
-- **Cons**: Still limited compared to proper SSG
-- **Time**: 2-3 hours
+### Input Fields
+1. Equipment name (text)
+2. Equipment purchase price (currency with $ formatting)
+3. Monthly rental cost (currency with $ formatting)
+4. Time horizon in months (number)
+5. Monthly maintenance cost for owned equipment (currency)
+6. Expected resale value percentage (e.g., 60%)
 
-### Option B: Add SSG to Vite
-Use vite-plugin-ssr or vite-ssg for static generation
-- **Pros**: Better SEO, keeps Vite
-- **Cons**: More complex setup
-- **Time**: 4-6 hours
+### Calculations
+- **Total Rent Cost** = Monthly Rental × Time Horizon
+- **Total Own Cost** = Purchase Price + (Monthly Maintenance × Time Horizon) - Resale Value
+- **Resale Value** = Purchase Price × (Resale % / 100)
+- **Savings** = |Total Rent Cost - Total Own Cost|
+- **Break-even Point** = Month when ownership becomes cheaper than renting
 
-### Option C: Migrate to Next.js
-Full migration to Next.js with Static Site Generation
-- **Pros**: Best SEO, perfect for Vercel, industry standard
-- **Cons**: Complete rewrite of components
-- **Time**: 1-2 days
-
----
-
-## Recommended Plan: Option A (Quick Wins First)
-
-### Phase 1: Critical SEO Fixes
-- [ ] Fix sitemap.xml URL slugs to match actual blog post routes
-- [ ] Install react-helmet-async for dynamic meta tags
-- [ ] Add dynamic `<title>` for each blog post
-- [ ] Add dynamic meta description for each blog post
-- [ ] Add dynamic Open Graph tags (og:title, og:description, og:image)
-- [ ] Add dynamic Twitter Card tags
-- [ ] Add canonical tags for all blog posts
-
-### Phase 2: Schema Markup Enhancement
-- [ ] Add BlogPosting schema.org markup for each blog post
-- [ ] Add author information to schema
-- [ ] Add datePublished and dateModified to schema
-- [ ] Add article image to schema
-- [ ] Add breadcrumb schema for navigation
-
-### Phase 3: Prerendering Implementation
-- [ ] Evaluate prerendering options (vite-plugin-ssr vs custom script)
-- [ ] Configure prerendering for all blog post URLs
-- [ ] Generate static HTML files during build
-- [ ] Update vercel.json (if needed) to serve prerendered pages
-- [ ] Test that curl shows full HTML content
-
-### Phase 4: Content & Sitemap Automation
-- [ ] Move blog posts from Blog.tsx to separate data/blogs.json file
-- [ ] Create script to auto-generate sitemap.xml from blog data
-- [ ] Add sitemap generation to build process
-- [ ] Validate all blog slugs match sitemap entries
-
-### Phase 5: Testing & Validation
-- [ ] Test with `curl` to verify HTML is server-rendered
-- [ ] Test with Google Search Console URL Inspection Tool
-- [ ] Validate meta tags with Facebook Sharing Debugger
-- [ ] Check Twitter Card Validator
-- [ ] Submit updated sitemap to Google Search Console
-- [ ] Monitor Google Search Console for indexing status
+### Results Display
+- Total rent cost vs total ownership cost comparison
+- Break-even month analysis
+- Recommendation (rent or buy) with conditional styling
+- Detailed cost breakdown
+- Fun messaging similar to PurchaseCalculator
 
 ---
 
-## Expected Outcomes
+## Technical Implementation
 
-After implementing Phase 1-2:
-- ✅ Each blog post has unique title and description in Google results
-- ✅ Blog posts properly shared on social media with correct previews
-- ✅ Sitemap matches actual URLs (no 404s)
-- ⚠️ Still relies on JavaScript for content (some bots may struggle)
+### Component Structure
+Following the existing PurchaseCalculator pattern:
+- Use `'use client'` directive
+- Dark theme: `bg-gray-900`, `bg-gray-800`
+- Red accents: `bg-red-600`, `text-red-400`
+- Currency formatting with `$` and commas
+- Real-time calculation with `useEffect`
+- Results with conditional styling (green for buy, red/orange for rent)
 
-After implementing Phase 3 (Prerendering):
-- ✅ Full HTML content visible to all search engines
-- ✅ Faster time-to-content
-- ✅ Better SEO rankings
-- ✅ Works even with JavaScript disabled
+### Styling Guidelines
+- Container: `max-w-7xl mx-auto px-4`
+- Section wrapper: `bg-black text-white py-20`
+- Title styling to match Services section
+- Form inputs with same styling as PurchaseCalculator
+- Responsive grid for inputs
 
----
-
-## Alternative: Next.js Migration (Future)
-
-If quick fixes don't provide sufficient results, we can migrate to Next.js later:
-
-### Migration Tasks (if needed):
-- [ ] Create new Next.js project with `npx create-next-app`
-- [ ] Move components to Next.js structure
-- [ ] Convert blog routing to Next.js dynamic routes
-- [ ] Add getStaticProps and getStaticPaths for blog posts
-- [ ] Migrate styling (Tailwind already supported)
-- [ ] Update Vercel deployment config
-- [ ] Test build and deployment
-
----
-
-## What I Need From You
-
-**Please choose an approach:**
-
-1. **Start with Option A** (Quick fixes + prerendering) - Recommended, fast results
-2. **Go with Option B** (Add Vite SSG plugin) - More complex but keeps Vite
-3. **Migrate to Next.js** (Option C) - Best long-term solution but requires rewrite
-
-I recommend starting with **Option A** to get quick SEO wins, then evaluate if Next.js migration is worth the effort based on results.
+### Files to Modify
+1. Create: `/components/RentVsBuyCalculator.tsx`
+2. Update: `/app/page.tsx` (add component import and render)
 
 ---
 
 ## Review Section
 
 ### Summary
-Successfully completed **Option A (Phases 1-2)** SEO improvements in ~20 minutes. All blog posts now have unique, dynamic meta tags and proper schema markup for search engines.
+Successfully implemented a fully-functional Rent/Buy Calculator component on the homepage with dark theme styling and comprehensive cost comparison logic.
 
-### Changes Made:
+### Changes Made
 
-#### Phase 1: Critical SEO Fixes ✅
-- ✅ Fixed sitemap.xml URLs to match actual blog post slugs (all 6 posts now correctly listed)
-- ✅ Added missing 6th blog post to sitemap (Technology in Modern Construction Equipment)
-- ✅ Installed and configured react-helmet-async for dynamic meta tag management
-- ✅ Added dynamic `<title>` tags unique to each blog post
-- ✅ Added dynamic meta descriptions for each blog post
-- ✅ Added dynamic Open Graph tags (og:title, og:description, og:image, og:type)
-- ✅ Added dynamic Twitter Card tags for social media sharing
-- ✅ Added canonical tags to prevent duplicate content issues
+#### 1. Created `/components/RentVsBuyCalculator.tsx` ✅
+- Component follows existing dark theme styling (bg-black, bg-gray-900, bg-gray-800)
+- Uses red accent colors (bg-red-600, text-red-400) to match brand
+- Implements all 10 input fields with slider controls:
+  - Equipment Type (text input)
+  - Purchase Price ($50k-$500k)
+  - Hours Per Year (200-2,080 hrs with utilization %)
+  - Years of Ownership (1-10 years)
+  - Operator Hourly Wage ($25-$100/hr fully loaded)
+  - Maintenance Cost Per Hour ($5-$30/hr)
+  - Monthly Rental Rate ($1k-$15k/month)
+  - Financing Interest Rate (0-12%)
+  - Tax Rate (15-40%)
+  - Before/After Tax toggle
 
-#### Phase 2: Schema Markup Enhancement ✅
-- ✅ Added BlogPosting schema.org markup for each blog post
-- ✅ Added author information (Tyler McClain) to schema
-- ✅ Added datePublished and dateModified to schema
-- ✅ Added article images to schema
-- ✅ Added publisher information with logo
-- ✅ Added article section (category) metadata
-- ✅ Added relevant keywords per post
+#### 2. Calculation Logic ✅
+**BUYING COSTS:**
+- Purchase price
+- Operator costs: 2,080 hours/year (full-time) × wage × years
+- Maintenance: hours/year × years × maintenance rate
+- Insurance: purchase price × 1.5% per year
+- Financing interest: average loan balance × rate × years
+- Resale value: 20% depreciation year 1, then 12% annually
+- Tax benefit: depreciation × tax rate (bonus depreciation)
 
-### Files Modified:
+**RENTING COSTS:**
+- Rental cost: monthly rate × (hours per year ÷ 176 hours/month) × years
+- Operator costs: actual hours used × wage × years (usage only)
+- Tax benefit: rental costs are 100% tax deductible × tax rate
 
-1. **public/sitemap.xml**
-   - Fixed all 5 incorrect blog post URLs
-   - Added 6th missing blog post entry
-   - Updated dates to match actual blog post dates (2025)
-   - Now sorted newest to oldest
+#### 3. Display Features ✅
+- **Section title:** "Rent/Buy Calculator" with centered heading
+- **Two-column responsive layout:** Buy side vs Rent side
+- **Complete cost breakdowns** with line items for all expenses
+- **Prominent recommendation banner** showing which option saves money (green for rent, blue for buy)
+- **Utilization rate displayed** prominently (hours ÷ 2,080)
+- **Rental months calculated:** hours ÷ 176 hours/month
+- **Before/After tax toggle** with smooth transition
+- **Currency formatting** with $ and commas using toLocaleString
 
-2. **src/main.tsx**
-   - Wrapped App with HelmetProvider for react-helmet-async support
+#### 4. Additional Features ✅
+- **Low utilization warning:** Shows orange warning when machine is used < 50%
+- **Rent side benefits box:** Lists 6 key benefits in green styling
+- **Real-time calculations:** Uses useMemo for automatic recalculation
+- **Responsive design:** Two-column on desktop, stacks on mobile
+- **Icon integration:** Uses Lucide React icons (Calculator, DollarSign, Clock)
+- **Smooth interactions:** Hover effects and transitions throughout
 
-3. **src/components/Blog.tsx**
-   - Imported Helmet from react-helmet-async
-   - Added dynamic Helmet tags for individual blog posts (lines 475-529)
-   - Added Helmet tags for blog listing page (lines 624-644)
-   - Each blog post now has unique SEO metadata
+#### 5. Homepage Integration ✅
+- Updated `/app/page.tsx` to import and render RentVsBuyCalculator
+- Component placed between Services section and Footer
+- Maintains consistent page flow and spacing
 
-4. **package.json** (automatic)
-   - Added react-helmet-async dependency
+### Files Modified
+1. **Created:** `/components/RentVsBuyCalculator.tsx` (new file)
+2. **Updated:** `/app/page.tsx` (added import and component)
 
-### Technical Implementation:
+### Technical Implementation
+- **Framework:** Next.js 16.0.0 with 'use client' directive
+- **State Management:** React useState hooks (10 state variables)
+- **Performance:** useMemo for efficient calculation caching
+- **TypeScript:** Full type safety with proper interfaces
+- **Styling:** Tailwind CSS utility classes only (no custom CSS)
+- **Icons:** Lucide React for Calculator, DollarSign, TrendingDown, Clock
 
-**Sitemap Fixes:**
-- `/blog/cat-excavator-guide` → `/blog/complete-guide-choosing-right-cat-excavator`
-- `/blog/heavy-equipment-safety` → `/blog/essential-safety-tips-heavy-equipment-operation`
-- `/blog/cat-skid-steer-versatility` → `/blog/ultimate-guide-cat-skid-steer-versatility`
-- `/blog/equipment-maintenance-tips` → `/blog/essential-maintenance-tips-extend-heavy-equipment-life`
-- `/blog/construction-site-efficiency` → `/blog/construction-site-efficiency-right-equipment-reduces-timelines`
-- Added: `/blog/technology-modern-construction-equipment-gps-telematics-grade-control`
-
-**Dynamic Meta Tags Per Blog Post:**
-- Title: `{Post Title} | Benchmark Equipment Blog`
-- Description: Uses post excerpt (unique per post)
-- Canonical URL: Prevents duplicate content penalties
-- Open Graph: Proper Facebook sharing with images
-- Twitter Cards: Rich previews on Twitter
-- BlogPosting Schema: Enhanced search result display
-
-### Build Results:
+### Build Results
 ✅ **Build successful** - No TypeScript errors
-✅ **Bundle size**: 320 KB (reasonable for app with 6 long-form blog posts)
-✅ **All tests passed**
+✅ **All pages compiled** successfully
+✅ **Static optimization** working correctly
 
-### Expected SEO Improvements:
-
-**Immediate Benefits:**
-1. ✅ Google can now find and index all 6 blog posts (no more 404s)
-2. ✅ Each blog post appears in search results with unique title/description
-3. ✅ Social media shares show correct preview images and descriptions
-4. ✅ Rich snippets in Google with author, date, and category info
-5. ✅ Canonical tags prevent duplicate content issues
-
-**Measurable Results Expected:**
-- Blog posts should start appearing in Google Search Console within 24-48 hours
-- Facebook/Twitter shares will show rich previews immediately
-- Google may show rich snippets (author, date) in search results
-
-### What Still Needs Work (Phase 3 - Prerendering):
-
-⚠️ **Current Limitation**: Content is still client-side rendered
-- Modern Google can index it, but it's not optimal
-- Some older bots may struggle
-- Initial page load doesn't show blog content in HTML source
-
-**To Implement Later (if needed):**
-- Phase 3: Add prerendering for static HTML generation
-- Phase 4: Move blog posts to JSON file & auto-generate sitemap
-
-### Testing Checklist for You:
-
+### Testing Checklist
 **Before Deploying:**
-1. ☐ Review changes locally with `npm run dev`
-2. ☐ Visit a blog post URL and view page source to verify meta tags
-3. ☐ Check that title changes in browser tab when navigating posts
+- ☐ Test locally with `npm run dev`
+- ☐ Verify all sliders adjust calculations in real-time
+- ☐ Test Before/After Tax toggle
+- ☐ Verify recommendation banner changes based on calculations
+- ☐ Check responsive design on mobile viewport
+- ☐ Test with various equipment scenarios (high/low utilization)
 
-**After Deploying to Vercel:**
-1. ☐ Test blog post URL: https://benchmarkequip.com/blog/complete-guide-choosing-right-cat-excavator
-2. ☐ Validate with [Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)
-3. ☐ Validate with [Twitter Card Validator](https://cards-dev.twitter.com/validator)
-4. ☐ Submit sitemap to [Google Search Console](https://search.google.com/search-console)
-5. ☐ Use URL Inspection Tool in GSC to test a blog post URL
-6. ☐ Monitor indexing status over next 7 days
+**After Deploying:**
+- ☐ Test on production URL
+- ☐ Verify calculator loads quickly
+- ☐ Test on different browsers (Chrome, Safari, Firefox)
+- ☐ Verify mobile responsiveness on actual devices
 
-### Next Steps:
+### User Experience Highlights
+1. **Immediate feedback:** All calculations update in real-time as sliders move
+2. **Clear recommendations:** Large banner tells users which option saves money
+3. **Transparency:** Complete cost breakdowns show exactly where money goes
+4. **Flexibility:** Before/After tax toggle lets users see both scenarios
+5. **Visual hierarchy:** Color-coded results (green for savings, blue for buy)
+6. **Educational:** Shows utilization rate and rental benefits to inform decisions
 
-**Immediate:**
-1. Deploy to Vercel
-2. Test URLs in production
-3. Submit updated sitemap to Google Search Console
+### Next Steps
+1. Deploy to production
+2. Monitor user engagement with the calculator
+3. Consider adding:
+   - Print/PDF export functionality
+   - Email results feature
+   - Comparison chart/graph visualization
+   - Save calculation to user account (if auth added)
 
-**Within 1-2 Weeks:**
-- Monitor Google Search Console for indexing status
-- Check if blog posts appear in search results
-- Evaluate if Phase 3 (prerendering) is needed based on actual indexing results
+---
 
-**Future (Optional - Next.js Migration):**
-- If SEO results aren't satisfactory after 2-4 weeks, consider Next.js migration
-- This would provide best-in-class SEO with full static site generation
-- Can be done as parallel development without disrupting production site
+## Update: Moved Calculator to Separate Page
 
-### Risk Assessment:
-✅ **Zero risk** - All changes are additive
-✅ **No breaking changes** - Existing functionality unchanged
-✅ **Fully reversible** - Can rollback if any issues
-✅ **Production ready** - Build passes with no errors
+### Changes Made (Latest)
+
+#### 1. Removed Calculator from Homepage ✅
+- Removed `RentVsBuyCalculator` import and component from `/app/page.tsx`
+- Homepage now shows: Header → Hero → Equipment Categories → Services → Footer
+
+#### 2. Created Dedicated Page ✅
+- Created `/app/rent-vs-buy/page.tsx`
+- Full-page layout with Header → Calculator → Footer
+- Accessible at: `/rent-vs-buy`
+
+#### 3. Added Navigation Links ✅
+- Added "Rent/Buy Calculator" to desktop navigation (after Equipment Rentals)
+- Added "Rent/Buy Calculator" to mobile navigation
+- Link works on both desktop and mobile
+
+#### 4. Improved Rent Side Comparison ✅
+- Added matching line items to rent side showing $0 for:
+  - Purchase Price: $0
+  - Maintenance: $0
+  - Insurance: $0
+  - Financing Interest: $0 (if applicable)
+  - Resale Value: $0
+- Shows actual costs for:
+  - Operator Costs (Usage Only): [calculated value]
+  - Rental Costs: [calculated value]
+  - Tax Savings: [calculated value if after-tax]
+
+#### 5. Moved Benefits Section ✅
+- Moved "Benefits of Renting" section below both comparison cards
+- Now appears as a standalone section with:
+  - 2-column grid layout (responsive)
+  - Green icon checkmarks
+  - Benefit title + description for each item
+  - Enhanced visual presentation
+
+### Files Modified (Latest Update)
+1. **Updated:** `/app/page.tsx` - Removed calculator
+2. **Created:** `/app/rent-vs-buy/page.tsx` - New dedicated page
+3. **Updated:** `/components/Header.tsx` - Added navigation links
+4. **Updated:** `/components/RentVsBuyCalculator.tsx` - Improved rent side and moved benefits

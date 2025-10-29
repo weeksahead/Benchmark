@@ -127,17 +127,27 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
   // Handle migrating existing photos to Supabase
   const handleMigratePhotos = async () => {
-    if (!confirm('This will upload all existing photos from /public/assets to Supabase. Continue?')) {
+    console.log('Migrate button clicked');
+
+    const confirmed = confirm('This will upload all existing photos from /public/assets to Supabase. Continue?');
+    console.log('User confirmation:', confirmed);
+
+    if (!confirmed) {
+      setSaveMessage('Migration cancelled');
+      setTimeout(() => setSaveMessage(''), 2000);
       return;
     }
 
     setIsMigrating(true);
     setSaveMessage('Migrating photos to Supabase...');
+    console.log('Starting migration...');
 
     try {
       const response = await fetch('/api/migrate-photos', {
         method: 'POST'
       });
+
+      console.log('Migration response:', response.status);
 
       if (!response.ok) {
         throw new Error('Failed to migrate photos');

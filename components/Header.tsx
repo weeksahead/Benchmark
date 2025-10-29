@@ -30,6 +30,7 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-6">
             <nav className="flex items-center space-x-6">
               <a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors font-medium">Equipment Rentals</a>
+              <Link href="/rent-vs-buy" className="hover:text-red-500 transition-colors font-medium">Rent/Buy Calculator</Link>
               <Link href="/photos" className="hover:text-red-500 transition-colors font-medium">Photos</Link>
               <Link href="/blog" className="hover:text-red-500 transition-colors font-medium">Blog</Link>
               <Link href="/about" className="hover:text-red-500 transition-colors font-medium">About</Link>
@@ -55,6 +56,7 @@ const Header = () => {
           <div className="md:hidden py-4 border-t border-gray-800">
             <nav className="flex flex-col space-y-4">
               <a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="hover:text-red-500 transition-colors font-medium">Equipment Rentals</a>
+              <Link href="/rent-vs-buy" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">Rent/Buy Calculator</Link>
               <Link href="/photos" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">Photos</Link>
               <Link href="/blog" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">Blog</Link>
               <Link href="/about" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">About</Link>

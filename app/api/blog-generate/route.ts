@@ -83,8 +83,8 @@ CRITICAL REQUIREMENTS:
 1. Return ONLY the JSON object - no markdown code blocks, no backticks, just pure JSON
 2. Use DOUBLE QUOTES for HTML attributes (not single quotes)
 3. Escape any quotes within content with backslash
-4. Keep content under 15000 characters total
-5. Ensure valid JSON - test it mentally before responding
+4. Ensure valid JSON - test it mentally before responding
+5. Always complete the closing JSON braces properly
 
 Make the content authoritative, detailed, and valuable for contractors researching equipment.`
 
@@ -106,7 +106,7 @@ Make the content authoritative, detailed, and valuable for contractors researchi
           },
           body: JSON.stringify({
             model: 'claude-sonnet-4-20250514',
-            max_tokens: 4096,
+            max_tokens: 8192,
             system: systemPrompt,
             messages: [
               {

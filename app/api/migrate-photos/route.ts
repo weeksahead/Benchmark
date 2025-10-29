@@ -29,8 +29,9 @@ export async function POST() {
 
         const imageBuffer = fs.readFileSync(imagePath)
 
-        // Optimize image
+        // Optimize image with auto-rotation based on EXIF
         const optimizedBuffer = await sharp(imageBuffer)
+          .rotate() // Auto-rotate based on EXIF orientation
           .resize(1200, 800, {
             fit: 'inside',
             withoutEnlargement: true

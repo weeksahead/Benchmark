@@ -24,8 +24,9 @@ export async function POST(request: NextRequest) {
     // Convert base64 to buffer
     const buffer = Buffer.from(base64Data, 'base64')
 
-    // Optimize image
+    // Optimize image with auto-rotation based on EXIF
     const optimizedBuffer = await sharp(buffer)
+      .rotate() // Auto-rotate based on EXIF orientation
       .resize(1200, 800, {
         fit: 'inside',
         withoutEnlargement: true

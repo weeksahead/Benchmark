@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
 
     // Optimize image: resize to 1200x630 and compress to ~200KB
     const optimizedBuffer = await sharp(buffer)
+      .rotate() // Auto-rotate based on EXIF orientation
       .resize(1200, 630, {
         fit: 'cover',
         position: 'center'

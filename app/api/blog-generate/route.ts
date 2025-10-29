@@ -91,7 +91,7 @@ Make the content authoritative, detailed, and valuable for contractors researchi
     console.log('Generating blog content with Claude...')
 
     // Retry logic for API overload errors
-    let response
+    let response: Response | undefined
     let lastError
     const maxRetries = 3
 
@@ -144,6 +144,10 @@ Make the content authoritative, detailed, and valuable for contractors researchi
         console.log(`Request failed, retrying in ${waitTime/1000}s... (attempt ${attempt}/${maxRetries})`)
         await new Promise(resolve => setTimeout(resolve, waitTime))
       }
+    }
+
+    if (!response) {
+      throw new Error('Failed to get response from Claude API after retries')
     }
 
     const data = await response.json()

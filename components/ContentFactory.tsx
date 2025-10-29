@@ -13,11 +13,7 @@ interface GeneratedContent {
   keywords: string[];
 }
 
-interface ContentFactoryProps {
-  onSaveComplete?: () => void;
-}
-
-const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
+const ContentFactory = () => {
   const [topic, setTopic] = useState('');
   const [equipmentModel, setEquipmentModel] = useState('');
   const [contentAngle, setContentAngle] = useState('');
@@ -25,11 +21,12 @@ const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
   const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [isSuggesting, setIsSuggesting] = useState(false);
   const [suggestion, setSuggestion] = useState<any>(null);
   const [featuredImage, setFeaturedImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const equipmentModels = [
     'Cat 301.7 (Mini Excavator)',
@@ -101,14 +98,36 @@ const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
     }
   };
 
-  const handleSave = async () => {
+  const handlePublish = async () => {
     if (!generatedContent) return;
 
-    setIsSaving(true);
-    setSaveMessage('Saving draft to Monday.com...');
+    setIsPublishing(true);
+    setSaveMessage('Publishing blog post to site...');
 
     try {
-      const response = await fetch('/api/blog-save', {
+      // Publish to site first
+      const response = await fetch('/api/blog-publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: generatedContent.title,
+          excerpt: generatedContent.excerpt,
+          content: generatedContent.content,
+          category: generatedContent.category,
+          readTime: generatedContent.readTime,
+          slug: generatedContent.slug,
+          featuredImage: featuredImage
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to publish blog post');
+      }
+
+      const data = await response.json();
+
+      // After successful publish, track in Monday.com (don't await, fire and forget)
+      fetch('/api/blog-save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -121,29 +140,30 @@ const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
           wordCount: generatedContent.content.split(/\s+/).length,
           slug: generatedContent.slug,
           excerpt: generatedContent.excerpt,
-          content: generatedContent.content,
-          featuredImage: featuredImage ? 'image-included' : null // Don't send base64 data, just indicate presence
+          content: generatedContent.content.substring(0, 1000), // Just first 1000 chars for reference
+          featuredImage: featuredImage ? 'published' : null
         })
-      });
+      }).catch(err => console.log('Monday tracking failed (non-critical):', err));
 
-      if (!response.ok) {
-        throw new Error('Failed to save draft');
-      }
+      setSaveMessage(`🎉 Blog post published successfully! View at /blog/${data.post.slug}`);
 
-      const data = await response.json();
-      setSaveMessage('✅ Draft saved to Monday.com! Redirecting to drafts...');
-
-      // Redirect to drafts page after a short delay
-      if (onSaveComplete) {
-        setTimeout(() => {
-          onSaveComplete();
-        }, 1500);
-      }
+      // Reset form after a delay
+      setTimeout(() => {
+        setTopic('');
+        setEquipmentModel('');
+        setContentAngle('');
+        setGeneratedContent(null);
+        setShowPreview(false);
+        setSaveMessage('');
+        setFeaturedImage(null);
+        setImagePreview(null);
+        setIsEditing(false);
+      }, 3000);
     } catch (error) {
-      console.error('Save error:', error);
-      setSaveMessage('❌ Failed to save draft. Please try again.');
+      console.error('Publish error:', error);
+      setSaveMessage('❌ Failed to publish blog post. Please try again.');
     } finally {
-      setIsSaving(false);
+      setIsPublishing(false);
     }
   };
 
@@ -343,20 +363,48 @@ const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
 
           {showPreview && (
             <div className="space-y-4">
+              {/* Edit Mode Toggle */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="text-sm px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                >
+                  {isEditing ? 'Done Editing' : 'Edit Content'}
+                </button>
+              </div>
+
               {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">Title</label>
-                <div className="px-4 py-3 bg-gray-800 rounded-lg text-white">
-                  {generatedContent.title}
-                </div>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    value={generatedContent.title}
+                    onChange={(e) => setGeneratedContent({ ...generatedContent, title: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                ) : (
+                  <div className="px-4 py-3 bg-gray-800 rounded-lg text-white">
+                    {generatedContent.title}
+                  </div>
+                )}
               </div>
 
               {/* Excerpt */}
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">Excerpt</label>
-                <div className="px-4 py-3 bg-gray-800 rounded-lg text-white">
-                  {generatedContent.excerpt}
-                </div>
+                {isEditing ? (
+                  <textarea
+                    value={generatedContent.excerpt}
+                    onChange={(e) => setGeneratedContent({ ...generatedContent, excerpt: e.target.value })}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  />
+                ) : (
+                  <div className="px-4 py-3 bg-gray-800 rounded-lg text-white">
+                    {generatedContent.excerpt}
+                  </div>
+                )}
               </div>
 
               {/* Category & Read Time */}
@@ -417,30 +465,40 @@ const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
 
               {/* Content */}
               <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Full Content</label>
-                <div
-                  className="px-4 py-3 bg-gray-800 rounded-lg text-white max-h-96 overflow-y-auto"
-                  style={{ lineHeight: '1.8' }}
-                  dangerouslySetInnerHTML={{ __html: generatedContent.content }}
-                />
+                <label className="block text-sm font-medium text-gray-400 mb-2">Full Content (HTML)</label>
+                {isEditing ? (
+                  <textarea
+                    value={generatedContent.content}
+                    onChange={(e) => setGeneratedContent({ ...generatedContent, content: e.target.value })}
+                    rows={20}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white font-mono text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                    placeholder="Edit HTML content here..."
+                  />
+                ) : (
+                  <div
+                    className="px-4 py-3 bg-gray-800 rounded-lg text-white max-h-96 overflow-y-auto"
+                    style={{ lineHeight: '1.8' }}
+                    dangerouslySetInnerHTML={{ __html: generatedContent.content }}
+                  />
+                )}
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-4">
                 <button
-                  onClick={handleSave}
-                  disabled={isSaving}
+                  onClick={handlePublish}
+                  disabled={isPublishing}
                   className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
                 >
-                  {isSaving ? (
+                  {isPublishing ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Saving...
+                      Publishing...
                     </>
                   ) : (
                     <>
-                      <Save className="w-5 h-5 mr-2" />
-                      Save Draft
+                      <FileText className="w-5 h-5 mr-2" />
+                      Publish to Site
                     </>
                   )}
                 </button>

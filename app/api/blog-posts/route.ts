@@ -1,18 +1,20 @@
 import { NextResponse } from 'next/server'
-import { getAllBlogPosts } from '@/data/blogPosts'
+import { supabase } from '@/lib/supabase'
 
 export async function GET() {
   try {
-    const posts = getAllBlogPosts()
+    const { data: posts, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .order('created_at', { ascending: false })
 
-    // Sort by date (most recent first)
-    const sortedPosts = posts.sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime()
-    })
+    if (error) {
+      throw error
+    }
 
     return NextResponse.json({
       success: true,
-      posts: sortedPosts
+      posts: posts || []
     })
   } catch (error: any) {
     console.error('Error fetching blog posts:', error)

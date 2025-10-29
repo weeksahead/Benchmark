@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { blogPosts } from '@/data/blogPosts'
+import { supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,6 +7,15 @@ export async function GET(request: NextRequest) {
 
     if (!CLAUDE_API_KEY) {
       return NextResponse.json({ error: 'Claude API key not configured' }, { status: 500 })
+    }
+
+    // Get existing blog posts from Supabase
+    const { data: blogPosts, error } = await supabase
+      .from('blog_posts')
+      .select('title, category')
+
+    if (error || !blogPosts) {
+      throw new Error('Failed to fetch blog posts')
     }
 
     // Get existing blog titles for context

@@ -1,16 +1,37 @@
 import { Metadata } from 'next'
-import { getBlogPost, getAllBlogSlugs } from '@/data/blogPosts'
 import { notFound } from 'next/navigation'
 import BlogPostClient from './BlogPostClient'
+import { supabase } from '@/lib/supabase'
+
+interface BlogPost {
+  id: number
+  title: string
+  excerpt: string
+  content: string
+  author: string
+  date: string
+  category: string
+  image: string
+  read_time: string
+  slug: string
+}
 
 export async function generateStaticParams() {
-  const slugs = getAllBlogSlugs()
-  return slugs.map((slug) => ({ slug }))
+  const { data: posts } = await supabase
+    .from('blog_posts')
+    .select('slug')
+
+  return posts?.map((post) => ({ slug: post.slug })) || []
 }
 
 export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const params = await props.params
-  const post = getBlogPost(params.slug)
+
+  const { data: post } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('slug', params.slug)
+    .single()
 
   if (!post) {
     return {
@@ -48,11 +69,22 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 
 export default async function BlogPostPage(props: { params: Promise<{ slug: string }> }) {
   const params = await props.params
-  const post = getBlogPost(params.slug)
+
+  const { data: post } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('slug', params.slug)
+    .single()
 
   if (!post) {
     notFound()
   }
 
-  return <BlogPostClient post={post} />
+  // Transform read_time to readTime for compatibility with BlogPostClient
+  const postWithReadTime = {
+    ...post,
+    readTime: post.read_time
+  }
+
+  return <BlogPostClient post={postWithReadTime} />
 }

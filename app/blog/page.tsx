@@ -1,16 +1,46 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Calendar, Search, Tag } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { getAllBlogPosts } from '@/data/blogPosts'
+
+interface BlogPost {
+  id: number
+  title: string
+  excerpt: string
+  content: string
+  author: string
+  date: string
+  category: string
+  image: string
+  read_time: string
+  slug: string
+}
 
 export default function BlogPage() {
-  const blogPosts = getAllBlogPosts()
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const response = await fetch('/api/blog-posts')
+        const data = await response.json()
+        if (data.success) {
+          setBlogPosts(data.posts)
+        }
+      } catch (error) {
+        console.error('Error fetching blog posts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPosts()
+  }, [])
 
   const categories = ['All', ...Array.from(new Set(blogPosts.map(post => post.category)))]
 
@@ -72,7 +102,12 @@ export default function BlogPage() {
           </div>
 
           {/* Blog Posts Grid */}
-          {filteredPosts.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 border-4 border-gray-600 border-t-red-500 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-400">Loading blog posts...</p>
+            </div>
+          ) : filteredPosts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.map((post) => (
                 <Link key={post.id} href={`/blog/${post.slug}`}>
@@ -91,7 +126,7 @@ export default function BlogPage() {
                           <Calendar className="w-4 h-4" />
                           <span>{formatDate(post.date)}</span>
                         </div>
-                        <span>{post.readTime}</span>
+                        <span>{post.read_time}</span>
                       </div>
 
                       <h2 className="text-xl font-bold mb-3 group-hover:text-red-500 transition-colors">

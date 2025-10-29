@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { FileText, Edit, Image as ImageIcon, Loader2, X, Save, Upload } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 
 interface BlogPost {
   id: number;
@@ -84,9 +85,22 @@ const PostedBlogs = () => {
     }
 
     setIsUploadingImage(true);
-    setMessage('Uploading image...');
+    const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
+    setMessage(`Compressing image (${originalSizeMB}MB)...`);
 
     try {
+      // Compress image on client side before uploading
+      const options = {
+        maxSizeMB: 1, // Max 1MB
+        maxWidthOrHeight: 1920, // Max dimension
+        useWebWorker: true,
+        fileType: 'image/jpeg'
+      };
+
+      const compressedFile = await imageCompression(file, options);
+      const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
+      setMessage(`Uploading (compressed to ${compressedSizeMB}MB)...`);
+
       const reader = new FileReader();
       reader.onload = async (event) => {
         const imageData = event.target?.result as string;
@@ -113,9 +127,9 @@ const PostedBlogs = () => {
           image: data.imagePath
         });
 
-        setMessage('✅ Image uploaded successfully!');
+        setMessage(`✅ Image uploaded! (${originalSizeMB}MB → ${compressedSizeMB}MB)`);
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
     } catch (error) {
       console.error('Image upload error:', error);
       setMessage('❌ Failed to upload image');

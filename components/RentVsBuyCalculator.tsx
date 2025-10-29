@@ -339,7 +339,7 @@ const RentVsBuyCalculator = () => {
         </div>
 
         {/* Results Section - Only show after calculation */}
-        {!hasCalculated ? (
+        {!hasCalculated || !displayCosts ? (
           <div className="bg-gray-900 rounded-xl shadow-lg p-12 mb-8 text-center border border-gray-700">
             <Calculator className="w-16 h-16 text-gray-600 mx-auto mb-4" />
             <p className="text-xl text-gray-400">Click "Calculate" to see your results</p>

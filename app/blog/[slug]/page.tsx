@@ -16,6 +16,9 @@ interface BlogPost {
   slug: string
 }
 
+// Revalidate blog posts every 60 seconds to show updates
+export const revalidate = 60
+
 export async function generateStaticParams() {
   const { data: posts } = await supabase
     .from('blog_posts')

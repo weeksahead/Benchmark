@@ -6,6 +6,9 @@ import { Calendar, Search, Tag } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 
+// Note: revalidate is set on server components, this is a client component
+// Blog posts will refresh when users navigate here
+
 interface BlogPost {
   id: number
   title: string

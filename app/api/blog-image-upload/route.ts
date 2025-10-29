@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { promises as fs } from 'fs'
-import path from 'path'
 import sharp from 'sharp'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,19 +16,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid image format' }, { status: 400 })
     }
 
-    // Create blog images directory if it doesn't exist
-    const blogImagesDir = path.join(process.cwd(), 'public', 'images', 'blog')
-    try {
-      await fs.access(blogImagesDir)
-    } catch {
-      await fs.mkdir(blogImagesDir, { recursive: true })
-    }
-
     // Generate filename
     const timestamp = Date.now()
     const sanitizedFilename = (filename || 'blog-image').replace(/[^a-z0-9]/gi, '-').toLowerCase()
     const finalFilename = `${sanitizedFilename}-${timestamp}.jpg`
-    const filepath = path.join(blogImagesDir, finalFilename)
 
     // Convert base64 to buffer
     const buffer = Buffer.from(base64Data, 'base64')
@@ -46,13 +36,28 @@ export async function POST(request: NextRequest) {
       })
       .toBuffer()
 
-    // Save optimized image
-    await fs.writeFile(filepath, optimizedBuffer)
-
     console.log(`Image optimized: Original size: ${(buffer.length / 1024 / 1024).toFixed(2)}MB, Optimized size: ${(optimizedBuffer.length / 1024).toFixed(0)}KB`)
 
+    // Upload to Supabase Storage
+    const { data, error } = await supabaseAdmin.storage
+      .from('blog-images')
+      .upload(finalFilename, optimizedBuffer, {
+        contentType: 'image/jpeg',
+        upsert: true
+      })
+
+    if (error) {
+      console.error('Supabase upload error:', error)
+      throw new Error(`Failed to upload to Supabase: ${error.message}`)
+    }
+
+    // Get public URL
+    const { data: { publicUrl } } = supabaseAdmin.storage
+      .from('blog-images')
+      .getPublicUrl(finalFilename)
+
     // Return the public path
-    const publicPath = `/images/blog/${finalFilename}`
+    const publicPath = publicUrl
 
     console.log('Blog image uploaded successfully:', publicPath)
 

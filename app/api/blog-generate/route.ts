@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Topic is required' }, { status: 400 })
     }
 
-    const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY
+    const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || process.env.BENCHMARK_SECRET_ANTHROPIC
 
     if (!CLAUDE_API_KEY) {
       return NextResponse.json({ error: 'Claude API key not configured' }, { status: 500 })
@@ -80,30 +80,60 @@ Make the content authoritative, detailed, and valuable for contractors researchi
 
     console.log('Generating blog content with Claude...')
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': CLAUDE_API_KEY,
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: userPrompt
-          }
-        ]
-      })
-    })
+    // Retry logic for API overload errors
+    let response
+    let lastError
+    const maxRetries = 3
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error('Claude API error:', response.status, errorData)
-      throw new Error(`Claude API error: ${response.status}`)
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': CLAUDE_API_KEY,
+            'anthropic-version': '2023-06-01'
+          },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 4096,
+            system: systemPrompt,
+            messages: [
+              {
+                role: 'user',
+                content: userPrompt
+              }
+            ]
+          })
+        })
+
+        if (response.ok) {
+          break // Success, exit retry loop
+        }
+
+        const errorData = await response.json()
+
+        // If it's a 529 overloaded error and we have retries left, wait and retry
+        if (response.status === 529 && attempt < maxRetries) {
+          const waitTime = Math.pow(2, attempt) * 1000 // Exponential backoff: 2s, 4s, 8s
+          console.log(`Claude API overloaded (529), retrying in ${waitTime/1000}s... (attempt ${attempt}/${maxRetries})`)
+          await new Promise(resolve => setTimeout(resolve, waitTime))
+          lastError = errorData
+          continue
+        }
+
+        // For other errors or final retry, throw
+        console.error('Claude API error:', response.status, errorData)
+        throw new Error(`Claude API error: ${response.status}`)
+      } catch (fetchError: any) {
+        if (attempt === maxRetries) {
+          throw fetchError
+        }
+        lastError = fetchError
+        const waitTime = Math.pow(2, attempt) * 1000
+        console.log(`Request failed, retrying in ${waitTime/1000}s... (attempt ${attempt}/${maxRetries})`)
+        await new Promise(resolve => setTimeout(resolve, waitTime))
+      }
     }
 
     const data = await response.json()

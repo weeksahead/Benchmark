@@ -3,7 +3,7 @@ import { supabase } from '@/lib/supabase'
 
 export async function GET(request: NextRequest) {
   try {
-    const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY
+    const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY || process.env.BENCHMARK_SECRET_ANTHROPIC
 
     if (!CLAUDE_API_KEY) {
       return NextResponse.json({ error: 'Claude API key not configured' }, { status: 500 })

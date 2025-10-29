@@ -454,7 +454,6 @@ const ContentFactory = ({ onSaveComplete }: ContentFactoryProps) => {
                     setSaveMessage('');
                     setFeaturedImage(null);
                     setImagePreview(null);
-                    setSavedToMonday(false);
                   }}
                   className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                 >

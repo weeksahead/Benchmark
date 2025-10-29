@@ -76,7 +76,7 @@ export async function GET() {
           const body = contentUpdate.body
 
           // Extract excerpt
-          const excerptMatch = body.match(/EXCERPT:\s*(.*?)(?=\n\n━|$)/s)
+          const excerptMatch = body.match(/EXCERPT:\s*([\s\S]*?)(?=\n\n━|$)/)
           if (excerptMatch) {
             excerpt = excerptMatch[1].trim()
           }
@@ -85,7 +85,7 @@ export async function GET() {
           hasImage = body.includes('✅ Featured image included')
 
           // Extract full content
-          const contentMatch = body.match(/FULL CONTENT:\s*(.*?)(?=\n\n━|$)/s)
+          const contentMatch = body.match(/FULL CONTENT:\s*([\s\S]*?)(?=\n\n━|$)/)
           if (contentMatch) {
             content = contentMatch[1].trim()
           }

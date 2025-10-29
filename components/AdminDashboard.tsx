@@ -47,6 +47,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [isLoadingCalculations, setIsLoadingCalculations] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
 
   // Load from JSON configs
   const [sliderImages, setSliderImages] = useState<SlideImage[]>(slidesData);
@@ -124,7 +125,52 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     setSavedCalculations(prev => prev.filter(calc => calc.id !== id));
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, type: 'slider' | 'gallery') => {
+  // Handle migrating existing photos to Supabase
+  const handleMigratePhotos = async () => {
+    if (!confirm('This will upload all existing photos from /public/assets to Supabase. Continue?')) {
+      return;
+    }
+
+    setIsMigrating(true);
+    setSaveMessage('Migrating photos to Supabase...');
+
+    try {
+      const response = await fetch('/api/migrate-photos', {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to migrate photos');
+      }
+
+      const data = await response.json();
+      setSaveMessage(`✅ ${data.message}`);
+
+      // Update gallery images with new Supabase URLs
+      if (data.results) {
+        const newImages = data.results
+          .filter((r: any) => r.status === 'success')
+          .map((r: any, index: number) => ({
+            id: index + 1,
+            src: r.newSrc,
+            alt: galleryImages.find(img => img.src === r.originalSrc)?.alt || 'Equipment Photo',
+            category: galleryImages.find(img => img.src === r.originalSrc)?.category || 'Other'
+          }));
+
+        if (newImages.length > 0) {
+          setGalleryImages(newImages);
+        }
+      }
+    } catch (error) {
+      console.error('Migration error:', error);
+      setSaveMessage('❌ Failed to migrate photos');
+    } finally {
+      setIsMigrating(false);
+      setTimeout(() => setSaveMessage(''), 5000);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'slider' | 'gallery') => {
     const files = e.target.files;
     if (!files || files.length === 0) {
       console.log('No files selected');
@@ -134,60 +180,71 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     console.log(`Uploading ${files.length} files for ${type}`);
 
     // Process each uploaded file
-    Array.from(files).forEach(file => {
+    for (const file of Array.from(files)) {
       console.log('Processing file:', file.name, file.type, file.size);
-      
+
       if (!file.type.startsWith('image/')) {
         alert(`${file.name} is not an image file`);
-        return;
+        continue;
       }
 
-      const reader = new FileReader();
-      
-      reader.onload = (event) => {
-        try {
-          const imageUrl = event.target?.result as string;
-          console.log('File read successfully, creating new entry');
-        
-          if (type === 'slider') {
-            const newSlide: SlideImage = {
-              id: Date.now() + Math.random(),
-              image: imageUrl,
-              title: 'New Slide Title',
-              subtitle: 'New Slide Subtitle',
-              buttonText: 'View Equipment'
-            };
-            setSliderImages(prev => {
-              console.log('Adding new slide');
-              return [...prev, newSlide];
-            });
-          } else {
-            const newImage: PhotoGalleryImage = {
-              id: Date.now() + Math.random(),
-              src: imageUrl,
+      try {
+        const reader = new FileReader();
+
+        const imageData = await new Promise<string>((resolve, reject) => {
+          reader.onload = (event) => resolve(event.target?.result as string);
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(file);
+        });
+
+        if (type === 'slider') {
+          // For slider, still use base64 (keep existing behavior)
+          const newSlide: SlideImage = {
+            id: Date.now() + Math.random(),
+            image: imageData,
+            title: 'New Slide Title',
+            subtitle: 'New Slide Subtitle',
+            buttonText: 'View Equipment'
+          };
+          setSliderImages(prev => [...prev, newSlide]);
+        } else {
+          // For gallery, upload to Supabase
+          setSaveMessage('Uploading to Supabase...');
+
+          const response = await fetch('/api/gallery-photo-add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: imageData,
               alt: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
               category: 'Other'
-            };
-            setGalleryImages(prev => {
-              console.log('Adding new gallery image');
-              return [...prev, newImage];
-            });
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to upload image');
           }
-        } catch (error) {
-          console.error('Error processing file result:', error);
-          alert(`Error processing ${file.name}. Please try again.`);
+
+          const data = await response.json();
+
+          const newImage: PhotoGalleryImage = {
+            id: Date.now() + Math.random(),
+            src: data.photo.src,
+            alt: data.photo.alt,
+            category: data.photo.category
+          };
+
+          setGalleryImages(prev => [...prev, newImage]);
+          setSaveMessage('✅ Photo uploaded successfully!');
+          setTimeout(() => setSaveMessage(''), 3000);
         }
-      };
-      
-      reader.onerror = (error) => {
-        console.error('Error reading file:', error);
-        alert(`Error reading ${file.name}. Please try again.`);
-      };
-      
-      console.log('Starting to read file as data URL');
-      reader.readAsDataURL(file);
-    });
-    
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        setSaveMessage(`❌ Error uploading ${file.name}`);
+        setTimeout(() => setSaveMessage(''), 3000);
+      }
+    }
+
     // Clear the input so the same file can be uploaded again if needed
     e.target.value = '';
   };
@@ -502,17 +559,27 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Photo Gallery</h2>
-              <label className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer flex items-center space-x-2">
-                <Upload className="w-4 h-4" />
-                <span>Upload Photos</span>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, 'gallery')}
-                  className="hidden"
-                />
-              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleMigratePhotos}
+                  disabled={isMigrating}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                >
+                  <Archive className="w-4 h-4" />
+                  <span>{isMigrating ? 'Migrating...' : 'Migrate to Supabase'}</span>
+                </button>
+                <label className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer flex items-center space-x-2">
+                  <Upload className="w-4 h-4" />
+                  <span>Upload Photos</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, 'gallery')}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -101,27 +101,10 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
 
           {/* Article Content */}
           <div className="prose prose-invert prose-lg max-w-none">
-            <div className="text-gray-300 leading-relaxed space-y-6">
-              {post.content.split('\n\n').map((paragraph, index) => {
-                if (paragraph.trim() === '') return null
-
-                // Handle headings
-                if (paragraph.startsWith('## ')) {
-                  return (
-                    <h2 key={index} className="text-2xl font-bold text-white mt-10 mb-6 first:mt-0">
-                      {paragraph.replace('## ', '')}
-                    </h2>
-                  )
-                }
-
-                // Handle regular paragraphs
-                return (
-                  <p key={index} className="text-gray-300 leading-relaxed mb-6 font-normal">
-                    {paragraph}
-                  </p>
-                )
-              })}
-            </div>
+            <div
+              className="text-gray-300 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
           </div>
 
           {/* Call to Action */}

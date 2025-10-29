@@ -1,12 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive, Wand2 } from 'lucide-react';
+import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive, Wand2, FileText } from 'lucide-react';
 import slidesData from '../config/slides.json';
 import photosData from '../config/photos.json';
 import PurchaseCalculator from './PurchaseCalculator';
 import SavedCalculations from './SavedCalculations';
 import ContentFactory from './ContentFactory';
+import PostedBlogs from './PostedBlogs';
 
 interface SavedCalculation {
   id: string;
@@ -41,7 +42,7 @@ interface PhotoGalleryImage {
 }
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
-  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines' | 'calculator' | 'saved' | 'content'>('slider');
+  const [activeTab, setActiveTab] = useState<'slider' | 'gallery' | 'machines' | 'calculator' | 'saved' | 'content' | 'posted'>('slider');
   const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
@@ -390,6 +391,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <Wand2 className="w-5 h-5" />
               <span>Content Factory</span>
             </button>
+            <button
+              onClick={() => setActiveTab('posted')}
+              className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-3 ${
+                activeTab === 'posted'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              <FileText className="w-5 h-5" />
+              <span>Posted Blogs</span>
+            </button>
           </nav>
         </aside>
 
@@ -694,6 +706,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         {activeTab === 'content' && (
           <div>
             <ContentFactory />
+          </div>
+        )}
+
+        {/* Posted Blogs */}
+        {activeTab === 'posted' && (
+          <div>
+            <PostedBlogs />
           </div>
         )}
           </div>

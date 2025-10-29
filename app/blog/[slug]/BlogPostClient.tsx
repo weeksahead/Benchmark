@@ -100,12 +100,14 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
           </div>
 
           {/* Article Content */}
-          <div className="prose prose-invert prose-lg max-w-none">
-            <div
-              className="text-gray-300 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-          </div>
+          <div
+            className="text-gray-300 blog-content"
+            dangerouslySetInnerHTML={{ __html: post.content }}
+            style={{
+              fontSize: '1.125rem',
+              lineHeight: '1.8'
+            }}
+          />
 
           {/* Call to Action */}
           <div className="mt-12 bg-gray-900 rounded-lg p-8 text-center">

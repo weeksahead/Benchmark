@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Upload to Supabase Storage
     const { data, error } = await supabaseAdmin.storage
-      .from('blog-images')
+      .from('Blog-images')
       .upload(finalFilename, optimizedBuffer, {
         contentType: 'image/jpeg',
         upsert: true
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Get public URL
     const { data: { publicUrl } } = supabaseAdmin.storage
-      .from('blog-images')
+      .from('Blog-images')
       .getPublicUrl(finalFilename)
 
     // Return the public path

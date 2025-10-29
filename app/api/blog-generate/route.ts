@@ -33,6 +33,14 @@ Writing Guidelines:
 - Use proper SEO techniques (keywords, headings, structure)
 - Aim for 1,500-2,000 words for comprehensive coverage
 
+SEO Best Practices - External Links:
+- Include 4-7 external backlinks to authoritative sources
+- Link to: .gov sites, .edu institutions, industry organizations (AGC, ASCE, OSHA, etc.)
+- Use descriptive anchor text (not "click here")
+- Format: <a href="https://example.com" target="_blank" rel="noopener noreferrer">descriptive text</a>
+- Cite specific studies, statistics, or regulations with links to original sources
+- Link naturally within sentences, not as standalone references
+
 Content Structure:
 - Engaging introduction with the problem/need
 - Clear section headings (H2, H3)
@@ -62,6 +70,8 @@ Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
     - <p style=\"margin-bottom: 1.5em; line-height: 1.8;\">Paragraph text here.</p>
     - Each paragraph in its own <p> tag
     - Use <ul><li>items</li></ul> for lists
+    - Include 4-7 external links: <a href=\"https://example.com\" target=\"_blank\" rel=\"noopener noreferrer\">anchor text</a>
+    - Link to authoritative sources (.gov, .edu, OSHA, AGC, ASCE, etc.)
     - NO markdown syntax",
   "category": "Equipment Guides",
   "readTime": "X min read",

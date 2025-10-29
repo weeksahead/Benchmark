@@ -25,6 +25,9 @@ const PostedBlogs = () => {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [showImagePicker, setShowImagePicker] = useState(false);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   // Filters
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -135,6 +138,35 @@ const PostedBlogs = () => {
       setMessage('❌ Failed to upload image');
     } finally {
       setIsUploadingImage(false);
+    }
+  };
+
+  const loadExistingImages = async () => {
+    setLoadingImages(true);
+    try {
+      const response = await fetch('/api/blog-images-list');
+      if (!response.ok) throw new Error('Failed to load images');
+
+      const data = await response.json();
+      setExistingImages(data.images || []);
+      setShowImagePicker(true);
+    } catch (error) {
+      console.error('Error loading images:', error);
+      setMessage('❌ Failed to load existing images');
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
+  const selectExistingImage = (imageUrl: string) => {
+    if (editingPost) {
+      setEditingPost({
+        ...editingPost,
+        image: imageUrl
+      });
+      setShowImagePicker(false);
+      setMessage('✅ Image selected!');
+      setTimeout(() => setMessage(''), 2000);
     }
   };
 
@@ -306,17 +338,28 @@ const PostedBlogs = () => {
                     alt={editingPost.title}
                     className="w-full h-64 object-cover rounded-lg"
                   />
-                  <label className="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors">
-                    <Upload className="w-4 h-4 mr-2" />
-                    {isUploadingImage ? 'Uploading...' : 'Change Image'}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                      className="hidden"
-                      disabled={isUploadingImage}
-                    />
-                  </label>
+                  <div className="flex gap-2">
+                    <label className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors">
+                      <Upload className="w-4 h-4 mr-2" />
+                      {isUploadingImage ? 'Uploading...' : 'Upload New'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isUploadingImage}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={loadExistingImages}
+                      disabled={loadingImages}
+                      className="flex-1 flex items-center justify-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                    >
+                      <ImageIcon className="w-4 h-4 mr-2" />
+                      {loadingImages ? 'Loading...' : 'Choose Existing'}
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -412,6 +455,53 @@ const PostedBlogs = () => {
                   Cancel
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Image Picker Modal */}
+      {showImagePicker && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gray-900 p-6 border-b border-gray-800 flex items-center justify-between">
+              <h3 className="text-2xl font-bold">Choose Existing Image</h3>
+              <button
+                onClick={() => setShowImagePicker(false)}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {existingImages.length === 0 ? (
+                <div className="text-center py-12">
+                  <ImageIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-400">No images found in storage</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {existingImages.map((imageUrl, index) => (
+                    <div
+                      key={index}
+                      onClick={() => selectExistingImage(imageUrl)}
+                      className="relative group cursor-pointer rounded-lg overflow-hidden hover:ring-2 hover:ring-red-500 transition-all"
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`Image ${index + 1}`}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity flex items-center justify-center">
+                        <span className="text-white opacity-0 group-hover:opacity-100 font-semibold">
+                          Select
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

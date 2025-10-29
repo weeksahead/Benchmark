@@ -11,7 +11,7 @@ export async function POST() {
     const photosJsonPath = path.join(process.cwd(), 'config', 'photos.json')
     console.log('📂 Reading photos from:', photosJsonPath)
     const photosData = JSON.parse(fs.readFileSync(photosJsonPath, 'utf-8'))
-    console.log(`📸 Found ${photosData.length} photos to migrate:`, photosData.map(p => p.src))
+    console.log(`📸 Found ${photosData.length} photos to migrate:`, photosData.map((p: any) => p.src))
 
     const results = []
 

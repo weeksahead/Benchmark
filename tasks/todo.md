@@ -173,6 +173,90 @@ Successfully implemented a fully-functional Rent/Buy Calculator component on the
 
 ---
 
+## Update: Add Insurance Costs for Renters
+
+### Problem
+Currently, the calculator only includes insurance costs for buying, not for renting. This is unrealistic because renters also need insurance when they have equipment.
+
+### Proposed Solution
+**Insurance Logic:**
+- **Buying**: Insurance 365 days/year (year-round coverage) - Current implementation ✅
+- **Renting**: Insurance pro-rated to rental months used (only when equipment is rented) - **NEW**
+
+This makes sense because:
+- Owners need insurance whether equipment is working or idle
+- Renters only need insurance during the actual rental period (correlated to utilization)
+
+### Implementation Plan
+
+#### 1. Review Current Insurance Calculation (Buying)
+- Current: `insurancePerYear = purchasePrice * 0.015`
+- Current: `totalInsurance = insurancePerYear * yearsOfOwnership`
+- This covers 12 months/year - ✅ Correct for buying
+
+#### 2. Add Insurance Calculation for Renting
+- New variable: `rentInsurancePerYear`
+- Formula: `(purchasePrice * 0.015) * (rentalMonthsPerYear / 12)`
+- Example: If renting 4.5 months/year → pay 37.5% of annual insurance
+- New variable: `totalRentInsurance = rentInsurancePerYear * yearsOfOwnership`
+
+#### 3. Update Total Rent Cost
+- Add `totalRentInsurance` to the total rent cost calculation
+- Update: `totalRentCost = totalRentalCost + rentOperatorCosts + totalRentInsurance`
+- Update all dependent calculations (after-tax, per hour, etc.)
+
+#### 4. Update UI Display (Rent Card)
+- Change Insurance line from `$0` (gray) to calculated amount (white)
+- Display: `formatCurrency(calculations.totalRentInsurance)`
+- Make line item color consistent with active costs (white instead of gray)
+
+#### 5. Test Calculations
+- Verify insurance scales correctly with rental months
+- Test edge cases: very low utilization vs high utilization
+- Ensure recommendation logic still works correctly
+
+### Files to Modify
+1. `/components/RentVsBuyCalculator.tsx` - Update calculations and UI
+
+### Expected Impact
+- Renting will become slightly more expensive (more realistic)
+- Low utilization scenarios: minimal impact (small rental months)
+- High utilization scenarios: larger insurance costs for renters
+
+### Implementation Summary ✅
+
+**Changes Made:**
+
+1. **Added rental insurance calculation** (RentVsBuyCalculator.tsx:56-58)
+   - `rentInsurancePerYear = insurancePerYear * (rentalMonthsPerYear / 12)`
+   - `totalRentInsurance = rentInsurancePerYear * yearsOfOwnership`
+   - Pro-rated based on actual rental months used
+
+2. **Updated total rent cost** (RentVsBuyCalculator.tsx:60)
+   - Changed from: `totalRentalCost + rentOperatorCosts`
+   - Changed to: `totalRentalCost + rentOperatorCosts + totalRentInsurance`
+
+3. **Added to results object** (RentVsBuyCalculator.tsx:96)
+   - Added `totalRentInsurance` to calculation results
+
+4. **Updated Rent Card UI** (RentVsBuyCalculator.tsx:448-450)
+   - Changed label: "Insurance" → "Insurance (Pro-rated)"
+   - Changed value: `$0` (gray) → `{formatCurrency(calculations.totalRentInsurance)}` (white)
+   - Now shows actual calculated insurance cost
+
+**Example Calculation (Default Values):**
+- Purchase Price: $150,000
+- Hours Per Year: 800
+- Rental Months: 4.5 months/year
+- Insurance Rate: 1.5% of purchase price
+
+*Buying:* $2,250/year × 5 years = **$11,250** total
+*Renting:* $2,250 × (4.5/12) × 5 years = **$4,219** total
+
+**Build Status:** ✅ Successful (no errors)
+
+---
+
 ## Update: Moved Calculator to Separate Page
 
 ### Changes Made (Latest)

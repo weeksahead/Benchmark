@@ -53,7 +53,11 @@ const RentVsBuyCalculator = () => {
     const totalRentalCost = monthlyRentalRate * rentalMonthsPerYear * yearsOfOwnership;
     const rentOperatorCosts = hoursPerYear * operatorWage * yearsOfOwnership;
 
-    const totalRentCost = totalRentalCost + rentOperatorCosts;
+    // Rental insurance (pro-rated to rental months used)
+    const rentInsurancePerYear = insurancePerYear * (rentalMonthsPerYear / 12);
+    const totalRentInsurance = rentInsurancePerYear * yearsOfOwnership;
+
+    const totalRentCost = totalRentalCost + rentOperatorCosts + totalRentInsurance;
     const rentAnnualCost = totalRentCost / yearsOfOwnership;
     const rentCostPerHour = totalRentCost / (hoursPerYear * yearsOfOwnership);
 
@@ -89,6 +93,7 @@ const RentVsBuyCalculator = () => {
       rentCostPerHour,
       totalRentalCost,
       rentOperatorCosts,
+      totalRentInsurance,
       monthlyRentalRate,
       rentalMonthsPerYear,
       buyDepreciationTaxSavings,
@@ -440,8 +445,8 @@ const RentVsBuyCalculator = () => {
                 <span className="font-semibold text-gray-500">$0</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-300">Insurance</span>
-                <span className="font-semibold text-gray-500">$0</span>
+                <span className="text-gray-300">Insurance (Pro-rated)</span>
+                <span className="font-semibold text-white">{formatCurrency(calculations.totalRentInsurance)}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-gray-300">Rental Costs ({calculations.rentalMonthsPerYear.toFixed(1)} months/year)</span>

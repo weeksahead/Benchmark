@@ -14,6 +14,7 @@ interface GeneratedContent {
 }
 
 const ContentFactory = () => {
+  const [mode, setMode] = useState<'blog' | 'image'>('blog');
   const [topic, setTopic] = useState('');
   const [equipmentModel, setEquipmentModel] = useState('');
   const [contentAngle, setContentAngle] = useState('');
@@ -30,6 +31,11 @@ const ContentFactory = () => {
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState(false);
+
+  // Image generation states
+  const [imagePrompt, setImagePrompt] = useState('');
+  const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const contentAngles = [
     'Specifications & Features',
@@ -228,15 +234,80 @@ const ContentFactory = () => {
     setTimeout(() => setSaveMessage(''), 2000);
   };
 
+  const handleGenerateImage = async () => {
+    if (!imagePrompt.trim()) {
+      setSaveMessage('Please enter an image description');
+      return;
+    }
+
+    setIsGeneratingImage(true);
+    setSaveMessage('Generating image with AI...');
+    setGeneratedImageUrl(null);
+
+    try {
+      const response = await fetch('/api/image-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: imagePrompt })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate image');
+      }
+
+      const data = await response.json();
+      setGeneratedImageUrl(data.imageUrl);
+      setSaveMessage('✅ Image generated and saved to Supabase!');
+    } catch (error) {
+      console.error('Image generation error:', error);
+      setSaveMessage('❌ Failed to generate image. Please try again.');
+    } finally {
+      setIsGeneratingImage(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Mode Selector */}
       <div className="bg-gray-900 p-6 rounded-lg">
         <div className="flex items-center mb-6">
           <Wand2 className="w-6 h-6 text-red-500 mr-3" />
           <h2 className="text-2xl font-bold">AI Content Factory</h2>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={() => setMode('blog')}
+            className={`p-6 rounded-lg border-2 transition-all ${
+              mode === 'blog'
+                ? 'border-red-500 bg-red-900/20'
+                : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+            }`}
+          >
+            <FileText className={`w-12 h-12 mx-auto mb-3 ${mode === 'blog' ? 'text-red-500' : 'text-gray-400'}`} />
+            <h3 className="text-lg font-bold mb-2">Create Blog</h3>
+            <p className="text-sm text-gray-400">Generate AI-powered blog posts</p>
+          </button>
+
+          <button
+            onClick={() => setMode('image')}
+            className={`p-6 rounded-lg border-2 transition-all ${
+              mode === 'image'
+                ? 'border-red-500 bg-red-900/20'
+                : 'border-gray-700 bg-gray-800 hover:border-gray-600'
+            }`}
+          >
+            <ImageIcon className={`w-12 h-12 mx-auto mb-3 ${mode === 'image' ? 'text-red-500' : 'text-gray-400'}`} />
+            <h3 className="text-lg font-bold mb-2">Create Image</h3>
+            <p className="text-sm text-gray-400">Generate AI images for your content</p>
+          </button>
+        </div>
+      </div>
+
+      {/* Blog Creation Section */}
+      {mode === 'blog' && (
+        <div className="bg-gray-900 p-6 rounded-lg">
+          <div className="space-y-4">
           {/* AI Topic Suggester */}
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-6 rounded-lg border border-purple-500/30">
             <div className="flex items-center justify-between mb-4">
@@ -543,6 +614,101 @@ const ContentFactory = () => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Image Generation Section */}
+      {mode === 'image' && (
+        <div className="bg-gray-900 p-6 rounded-lg">
+          <div className="flex items-center mb-6">
+            <ImageIcon className="w-6 h-6 text-red-500 mr-3" />
+            <h2 className="text-2xl font-bold">AI Image Generator</h2>
+          </div>
+
+          <div className="space-y-4">
+            {/* Image Prompt */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Image Description
+              </label>
+              <textarea
+                value={imagePrompt}
+                onChange={(e) => setImagePrompt(e.target.value)}
+                placeholder="Describe the image you want to create... e.g., 'A Caterpillar 320 excavator working at a construction site in North Texas, professional photography, golden hour lighting'"
+                rows={4}
+                className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
+              />
+              <p className="mt-2 text-sm text-gray-400">
+                💡 Tip: Be specific about equipment model, setting, lighting, and style for best results
+              </p>
+            </div>
+
+            {/* Generate Button */}
+            <button
+              onClick={handleGenerateImage}
+              disabled={isGeneratingImage}
+              className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
+            >
+              {isGeneratingImage ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Generating Image...
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-5 h-5 mr-2" />
+                  Generate Image with AI
+                </>
+              )}
+            </button>
+
+            {/* Status Message */}
+            {saveMessage && (
+              <div className={`p-3 rounded-lg ${saveMessage.includes('✅') ? 'bg-green-900/30 text-green-400' : saveMessage.includes('❌') ? 'bg-red-900/30 text-red-400' : 'bg-blue-900/30 text-blue-400'}`}>
+                {saveMessage}
+              </div>
+            )}
+
+            {/* Generated Image Preview */}
+            {generatedImageUrl && (
+              <div className="space-y-4">
+                <div className="border-2 border-green-500 rounded-lg p-4 bg-green-900/10">
+                  <h3 className="text-lg font-bold mb-3 text-green-400 flex items-center">
+                    <ImageIcon className="w-5 h-5 mr-2" />
+                    Image Generated Successfully!
+                  </h3>
+                  <img
+                    src={generatedImageUrl}
+                    alt="Generated"
+                    className="w-full rounded-lg mb-4"
+                  />
+                  <div className="bg-gray-800 p-3 rounded-lg">
+                    <p className="text-sm text-gray-400 mb-2">Image URL:</p>
+                    <p className="text-sm text-white font-mono break-all">{generatedImageUrl}</p>
+                  </div>
+                  <div className="mt-4 flex gap-3">
+                    <button
+                      onClick={() => setMode('blog')}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                    >
+                      <FileText className="w-5 h-5 mr-2" />
+                      Create Blog with This Image
+                    </button>
+                    <button
+                      onClick={() => {
+                        setImagePrompt('');
+                        setGeneratedImageUrl(null);
+                        setSaveMessage('');
+                      }}
+                      className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                    >
+                      Generate Another
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

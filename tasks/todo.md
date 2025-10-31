@@ -1,3 +1,44 @@
+# Fix Blog Post Formatting for Older Posts
+
+## Problem
+Blog posts from September 16 and earlier (May-Aug 2025) were displaying as one long paragraph without proper formatting, while newer posts (October 29+) had proper headings, paragraphs, and lists.
+
+## Root Cause
+On October 29, 2025, the blog system changed from markdown to HTML rendering:
+- **Before**: Content stored as markdown (`## Heading`, `\n\n` for paragraphs, `- ` for bullets)
+- **After**: Content stored as HTML (`<h2>`, `<p>`, `<ul>`)
+- Old posts still had markdown but the renderer now expects HTML
+
+## Solution
+Created migration script to convert old blog posts from markdown to HTML format.
+
+### Migration Script
+**File**: `scripts/migrate-blog-formatting.mjs`
+- Loads environment variables from `.env`
+- Connects to Supabase with admin client
+- Identifies posts from Sept 16 and earlier
+- Converts markdown formatting to HTML:
+  - `## Heading` → `<h2 style="...">Heading</h2>`
+  - `**bold**` → `<strong>bold</strong>`
+  - `- item` → `<ul><li>item</li></ul>`
+  - `\n\n` → `<p>paragraph</p>`
+- Updates database with converted content
+
+### Posts Converted
+Successfully migrated 4 blog posts:
+1. **May 17**: The Complete Guide to Choosing the Right Cat Excavator for Your Project
+2. **June 17**: Essential Safety Tips for Heavy Equipment Operation
+3. **July 17**: The Ultimate Guide to Cat Skid Steer Versatility: One Machine, Endless Possibilities
+4. **August 17**: Essential Maintenance Tips to Extend Heavy Equipment Life: A Professional Guide
+
+### Results
+- ✅ All old posts now have proper HTML formatting
+- ✅ Headings, paragraphs, and lists display correctly
+- ✅ Formatting matches newer posts
+- ✅ Database updated successfully
+
+---
+
 # Add Delete Button to Posted Blogs
 
 ## Analysis Summary

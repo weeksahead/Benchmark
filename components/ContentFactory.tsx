@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw, Upload, Image as ImageIcon } from 'lucide-react';
+import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw, Upload, Image as ImageIcon, X } from 'lucide-react';
 
 interface GeneratedContent {
   title: string;
@@ -27,6 +27,9 @@ const ContentFactory = () => {
   const [featuredImage, setFeaturedImage] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [showImagePicker, setShowImagePicker] = useState(false);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [loadingImages, setLoadingImages] = useState(false);
 
   const equipmentModels = [
     'Cat 301.7 (Mini Excavator)',
@@ -213,6 +216,31 @@ const ContentFactory = () => {
       setSaveMessage('✅ Image uploaded! It will be included when you save.');
     };
     reader.readAsDataURL(file);
+  };
+
+  const loadExistingImages = async () => {
+    setLoadingImages(true);
+    try {
+      const response = await fetch('/api/blog-images-list');
+      if (!response.ok) throw new Error('Failed to load images');
+
+      const data = await response.json();
+      setExistingImages(data.images || []);
+      setShowImagePicker(true);
+    } catch (error) {
+      console.error('Error loading images:', error);
+      setSaveMessage('❌ Failed to load existing images');
+    } finally {
+      setLoadingImages(false);
+    }
+  };
+
+  const selectExistingImage = (imageUrl: string) => {
+    setFeaturedImage(imageUrl);
+    setImagePreview(imageUrl);
+    setShowImagePicker(false);
+    setSaveMessage('✅ Image selected!');
+    setTimeout(() => setSaveMessage(''), 2000);
   };
 
   return (
@@ -448,18 +476,31 @@ const ContentFactory = () => {
                     </button>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-800 hover:bg-gray-700 transition-colors">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                      <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-400">Click to upload featured image</p>
-                    </div>
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleImageUpload}
-                    />
-                  </label>
+                  <div className="flex gap-2">
+                    <label className="flex-1 flex flex-col items-center justify-center h-32 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-800 hover:bg-gray-700 transition-colors">
+                      <div className="flex flex-col items-center justify-center">
+                        <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                        <p className="text-sm text-gray-400">Upload New</p>
+                      </div>
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      onClick={loadExistingImages}
+                      disabled={loadingImages}
+                      className="flex-1 flex flex-col items-center justify-center h-32 border-2 border-gray-700 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                    >
+                      <ImageIcon className="w-8 h-8 mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-400">
+                        {loadingImages ? 'Loading...' : 'Choose Existing'}
+                      </p>
+                    </button>
+                  </div>
                 )}
               </div>
 
@@ -520,6 +561,53 @@ const ContentFactory = () => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Image Picker Modal */}
+      {showImagePicker && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-gray-900 p-6 border-b border-gray-800 flex items-center justify-between">
+              <h3 className="text-2xl font-bold">Choose Existing Image</h3>
+              <button
+                onClick={() => setShowImagePicker(false)}
+                className="p-2 hover:bg-gray-800 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {existingImages.length === 0 ? (
+                <div className="text-center py-12">
+                  <ImageIcon className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-400">No images found in storage</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {existingImages.map((imageUrl, index) => (
+                    <div
+                      key={index}
+                      onClick={() => selectExistingImage(imageUrl)}
+                      className="relative group cursor-pointer rounded-lg overflow-hidden hover:ring-2 hover:ring-red-500 transition-all"
+                    >
+                      <img
+                        src={imageUrl}
+                        alt={`Image ${index + 1}`}
+                        className="w-full h-48 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-opacity flex items-center justify-center">
+                        <span className="text-white opacity-0 group-hover:opacity-100 font-semibold">
+                          Select
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

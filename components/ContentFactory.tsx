@@ -306,8 +306,9 @@ const ContentFactory = () => {
 
       {/* Blog Creation Section */}
       {mode === 'blog' && (
-        <div className="bg-gray-900 p-6 rounded-lg">
-          <div className="space-y-4">
+        <>
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <div className="space-y-4">
           {/* AI Topic Suggester */}
           <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 p-6 rounded-lg border border-purple-500/30">
             <div className="flex items-center justify-between mb-4">
@@ -422,11 +423,11 @@ const ContentFactory = () => {
               {saveMessage}
             </div>
           )}
+          </div>
         </div>
-      </div>
 
-      {/* Generated Content Preview */}
-      {generatedContent && (
+        {/* Generated Content Preview */}
+        {generatedContent && (
         <div className="bg-gray-900 p-6 rounded-lg space-y-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
@@ -615,6 +616,8 @@ const ContentFactory = () => {
             </div>
           )}
         </div>
+        )}
+        </>
       )}
 
       {/* Image Generation Section */}

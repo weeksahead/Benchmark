@@ -49,10 +49,10 @@ export async function POST(request: NextRequest) {
 
     console.log('Uploading to Supabase:', filename)
 
-    // Upload to Supabase storage
+    // Upload to Supabase storage (AI generated photos bucket)
     const { data: uploadData, error: uploadError } = await supabaseAdmin
       .storage
-      .from('Blog-images')
+      .from('AI generated photos')
       .upload(filename, imageBlob, {
         contentType: 'image/png',
         cacheControl: '3600',
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     // Get public URL
     const { data: publicUrlData } = supabaseAdmin
       .storage
-      .from('Blog-images')
+      .from('AI generated photos')
       .getPublicUrl(filename)
 
     const publicUrl = publicUrlData.publicUrl

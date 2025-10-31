@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { FileText, Edit, Image as ImageIcon, Loader2, X, Save, Upload, Trash2 } from 'lucide-react';
+import { FileText, Edit, Image as ImageIcon, Loader2, X, Save, Upload, Trash2, Wand2 } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
 
 interface BlogPost {
@@ -28,6 +28,7 @@ const PostedBlogs = () => {
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState(false);
+  const [selectedBucket, setSelectedBucket] = useState<'Blog-images' | 'AI generated photos'>('Blog-images');
   const [deletingPost, setDeletingPost] = useState<BlogPost | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -143,10 +144,11 @@ const PostedBlogs = () => {
     }
   };
 
-  const loadExistingImages = async () => {
+  const loadExistingImages = async (bucket: 'Blog-images' | 'AI generated photos') => {
     setLoadingImages(true);
+    setSelectedBucket(bucket);
     try {
-      const response = await fetch('/api/blog-images-list');
+      const response = await fetch(`/api/blog-images-list?bucket=${encodeURIComponent(bucket)}`);
       if (!response.ok) throw new Error('Failed to load images');
 
       const data = await response.json();
@@ -386,8 +388,8 @@ const PostedBlogs = () => {
                     alt={editingPost.title}
                     className="w-full h-64 object-cover rounded-lg"
                   />
-                  <div className="flex gap-2">
-                    <label className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors">
+                  <div className="grid grid-cols-3 gap-2">
+                    <label className="flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg cursor-pointer transition-colors">
                       <Upload className="w-4 h-4 mr-2" />
                       {isUploadingImage ? 'Uploading...' : 'Upload New'}
                       <input
@@ -400,12 +402,21 @@ const PostedBlogs = () => {
                     </label>
                     <button
                       type="button"
-                      onClick={loadExistingImages}
+                      onClick={() => loadExistingImages('Blog-images')}
                       disabled={loadingImages}
-                      className="flex-1 flex items-center justify-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                      className="flex items-center justify-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
                     >
                       <ImageIcon className="w-4 h-4 mr-2" />
-                      {loadingImages ? 'Loading...' : 'Choose Existing'}
+                      {loadingImages ? 'Loading...' : 'Blog Images'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => loadExistingImages('AI generated photos')}
+                      disabled={loadingImages}
+                      className="flex items-center justify-center px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                    >
+                      <Wand2 className="w-4 h-4 mr-2 text-purple-400" />
+                      {loadingImages ? 'Loading...' : 'AI Generated'}
                     </button>
                   </div>
                 </div>
@@ -513,7 +524,22 @@ const PostedBlogs = () => {
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
           <div className="bg-gray-900 rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-gray-900 p-6 border-b border-gray-800 flex items-center justify-between">
-              <h3 className="text-2xl font-bold">Choose Existing Image</h3>
+              <div>
+                <h3 className="text-2xl font-bold">Choose Existing Image</h3>
+                <p className="text-sm text-gray-400 mt-1">
+                  {selectedBucket === 'AI generated photos' ? (
+                    <span className="flex items-center">
+                      <Wand2 className="w-4 h-4 mr-1 text-purple-400" />
+                      AI Generated Photos
+                    </span>
+                  ) : (
+                    <span className="flex items-center">
+                      <ImageIcon className="w-4 h-4 mr-1" />
+                      Blog Images
+                    </span>
+                  )}
+                </p>
+              </div>
               <button
                 onClick={() => setShowImagePicker(false)}
                 className="p-2 hover:bg-gray-800 rounded-lg transition-colors"

@@ -1,11 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // List all files in the Blog-images bucket
+    // Get bucket name from query params, default to 'Blog-images'
+    const searchParams = request.nextUrl.searchParams
+    const bucket = searchParams.get('bucket') || 'Blog-images'
+
+    console.log(`Listing images from bucket: ${bucket}`)
+
+    // List all files in the specified bucket
     const { data, error } = await supabaseAdmin.storage
-      .from('Blog-images')
+      .from(bucket)
       .list()
 
     if (error) {
@@ -18,16 +24,17 @@ export async function GET() {
       .filter(file => file.name !== '.emptyFolderPlaceholder') // Filter out placeholder files
       .map(file => {
         const { data: { publicUrl } } = supabaseAdmin.storage
-          .from('Blog-images')
+          .from(bucket)
           .getPublicUrl(file.name)
         return publicUrl
       })
 
-    console.log(`Found ${imageUrls.length} images in Blog-images bucket`)
+    console.log(`Found ${imageUrls.length} images in ${bucket} bucket`)
 
     return NextResponse.json({
       success: true,
-      images: imageUrls
+      images: imageUrls,
+      bucket: bucket
     })
 
   } catch (error: any) {

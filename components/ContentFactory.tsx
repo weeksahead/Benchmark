@@ -31,21 +31,6 @@ const ContentFactory = () => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState(false);
 
-  const equipmentModels = [
-    'Cat 301.7 (Mini Excavator)',
-    'Cat 315 (Small Excavator)',
-    'Cat 320 (Medium Excavator)',
-    'Cat 323 (Medium Excavator)',
-    'Cat 336 (Medium Excavator)',
-    'Cat 395 (Large Excavator)',
-    'Cat 938M (Wheel Loader)',
-    'Cat 950M (Wheel Loader)',
-    'Cat 272D3 (Skid Steer)',
-    'Cat CS54B (Compactor/Roller)',
-    'Cat D8 (Dozer)',
-    'General Equipment Topic'
-  ];
-
   const contentAngles = [
     'Specifications & Features',
     'Best Use Cases & Applications',
@@ -313,18 +298,15 @@ const ContentFactory = () => {
           {/* Equipment Model */}
           <div>
             <label className="block text-sm font-medium mb-2">
-              Equipment Model (Optional)
+              Equipment Model (Optional - only used if specified)
             </label>
-            <select
+            <input
+              type="text"
               value={equipmentModel}
               onChange={(e) => setEquipmentModel(e.target.value)}
+              placeholder="e.g., Cat 320, Cat D8, Cat 938M Wheel Loader"
               className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
-            >
-              <option value="">Select a model...</option>
-              {equipmentModels.map((model) => (
-                <option key={model} value={model}>{model}</option>
-              ))}
-            </select>
+            />
           </div>
 
           {/* Content Angle */}

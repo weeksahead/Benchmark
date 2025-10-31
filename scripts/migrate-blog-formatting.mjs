@@ -107,11 +107,11 @@ async function migrateBlogPosts() {
       console.log(`  - ${post.date}: ${post.title}`)
     })
 
-    // Filter posts from September 16 and earlier (2025)
-    const cutoffDate = new Date('2025-09-16')
-    const oldPosts = posts.filter(post => new Date(post.date) <= cutoffDate)
+    // Filter posts before October 29, 2025 (when HTML rendering started)
+    const cutoffDate = new Date('2025-10-29')
+    const oldPosts = posts.filter(post => new Date(post.date) < cutoffDate)
 
-    console.log(`📅 Found ${oldPosts.length} posts from Sept 16 and earlier:\n`)
+    console.log(`📅 Found ${oldPosts.length} posts before Oct 29 (HTML change):\n`)
 
     oldPosts.forEach(post => {
       console.log(`  - ${post.date}: ${post.title}`)

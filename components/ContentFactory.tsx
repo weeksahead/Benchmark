@@ -37,6 +37,8 @@ const ContentFactory = () => {
   const [imagePrompt, setImagePrompt] = useState('');
   const [generatedImageUrl, setGeneratedImageUrl] = useState<string | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
+  const [savedImageUrl, setSavedImageUrl] = useState<string | null>(null);
 
   const contentAngles = [
     'Specifications & Features',
@@ -245,6 +247,7 @@ const ContentFactory = () => {
     setIsGeneratingImage(true);
     setSaveMessage('Generating image with AI...');
     setGeneratedImageUrl(null);
+    setSavedImageUrl(null);
 
     try {
       const response = await fetch('/api/image-generate', {
@@ -259,12 +262,40 @@ const ContentFactory = () => {
 
       const data = await response.json();
       setGeneratedImageUrl(data.imageUrl);
-      setSaveMessage('✅ Image generated and saved to Supabase!');
+      setSaveMessage('✅ Image generated! Review it below and click "Save to Supabase" when ready.');
     } catch (error) {
       console.error('Image generation error:', error);
       setSaveMessage('❌ Failed to generate image. Please try again.');
     } finally {
       setIsGeneratingImage(false);
+    }
+  };
+
+  const handleSaveImageToSupabase = async () => {
+    if (!generatedImageUrl) return;
+
+    setIsSavingToSupabase(true);
+    setSaveMessage('Saving image to Supabase...');
+
+    try {
+      const response = await fetch('/api/image-save-to-supabase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl: generatedImageUrl })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save image to Supabase');
+      }
+
+      const data = await response.json();
+      setSavedImageUrl(data.imageUrl);
+      setSaveMessage('✅ Image saved to Supabase! You can now use it in your blogs.');
+    } catch (error) {
+      console.error('Save to Supabase error:', error);
+      setSaveMessage('❌ Failed to save image to Supabase. Please try again.');
+    } finally {
+      setIsSavingToSupabase(false);
     }
   };
 
@@ -688,35 +719,66 @@ const ContentFactory = () => {
             {/* Generated Image Preview */}
             {generatedImageUrl && (
               <div className="space-y-4">
-                <div className="border-2 border-green-500 rounded-lg p-4 bg-green-900/10">
-                  <h3 className="text-lg font-bold mb-3 text-green-400 flex items-center">
+                <div className={`border-2 rounded-lg p-4 ${savedImageUrl ? 'border-green-500 bg-green-900/10' : 'border-yellow-500 bg-yellow-900/10'}`}>
+                  <h3 className={`text-lg font-bold mb-3 flex items-center ${savedImageUrl ? 'text-green-400' : 'text-yellow-400'}`}>
                     <ImageIcon className="w-5 h-5 mr-2" />
-                    Image Generated Successfully!
+                    {savedImageUrl ? 'Image Saved to Supabase!' : 'Image Generated - Review Before Saving'}
                   </h3>
                   <img
                     src={generatedImageUrl}
                     alt="Generated"
                     className="w-full rounded-lg mb-4"
                   />
-                  <div className="bg-gray-800 p-3 rounded-lg">
-                    <p className="text-sm text-gray-400 mb-2">Image URL:</p>
-                    <p className="text-sm text-white font-mono break-all">{generatedImageUrl}</p>
-                  </div>
-                  <div className="mt-4 flex gap-3">
-                    <button
-                      onClick={() => setMode('blog')}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
-                    >
-                      <FileText className="w-5 h-5 mr-2" />
-                      Create Blog with This Image
-                    </button>
+
+                  {!savedImageUrl ? (
+                    <>
+                      <div className="bg-gray-800 p-3 rounded-lg mb-4">
+                        <p className="text-sm text-gray-400 mb-2">Temporary OpenAI URL (will expire):</p>
+                        <p className="text-sm text-white font-mono break-all">{generatedImageUrl}</p>
+                      </div>
+                      <button
+                        onClick={handleSaveImageToSupabase}
+                        disabled={isSavingToSupabase}
+                        className="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white px-6 py-4 rounded-lg font-semibold transition-colors flex items-center justify-center mb-3"
+                      >
+                        {isSavingToSupabase ? (
+                          <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Saving to Supabase...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-5 h-5 mr-2" />
+                            Save to Supabase
+                          </>
+                        )}
+                      </button>
+                    </>
+                  ) : (
+                    <div className="bg-gray-800 p-3 rounded-lg mb-4">
+                      <p className="text-sm text-gray-400 mb-2">Permanent Supabase URL:</p>
+                      <p className="text-sm text-white font-mono break-all">{savedImageUrl}</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    {savedImageUrl && (
+                      <button
+                        onClick={() => setMode('blog')}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center"
+                      >
+                        <FileText className="w-5 h-5 mr-2" />
+                        Create Blog with This Image
+                      </button>
+                    )}
                     <button
                       onClick={() => {
                         setImagePrompt('');
                         setGeneratedImageUrl(null);
+                        setSavedImageUrl(null);
                         setSaveMessage('');
                       }}
-                      className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                      className={`${savedImageUrl ? '' : 'flex-1'} bg-gray-700 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors`}
                     >
                       Generate Another
                     </button>

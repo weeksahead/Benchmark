@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase-admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,48 +35,14 @@ export async function POST(request: NextRequest) {
     const openaiData = await openaiResponse.json()
     const imageUrl = openaiData.data[0].url
 
-    console.log('Image generated, downloading from OpenAI...')
+    console.log('Image generated successfully from OpenAI')
 
-    // Download the image from OpenAI
-    const imageResponse = await fetch(imageUrl)
-    const imageBuffer = await imageResponse.arrayBuffer()
-    const imageBlob = Buffer.from(imageBuffer)
-
-    // Generate a unique filename
-    const timestamp = Date.now()
-    const filename = `ai-generated-${timestamp}.png`
-
-    console.log('Uploading to Supabase:', filename)
-
-    // Upload to Supabase storage (AI generated photos bucket)
-    const { data: uploadData, error: uploadError } = await supabaseAdmin
-      .storage
-      .from('AI generated photos')
-      .upload(filename, imageBlob, {
-        contentType: 'image/png',
-        cacheControl: '3600',
-        upsert: false
-      })
-
-    if (uploadError) {
-      console.error('Supabase upload error:', uploadError)
-      throw uploadError
-    }
-
-    // Get public URL
-    const { data: publicUrlData } = supabaseAdmin
-      .storage
-      .from('AI generated photos')
-      .getPublicUrl(filename)
-
-    const publicUrl = publicUrlData.publicUrl
-
-    console.log('Image uploaded successfully:', publicUrl)
-
+    // Return the OpenAI URL directly - don't upload to Supabase yet
     return NextResponse.json({
       success: true,
-      imageUrl: publicUrl,
-      filename: filename
+      imageUrl: imageUrl, // OpenAI temporary URL
+      openaiUrl: imageUrl,
+      message: 'Image generated. Review it and click "Save to Supabase" to store it.'
     })
 
   } catch (error: any) {

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw, Upload, Image as ImageIcon, X } from 'lucide-react';
+import ImageCropModal from './ImageCropModal';
 
 interface GeneratedContent {
   title: string;
@@ -39,6 +40,11 @@ const ContentFactory = () => {
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [isSavingToSupabase, setIsSavingToSupabase] = useState(false);
   const [savedImageUrl, setSavedImageUrl] = useState<string | null>(null);
+
+  // Image crop modal state
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [currentCropImage, setCurrentCropImage] = useState<string>('');
+  const [currentCropFileName, setCurrentCropFileName] = useState<string>('');
 
   const contentAngles = [
     'Specifications & Features',
@@ -205,11 +211,29 @@ const ContentFactory = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const imageData = event.target?.result as string;
-      setFeaturedImage(imageData);
-      setImagePreview(imageData);
-      setSaveMessage('✅ Image uploaded! It will be included when you save.');
+      setCurrentCropImage(imageData);
+      setCurrentCropFileName(file.name);
+      setCropModalOpen(true);
     };
     reader.readAsDataURL(file);
+
+    e.target.value = '';
+  };
+
+  const handleCropSave = (croppedImage: string) => {
+    setFeaturedImage(croppedImage);
+    setImagePreview(croppedImage);
+    setCropModalOpen(false);
+    setSaveMessage('✅ Image cropped! It will be included when you save.');
+    setTimeout(() => setSaveMessage(''), 3000);
+  };
+
+  const handleCropCancel = () => {
+    setCropModalOpen(false);
+    setCurrentCropImage('');
+    setCurrentCropFileName('');
+    setSaveMessage('Upload cancelled');
+    setTimeout(() => setSaveMessage(''), 3000);
   };
 
   const loadExistingImages = async (bucket: 'Blog-images' | 'AI generated photos') => {
@@ -850,6 +874,16 @@ const ContentFactory = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Image Crop Modal */}
+      {cropModalOpen && (
+        <ImageCropModal
+          image={currentCropImage}
+          fileName={currentCropFileName}
+          onSave={handleCropSave}
+          onCancel={handleCropCancel}
+        />
       )}
     </div>
   );

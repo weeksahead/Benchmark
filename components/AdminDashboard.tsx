@@ -8,6 +8,7 @@ import PurchaseCalculator from './PurchaseCalculator';
 import SavedCalculations from './SavedCalculations';
 import ContentFactory from './ContentFactory';
 import PostedBlogs from './PostedBlogs';
+import ImageCropModal from './ImageCropModal';
 
 interface SavedCalculation {
   id: string;
@@ -57,6 +58,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Image crop modal state
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [currentCropImage, setCurrentCropImage] = useState<string>('');
+  const [currentCropFileName, setCurrentCropFileName] = useState<string>('');
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [currentFileIndex, setCurrentFileIndex] = useState(0);
 
   // Load calculations from Monday.com when component mounts
   useEffect(() => {
@@ -188,9 +196,44 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     }
 
     console.log(`Uploading ${files.length} files for ${type}`);
+    const fileArray = Array.from(files);
 
-    // Process each uploaded file
-    for (const file of Array.from(files)) {
+    // For gallery uploads, open crop modal for first image
+    if (type === 'gallery') {
+      const firstFile = fileArray[0];
+
+      if (!firstFile.type.startsWith('image/')) {
+        alert(`${firstFile.name} is not an image file`);
+        e.target.value = '';
+        return;
+      }
+
+      try {
+        const reader = new FileReader();
+        const imageData = await new Promise<string>((resolve, reject) => {
+          reader.onload = (event) => resolve(event.target?.result as string);
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(firstFile);
+        });
+
+        // Store all files and open crop modal for the first one
+        setPendingFiles(fileArray);
+        setCurrentFileIndex(0);
+        setCurrentCropImage(imageData);
+        setCurrentCropFileName(firstFile.name);
+        setCropModalOpen(true);
+      } catch (error) {
+        console.error('Error reading file:', error);
+        setSaveMessage(`❌ Error reading ${firstFile.name}`);
+        setTimeout(() => setSaveMessage(''), 3000);
+      }
+
+      e.target.value = '';
+      return;
+    }
+
+    // For slider, keep existing immediate upload behavior
+    for (const file of fileArray) {
       console.log('Processing file:', file.name, file.type, file.size);
 
       if (!file.type.startsWith('image/')) {
@@ -200,54 +243,20 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
       try {
         const reader = new FileReader();
-
         const imageData = await new Promise<string>((resolve, reject) => {
           reader.onload = (event) => resolve(event.target?.result as string);
           reader.onerror = (error) => reject(error);
           reader.readAsDataURL(file);
         });
 
-        if (type === 'slider') {
-          // For slider, still use base64 (keep existing behavior)
-          const newSlide: SlideImage = {
-            id: Date.now() + Math.random(),
-            image: imageData,
-            title: 'New Slide Title',
-            subtitle: 'New Slide Subtitle',
-            buttonText: 'View Equipment'
-          };
-          setSliderImages(prev => [...prev, newSlide]);
-        } else {
-          // For gallery, upload to Supabase
-          setSaveMessage('Uploading to Supabase...');
-
-          const response = await fetch('/api/gallery-photo-add', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              image: imageData,
-              alt: file.name.replace(/\.[^/.]+$/, ""), // Remove file extension
-              category: 'Other'
-            })
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to upload image');
-          }
-
-          const data = await response.json();
-
-          const newImage: PhotoGalleryImage = {
-            id: Date.now() + Math.random(),
-            src: data.photo.src,
-            alt: data.photo.alt,
-            category: data.photo.category
-          };
-
-          setGalleryImages(prev => [...prev, newImage]);
-          setSaveMessage('✅ Photo uploaded successfully!');
-          setTimeout(() => setSaveMessage(''), 3000);
-        }
+        const newSlide: SlideImage = {
+          id: Date.now() + Math.random(),
+          image: imageData,
+          title: 'New Slide Title',
+          subtitle: 'New Slide Subtitle',
+          buttonText: 'View Equipment'
+        };
+        setSliderImages(prev => [...prev, newSlide]);
       } catch (error) {
         console.error('Error uploading file:', error);
         setSaveMessage(`❌ Error uploading ${file.name}`);
@@ -255,8 +264,90 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       }
     }
 
-    // Clear the input so the same file can be uploaded again if needed
     e.target.value = '';
+  };
+
+  const handleCropSave = async (croppedImage: string) => {
+    const currentFile = pendingFiles[currentFileIndex];
+
+    try {
+      setSaveMessage('Uploading to Supabase...');
+
+      const response = await fetch('/api/gallery-photo-add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: croppedImage,
+          alt: currentFile.name.replace(/\.[^/.]+$/, ""), // Remove file extension
+          category: 'Other'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+
+      const newImage: PhotoGalleryImage = {
+        id: Date.now() + Math.random(),
+        src: data.photo.src,
+        alt: data.photo.alt,
+        category: data.photo.category
+      };
+
+      setGalleryImages(prev => [...prev, newImage]);
+      setSaveMessage('✅ Photo uploaded successfully!');
+      setTimeout(() => setSaveMessage(''), 3000);
+
+      // Check if there are more files to process
+      const nextIndex = currentFileIndex + 1;
+      if (nextIndex < pendingFiles.length) {
+        // Process next file
+        const nextFile = pendingFiles[nextIndex];
+
+        if (!nextFile.type.startsWith('image/')) {
+          alert(`${nextFile.name} is not an image file`);
+          // Skip to next file
+          setCurrentFileIndex(nextIndex);
+          handleCropSave(croppedImage);
+          return;
+        }
+
+        const reader = new FileReader();
+        const imageData = await new Promise<string>((resolve, reject) => {
+          reader.onload = (event) => resolve(event.target?.result as string);
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(nextFile);
+        });
+
+        setCurrentFileIndex(nextIndex);
+        setCurrentCropImage(imageData);
+        setCurrentCropFileName(nextFile.name);
+      } else {
+        // All files processed, close modal
+        setCropModalOpen(false);
+        setPendingFiles([]);
+        setCurrentFileIndex(0);
+        setCurrentCropImage('');
+        setCurrentCropFileName('');
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      setSaveMessage(`❌ Error uploading ${currentFile.name}`);
+      setTimeout(() => setSaveMessage(''), 3000);
+      setCropModalOpen(false);
+    }
+  };
+
+  const handleCropCancel = () => {
+    setCropModalOpen(false);
+    setPendingFiles([]);
+    setCurrentFileIndex(0);
+    setCurrentCropImage('');
+    setCurrentCropFileName('');
+    setSaveMessage('Upload cancelled');
+    setTimeout(() => setSaveMessage(''), 3000);
   };
 
   const updateSliderImage = (id: number, field: keyof SlideImage, value: string) => {
@@ -795,6 +886,16 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           </div>
         </main>
       </div>
+
+      {/* Image Crop Modal */}
+      {cropModalOpen && (
+        <ImageCropModal
+          image={currentCropImage}
+          fileName={currentCropFileName}
+          onSave={handleCropSave}
+          onCancel={handleCropCancel}
+        />
+      )}
     </div>
   );
 };

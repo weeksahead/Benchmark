@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Edit, Image as ImageIcon, Loader2, X, Save, Upload, Trash2, Wand2 } from 'lucide-react';
 import imageCompression from 'browser-image-compression';
+import ImageCropModal from './ImageCropModal';
 
 interface BlogPost {
   id: number;
@@ -31,6 +32,11 @@ const PostedBlogs = () => {
   const [selectedBucket, setSelectedBucket] = useState<'Blog-images' | 'AI generated photos'>('Blog-images');
   const [deletingPost, setDeletingPost] = useState<BlogPost | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Image crop modal state
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [currentCropImage, setCurrentCropImage] = useState<string>('');
+  const [currentCropFileName, setCurrentCropFileName] = useState<string>('');
 
   // Filters
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -90,12 +96,41 @@ const PostedBlogs = () => {
       return;
     }
 
+    try {
+      // Read file and open crop modal
+      const reader = new FileReader();
+      const imageData = await new Promise<string>((resolve, reject) => {
+        reader.onload = (event) => resolve(event.target?.result as string);
+        reader.onerror = (error) => reject(error);
+        reader.readAsDataURL(file);
+      });
+
+      setCurrentCropImage(imageData);
+      setCurrentCropFileName(file.name);
+      setCropModalOpen(true);
+    } catch (error) {
+      console.error('Error reading file:', error);
+      setMessage('❌ Error reading image file');
+    }
+
+    e.target.value = '';
+  };
+
+  const handleCropSave = async (croppedImage: string) => {
+    if (!editingPost) return;
+
     setIsUploadingImage(true);
-    const originalSizeMB = (file.size / 1024 / 1024).toFixed(2);
-    setMessage(`Compressing image (${originalSizeMB}MB)...`);
+    setCropModalOpen(false);
 
     try {
-      // Compress image on client side before uploading
+      // Convert base64 to blob
+      const response = await fetch(croppedImage);
+      const blob = await response.blob();
+
+      const originalSizeMB = (blob.size / 1024 / 1024).toFixed(2);
+      setMessage(`Compressing image (${originalSizeMB}MB)...`);
+
+      // Compress cropped image
       const options = {
         maxSizeMB: 1, // Max 1MB
         maxWidthOrHeight: 1920, // Max dimension
@@ -103,7 +138,7 @@ const PostedBlogs = () => {
         fileType: 'image/jpeg'
       };
 
-      const compressedFile = await imageCompression(file, options);
+      const compressedFile = await imageCompression(blob as File, options);
       const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
       setMessage(`Uploading (compressed to ${compressedSizeMB}MB)...`);
 
@@ -112,7 +147,7 @@ const PostedBlogs = () => {
         const imageData = event.target?.result as string;
 
         // Upload to server
-        const response = await fetch('/api/blog-image-upload', {
+        const uploadResponse = await fetch('/api/blog-image-upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -121,11 +156,11 @@ const PostedBlogs = () => {
           })
         });
 
-        if (!response.ok) {
+        if (!uploadResponse.ok) {
           throw new Error('Failed to upload image');
         }
 
-        const data = await response.json();
+        const data = await uploadResponse.json();
 
         // Update editing post with new image path
         setEditingPost({
@@ -142,6 +177,14 @@ const PostedBlogs = () => {
     } finally {
       setIsUploadingImage(false);
     }
+  };
+
+  const handleCropCancel = () => {
+    setCropModalOpen(false);
+    setCurrentCropImage('');
+    setCurrentCropFileName('');
+    setMessage('Upload cancelled');
+    setTimeout(() => setMessage(''), 3000);
   };
 
   const loadExistingImages = async (bucket: 'Blog-images' | 'AI generated photos') => {
@@ -631,6 +674,16 @@ const PostedBlogs = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Image Crop Modal */}
+      {cropModalOpen && (
+        <ImageCropModal
+          image={currentCropImage}
+          fileName={currentCropFileName}
+          onSave={handleCropSave}
+          onCancel={handleCropCancel}
+        />
       )}
     </div>
   );

@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import sharp from 'sharp'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
+// Increase body size limit for image uploads
+export const runtime = 'nodejs'
+export const maxDuration = 60
+
 export async function POST(request: NextRequest) {
   try {
     const { image, filename } = await request.json()

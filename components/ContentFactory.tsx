@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw, Upload, Image as ImageIcon, X } from 'lucide-react';
+import imageCompression from 'browser-image-compression';
 import ImageCropModal from './ImageCropModal';
 
 interface GeneratedContent {
@@ -243,12 +244,48 @@ const ContentFactory = () => {
     e.target.value = '';
   };
 
-  const handleCropSave = (croppedImage: string) => {
-    setFeaturedImage(croppedImage);
-    setImagePreview(croppedImage);
+  const handleCropSave = async (croppedImage: string) => {
     setCropModalOpen(false);
-    setSaveMessage('✅ Image cropped! It will be included when you save.');
-    setTimeout(() => setSaveMessage(''), 3000);
+    setSaveMessage('Compressing image...');
+
+    try {
+      // Convert base64 to blob
+      const response = await fetch(croppedImage);
+      const blob = await response.blob();
+
+      const originalSizeMB = (blob.size / 1024 / 1024).toFixed(2);
+      setSaveMessage(`Compressing image (${originalSizeMB}MB)...`);
+
+      // Compress cropped image
+      const options = {
+        maxSizeMB: 1, // Max 1MB
+        maxWidthOrHeight: 1920, // Max dimension
+        useWebWorker: true,
+        fileType: 'image/jpeg'
+      };
+
+      const compressedFile = await imageCompression(blob as File, options);
+      const compressedSizeMB = (compressedFile.size / 1024 / 1024).toFixed(2);
+      setSaveMessage(`Compressed to ${compressedSizeMB}MB`);
+
+      // Convert compressed file back to base64
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const compressedBase64 = event.target?.result as string;
+        setFeaturedImage(compressedBase64);
+        setImagePreview(compressedBase64);
+        setSaveMessage('✅ Image ready! It will be included when you publish.');
+        setTimeout(() => setSaveMessage(''), 3000);
+      };
+      reader.readAsDataURL(compressedFile);
+
+    } catch (error) {
+      console.error('Compression error:', error);
+      setSaveMessage('❌ Failed to compress image. Using original.');
+      setFeaturedImage(croppedImage);
+      setImagePreview(croppedImage);
+      setTimeout(() => setSaveMessage(''), 3000);
+    }
   };
 
   const handleCropCancel = () => {

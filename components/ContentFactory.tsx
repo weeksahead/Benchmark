@@ -108,6 +108,29 @@ const ContentFactory = () => {
     setSaveMessage('Publishing blog post to site...');
 
     try {
+      // If featured image is base64, upload it first to avoid payload size limit
+      let imageUrl = featuredImage;
+      if (featuredImage && featuredImage.startsWith('data:image')) {
+        setSaveMessage('Uploading image to Supabase...');
+
+        const imageUploadResponse = await fetch('/api/blog-image-upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: featuredImage,
+            filename: `blog-${generatedContent.slug}`
+          })
+        });
+
+        if (!imageUploadResponse.ok) {
+          throw new Error('Failed to upload image');
+        }
+
+        const imageData = await imageUploadResponse.json();
+        imageUrl = imageData.imagePath;
+        setSaveMessage('Image uploaded! Publishing blog post...');
+      }
+
       // Publish to site first
       const response = await fetch('/api/blog-publish', {
         method: 'POST',
@@ -119,7 +142,7 @@ const ContentFactory = () => {
           category: generatedContent.category,
           readTime: generatedContent.readTime,
           slug: generatedContent.slug,
-          featuredImage: featuredImage
+          featuredImage: imageUrl
         })
       });
 

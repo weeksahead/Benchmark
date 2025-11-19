@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import TylerAI from '@/components/TylerAI'
-import { Analytics } from '@vercel/analytics/react'
 import Script from 'next/script'
 
 export const metadata: Metadata = {
@@ -147,7 +146,6 @@ export default function RootLayout({
         </Script>
         {children}
         <TylerAI />
-        <Analytics />
       </body>
     </html>
   )

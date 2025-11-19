@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import TylerAI from '@/components/TylerAI'
+import { Analytics } from '@vercel/analytics/react'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://benchmarkequip.com'),
@@ -132,6 +133,7 @@ export default function RootLayout({
       <body>
         {children}
         <TylerAI />
+        <Analytics />
       </body>
     </html>
   )

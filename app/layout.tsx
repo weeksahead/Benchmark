@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 import TylerAI from '@/components/TylerAI'
 import { Analytics } from '@vercel/analytics/react'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://benchmarkequip.com'),
@@ -131,6 +132,19 @@ export default function RootLayout({
         />
       </head>
       <body>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-CE9WXZB9V3"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-CE9WXZB9V3');
+          `}
+        </Script>
         {children}
         <TylerAI />
         <Analytics />

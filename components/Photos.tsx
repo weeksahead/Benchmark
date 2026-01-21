@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react';
 import { Camera, Filter } from 'lucide-react';
 import photosData from '../config/photos.json';

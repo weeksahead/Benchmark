@@ -6,7 +6,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://benchmarkequip.com/</loc>
-    <lastmod>2024-09-17</lastmod>
+    <lastmod>2025-01-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -152,9 +152,17 @@
   <!-- About Page -->
   <url>
     <loc>https://benchmarkequip.com/about</loc>
-    <lastmod>2024-09-17</lastmod>
+    <lastmod>2025-01-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+
+  <!-- Rent vs Buy Calculator -->
+  <url>
+    <loc>https://benchmarkequip.com/rent-vs-buy</loc>
+    <lastmod>2025-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <!-- Privacy Policy -->

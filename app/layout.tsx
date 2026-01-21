@@ -71,7 +71,7 @@ export default function RootLayout({
               "@type": ["EquipmentRental", "LocalBusiness"],
               "name": "Benchmark Equipment Rental & Sales",
               "alternateName": "Benchmark Equipment",
-              "description": "Professional construction equipment rental and sales company serving Denton and North Texas. Specializing in excavators, skid steers, loaders, water trucks, and heavy machinery with low-hour, reliable equipment.",
+              "description": "Professional heavy duty equipment rental and sales company serving Denton and North Texas. Specializing in excavators, wheel loaders, dozers, rollers, compactors, skid steers, water trucks, off-road trucks, and more with low-hour, reliable Cat equipment.",
               "image": [
                 "https://benchmarkequip.com/assets/Cat%20336.jpeg",
                 "https://benchmarkequip.com/assets/cat-skid-steer-action.jpeg",
@@ -94,22 +94,16 @@ export default function RootLayout({
                 "latitude": 33.2148,
                 "longitude": -97.1331
               },
-              "areaServed": [
-                {
-                  "@type": "City",
-                  "name": "Denton"
-                },
-                {
-                  "@type": "State",
-                  "name": "Texas"
-                }
-              ],
+              "areaServed": {
+                "@type": "Country",
+                "name": "United States"
+              },
               "serviceType": ["Equipment Rental", "Heavy Machinery Rental", "Construction Equipment Sales"],
               "openingHoursSpecification": [
                 {
                   "@type": "OpeningHoursSpecification",
                   "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                  "opens": "07:00",
+                  "opens": "08:00",
                   "closes": "17:00"
                 }
               ],
@@ -126,6 +120,66 @@ export default function RootLayout({
                 "name": "Tyler McClain"
               },
               "slogan": "Driven by Relationships, Powered by Reliability"
+            })
+          }}
+        />
+        {/* FAQ Schema for AEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "What types of equipment does Benchmark Equipment rent?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Benchmark Equipment rents heavy duty construction equipment including excavators, wheel loaders, dozers, rollers, compactors, skid steers, water trucks, off-road trucks, and more. We specialize in Cat equipment and maintain low-hour machines for maximum reliability on your job site."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What areas does Benchmark Equipment serve?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Benchmark Equipment is headquartered in North Texas and provides heavy equipment rentals nationwide. We regularly deliver equipment to job sites across the country, including New York, Michigan, California, Arizona, and everywhere in between. No project is too far."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "How do I rent equipment from Benchmark Equipment?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Renting is simple. Call Tyler directly at (817) 403-4334 or email info@benchmarkequip.com to get set up. We'll discuss your project needs, confirm equipment availability, and coordinate logistics. Most rentals can be arranged within 24-48 hours."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Does Benchmark Equipment offer equipment delivery?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Benchmark Equipment offers full-service delivery nationwide, or you can arrange pickup yourself. We also relocate equipment between job sites as your project needs change. Our logistics team handles everything so you can focus on the work."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Should I rent or buy construction equipment?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Unless you plan to use equipment over 90% of available hours year-round, renting is typically the smarter financial decision. Renting eliminates maintenance costs, storage, depreciation, and capital tied up in assets. Use our free Rent vs Buy Calculator at benchmarkequip.com/rent-vs-buy to run the numbers for your situation."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "What are Benchmark Equipment's business hours?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Our office is open Monday through Friday, 8:00 AM to 5:00 PM. However, you can call anytime. We regularly coordinate equipment deliveries on weekends and after hours when projects demand it. Whatever it takes to meet our customers' needs."
+                  }
+                }
+              ]
             })
           }}
         />

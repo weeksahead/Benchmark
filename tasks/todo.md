@@ -1,77 +1,132 @@
-# Remove Vercel Analytics - COMPLETED
+# Answer Engine Optimization (AEO) Audit & Implementation
 
-## Plan
-Remove Vercel Analytics since Google Analytics provides more comprehensive tracking.
+## Audit Summary
+Site has strong foundational SEO but needs AEO enhancements to rank well in AI answer engines (ChatGPT, Perplexity, Google AI Overview, etc.)
 
-## Todo Items
-- [x] Remove Analytics import and component from app/layout.tsx
-- [x] Uninstall @vercel/analytics package
-- [x] Verify the implementation
-- [x] Deploy to production
+### Current Strengths
+- Comprehensive root layout metadata with Open Graph & Twitter cards
+- LocalBusiness + EquipmentRental JSON-LD schema
+- BlogPosting schema on individual blog posts
+- AI-friendly robots.txt (allows GPTBot, ClaudeBot, PerplexityBot)
+- Quality blog content (24+ posts, 1000+ words each)
 
-## Review
+### Key Gaps Identified
+- Secondary pages (About, Contact, Rent-vs-Buy, Photos) lack custom metadata
+- No FAQ schema markup
+- No breadcrumb navigation schema
+- Static sitemap missing pages, not auto-generated
+- No related posts / internal linking strategy
+- No HowTo or Service schema for equipment guides
+
+---
+
+## Phase 1: Quick Wins (High Impact, Low Effort) - COMPLETED
+
+### Page-Specific Metadata
+- [x] Add custom metadata to `/about/page.tsx`
+- [x] Add custom metadata to `/contact/page.tsx`
+- [x] Add custom metadata to `/rent-vs-buy/page.tsx`
+- [x] Add custom metadata to `/photos/page.tsx`
+
+### FAQ Schema
+- [x] Create FAQ data for common equipment rental questions
+- [x] Add FAQPage JSON-LD schema to homepage (in layout.tsx)
+
+### Sitemap Updates
+- [x] Add `/rent-vs-buy` to sitemap.xml
+- [x] Update lastmod dates in sitemap
+
+---
+
+## Phase 2: Structural Improvements
+
+### Breadcrumb Navigation
+- [ ] Create BreadcrumbList JSON-LD schema component
+- [ ] Add breadcrumbs to blog post pages
+- [ ] Add breadcrumbs to secondary pages
+
+### Internal Linking
+- [ ] Add "Related Posts" section to blog post template
+- [ ] Cross-link relevant equipment guides within blog content
+
+### Dynamic Sitemap
+- [ ] Create dynamic sitemap.ts that pulls from Supabase
+- [ ] Remove static sitemap.xml in favor of dynamic generation
+
+---
+
+## Phase 3: Content Enhancement
+
+### Service Schema
+- [ ] Add Service schema for equipment rental service
+- [ ] Add Service schema for equipment sales service
+- [ ] Add Service schema for delivery service
+
+### Author Schema
+- [ ] Create Person schema for Tyler McClain (expertise signals)
+- [ ] Link author schema to blog posts
+
+### Review/Testimonial Schema
+- [ ] Verify aggregate rating (5.0 / 50 reviews) accuracy
+- [ ] Add individual Review schema if testimonials exist
+
+---
+
+## Phase 4: Advanced AEO
+
+### HowTo Schema (for guides)
+- [ ] Add HowTo schema to "How to Choose" style blog posts
+- [ ] Add step-by-step markup where applicable
+
+### Product Schema
+- [ ] Consider Product schema for equipment categories
+- [ ] Add offers/pricing structure if applicable
+
+### Video Schema (if applicable)
+- [ ] Add VideoObject schema to any video content
+
+---
+
+## Review - Phase 1 Complete (2025-01-20)
+
+### Changes Made
+
+**1. Page Metadata (4 pages updated)**
+- Converted all 4 pages from client to server components to enable metadata export
+- Added unique title, description, and Open Graph tags to each:
+  - `/about` - Company info and family-owned messaging
+  - `/contact` - Phone number, address, and quote CTA
+  - `/rent-vs-buy` - Calculator tool description
+  - `/photos` - Fleet gallery description
+
+**2. FAQ Schema (6 questions)**
+Added FAQPage JSON-LD schema to `app/layout.tsx` with these questions:
+- What types of equipment does Benchmark rent?
+- What areas does Benchmark serve?
+- How do I rent equipment?
+- Does Benchmark offer delivery?
+- Should I rent or buy?
+- What are the business hours?
+
+**3. Sitemap Updates**
+- Added `/rent-vs-buy` page entry
+- Updated homepage lastmod to 2025-01-20
+
+**4. Component Fixes**
+Added 'use client' directive to components that were missing it:
+- `components/Contact.tsx`
+- `components/Photos.tsx`
+- `components/Footer.tsx`
+
+### Build Status
+Build passes successfully with all pages generating correctly
+
+---
+
+# Previous Completed Tasks
+
+## Remove Vercel Analytics - COMPLETED
 **Successfully removed Vercel Analytics. Site now uses only Google Analytics for comprehensive tracking.**
 
-### Changes Made:
-1. **Updated app/layout.tsx**:
-   - Removed `import { Analytics } from '@vercel/analytics/react'`
-   - Removed `<Analytics />` component from body
-2. **Uninstalled package**: Removed `@vercel/analytics` from dependencies
-
-### Result:
-- Simplified analytics setup with single tracking solution
-- Google Analytics provides all necessary visitor insights
-- Cleaner codebase with no redundant dependencies
-- Site still fully tracked across all pages including blog posts
-
----
-
-# Previous: Add Google Analytics (GA4) - COMPLETED
-
-## Review
+## Add Google Analytics (GA4) - COMPLETED
 **Successfully implemented Google Analytics 4 tracking across the entire site.**
-
-### Changes Made:
-1. **Updated app/layout.tsx** (lines 5, 136-147):
-   - Added Script import from 'next/script'
-   - Added Google Analytics gtag.js script with strategy="afterInteractive"
-   - Added inline script to initialize GA with measurement ID G-CE9WXZB9V3
-
-### What This Enables:
-- Comprehensive visitor tracking (demographics, behavior, sources)
-- Marketing campaign tracking and ROI measurement
-- Conversion tracking for business goals
-- Integration with Google Ads and Search Console
-- Detailed insights into customer journey
-
-### Technical Implementation:
-- Used Next.js Script component for optimized loading
-- Set strategy="afterInteractive" for best performance
-- Scripts load after page becomes interactive, not blocking initial page load
-- Tracks all pages automatically including blog posts
-
----
-
-# Previous: Add Vercel Web Analytics - COMPLETED
-
-## Review
-**Successfully implemented Vercel Web Analytics tracking across the entire site.**
-
-### Changes Made:
-1. **Installed package**: Added `@vercel/analytics` to dependencies via npm
-2. **Updated app/layout.tsx** (lines 4, 136):
-   - Added import: `import { Analytics } from '@vercel/analytics/react'`
-   - Added component: `<Analytics />` in the body alongside TylerAI
-
----
-
-# Previous: Blog Image Issue - RESOLVED
-
-## Problem
-Blog post image appeared broken with 404 for `cat-excavator-default.jpg1` in browser console.
-
-## Resolution
-**False alarm - browser cache issue.** Image is working correctly now. No corruption in database or code.
-
-## Lesson Learned
-Always check for cache issues (especially after deployments) before investigating potential bugs. Hard refresh (Cmd+Shift+R) or incognito mode can help identify caching problems.

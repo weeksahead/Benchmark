@@ -196,3 +196,27 @@ Build passes successfully with all pages generating correctly
 - Build passes successfully
 - XML sitemap validates
 - All 44 pages generate correctly
+
+---
+
+# SEO Audit Fix Part 2 - 2025-01-23
+
+## Additional Issues
+
+1. **Homepage missing canonical URL**
+2. **Blog post og:image URL could break** - If image already has full URL, concatenation creates double protocol
+
+## Todo List
+
+- [x] Add homepage canonical tag
+- [x] Fix og:image URL construction in blog posts
+
+## Review
+
+**1. Homepage Canonical** (`app/page.tsx`, `app/HomeClient.tsx`)
+- Split homepage into server/client components
+- Added `alternates.canonical: 'https://benchmarkequip.com/'`
+
+**2. Blog Post og:image Fix** (`app/blog/[slug]/page.tsx`)
+- Added check: if image starts with `http`, use as-is; otherwise prepend domain
+- Prevents double protocol issue (`https://benchmarkequip.comhttps://...`)

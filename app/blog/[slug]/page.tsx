@@ -43,7 +43,10 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   }
 
   const postUrl = `https://benchmarkequip.com/blog/${post.slug}`
-  const postImageUrl = `https://benchmarkequip.com${post.image}`
+  // Handle both relative paths and full URLs for images
+  const postImageUrl = post.image.startsWith('http')
+    ? post.image
+    : `https://benchmarkequip.com${post.image}`
 
   return {
     title: post.title,

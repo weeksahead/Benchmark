@@ -1,19 +1,12 @@
-'use client'
+import { Metadata } from 'next'
+import HomeClient from './HomeClient'
 
-import Header from '@/components/Header'
-import Hero from '@/components/Hero'
-import EquipmentCategories from '@/components/EquipmentCategories'
-import Services from '@/components/Services'
-import Footer from '@/components/Footer'
+export const metadata: Metadata = {
+  alternates: {
+    canonical: 'https://benchmarkequip.com/',
+  },
+}
 
 export default function Home() {
-  return (
-    <>
-      <Header />
-      <Hero />
-      <EquipmentCategories />
-      <Services />
-      <Footer />
-    </>
-  )
+  return <HomeClient />
 }

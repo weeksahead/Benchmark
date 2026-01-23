@@ -56,12 +56,12 @@ const Footer = ({ setCurrentPage }: FooterProps) => {
           <div>
             <h3 className="text-lg font-bold mb-6">Equipment</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-400 hover:text-red-500 transition-colors">Construction</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-red-500 transition-colors">Material Handling</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-red-500 transition-colors">Landscaping</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-red-500 transition-colors">Water Trucks</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-red-500 transition-colors">Road Construction</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-red-500 transition-colors">Horizontal</a></li>
+              <li><a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors">Construction</a></li>
+              <li><a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors">Material Handling</a></li>
+              <li><a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors">Landscaping</a></li>
+              <li><a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors">Water Trucks</a></li>
+              <li><a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors">Road Construction</a></li>
+              <li><a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors">Horizontal</a></li>
             </ul>
           </div>
 

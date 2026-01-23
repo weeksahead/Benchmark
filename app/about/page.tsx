@@ -6,6 +6,9 @@ import About from '@/components/About'
 export const metadata: Metadata = {
   title: 'About Benchmark Equipment - Denton TX Equipment Rental Company',
   description: 'Learn about Benchmark Equipment, a family-owned construction equipment rental and sales company in Denton, TX. We provide excavators, skid steers, and heavy equipment with personalized service and competitive rates.',
+  alternates: {
+    canonical: 'https://benchmarkequip.com/about',
+  },
   openGraph: {
     title: 'About Benchmark Equipment - Denton TX Equipment Rental Company',
     description: 'Family-owned construction equipment rental and sales company in Denton, TX. Personalized service, competitive rates, and quality equipment.',

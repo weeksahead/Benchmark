@@ -46,9 +46,15 @@ const Hero = () => {
             {/* Content Overlay */}
             <div className="relative z-10 flex items-center justify-center h-full">
               <div className="text-center max-w-4xl mx-auto px-6 sm:px-8 pb-20">
-                <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg leading-tight">
-                  {slide.title}
-                </h1>
+                {index === currentSlide ? (
+                  <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg leading-tight">
+                    {slide.title}
+                  </h1>
+                ) : (
+                  <span className="block text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg leading-tight" aria-hidden="true">
+                    {slide.title}
+                  </span>
+                )}
                 <p className="text-base sm:text-xl md:text-2xl lg:text-3xl mb-8 sm:mb-12 text-white drop-shadow-lg">
                   {slide.subtitle}
                 </p>

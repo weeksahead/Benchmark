@@ -130,3 +130,69 @@ Build passes successfully with all pages generating correctly
 
 ## Add Google Analytics (GA4) - COMPLETED
 **Successfully implemented Google Analytics 4 tracking across the entire site.**
+
+---
+
+# SEO Audit Fix - 2025-01-23
+
+## Issues Identified from External Audit
+
+### Critical Issues
+1. **Sitemap XML Parsing Error** - Line 20 has an unescaped `&` character in "Driven by Relationships, Powered by Reliability". XML requires `&amp;` instead of `&`.
+
+2. **Missing Canonical URLs** - About and Contact pages have OpenGraph URLs but lack explicit `alternates.canonical` tags.
+
+3. **Broken Footer Links** - 6 links in Footer.tsx Equipment section use `href="#"` placeholder links (lines 59-64).
+
+### Medium Priority Issues
+4. **Homepage Multiple H1 Tags** - Hero.tsx has an H1 inside a `.map()` loop, creating 5 H1 tags (one per carousel slide). Should have only one H1 per page.
+
+5. **Blog Listing Missing Metadata** - `/app/blog/page.tsx` is a client component with no metadata export.
+
+---
+
+## Todo List
+
+- [x] Fix sitemap.xml - Escape the `&` as `&amp;` on line 20
+- [x] Add canonical URLs to About and Contact page metadata
+- [x] Fix footer broken links - Replace `href="#"` with actual equipment catalog URLs
+- [x] Fix multiple H1 tags in Hero.tsx - Only render one H1
+- [x] Add blog listing metadata - Create server component wrapper
+
+---
+
+## Review - Completed 2025-01-23
+
+### Changes Made
+
+**1. Sitemap XML Fix** (`public/sitemap.xml`)
+- Escaped `&` to `&amp;` in the image caption on line 20
+- XML now validates successfully with xmllint
+
+**2. Canonical URLs** (`app/about/page.tsx`, `app/contact/page.tsx`)
+- Added `alternates.canonical` to both page metadata exports
+- About: `https://benchmarkequip.com/about`
+- Contact: `https://benchmarkequip.com/contact`
+
+**3. Footer Links** (`components/Footer.tsx`)
+- Replaced 6 broken `href="#"` links with actual equipment catalog URL
+- All equipment category links now point to `https://rent.benchmarkequip.com/items`
+- Added `target="_blank"` and `rel="noopener noreferrer"` for external links
+
+**4. Multiple H1 Fix** (`components/Hero.tsx`)
+- Modified carousel to render H1 only for the active slide
+- Non-active slides use `<span>` with `aria-hidden="true"` for accessibility
+- Visual appearance unchanged, semantic HTML now correct (single H1 per page)
+
+**5. Blog Listing Metadata** (`app/blog/page.tsx`, `app/blog/BlogClient.tsx`)
+- Split client/server components to enable metadata export
+- Created new `BlogClient.tsx` with all interactive functionality
+- `page.tsx` is now a server component with proper metadata:
+  - Title: "Equipment & Industry Blog - Construction Tips & Guides"
+  - Canonical URL: `https://benchmarkequip.com/blog`
+  - OpenGraph tags
+
+### Build Status
+- Build passes successfully
+- XML sitemap validates
+- All 44 pages generate correctly

@@ -6,6 +6,9 @@ import Contact from '@/components/Contact'
 export const metadata: Metadata = {
   title: 'Contact Benchmark Equipment - Get a Quote for Equipment Rental',
   description: 'Contact Benchmark Equipment in Denton, TX for equipment rental quotes, sales inquiries, or service questions. Call (940) 295-7100 or visit us at 5900 N Interstate 35, Denton, TX 76207.',
+  alternates: {
+    canonical: 'https://benchmarkequip.com/contact',
+  },
   openGraph: {
     title: 'Contact Benchmark Equipment - Get a Quote for Equipment Rental',
     description: 'Contact us for equipment rental quotes and sales inquiries. Call (940) 295-7100 or visit our Denton, TX location.',

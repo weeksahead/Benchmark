@@ -94,11 +94,11 @@ const Photos = () => {
                     className="bg-gray-900 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-all duration-300 cursor-pointer group"
                     onClick={() => setSelectedImage(image)}
                   >
-                    <div className="aspect-square overflow-hidden">
+                    <div className="aspect-[4/3] overflow-hidden bg-gray-800">
                       <img
                         src={image.src}
                         alt={image.alt}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                       />
                     </div>
                     <div className="p-4">

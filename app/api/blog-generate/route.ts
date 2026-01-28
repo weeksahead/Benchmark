@@ -130,8 +130,30 @@ Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
   "category": "Equipment Guides",
   "readTime": "X min read",
   "slug": "url-friendly-slug",
-  "keywords": ["keyword1", "keyword2", "keyword3", "keyword4", "keyword5"]
+  "keywords": {
+    "short": ["2-3 word high-volume keywords", "equipment rental", "cat excavator"],
+    "medium": ["3-5 word more specific phrases", "cat 320 excavator rental", "heavy equipment denton tx"],
+    "longtail": ["5+ word specific queries people search", "best excavator for clay soil north texas", "how much does cat 336 rental cost"]
+  },
+  "faqs": [
+    {
+      "question": "Specific question a contractor would ask about this topic?",
+      "answer": "Direct, helpful answer (2-4 sentences) that provides real value."
+    }
+  ]
 }
+
+KEYWORD REQUIREMENTS:
+- short: 3-4 high-volume, competitive keywords (2-3 words)
+- medium: 4-5 moderately specific phrases (3-5 words)
+- longtail: 3-4 very specific queries (5+ words) that match how people actually search
+
+FAQ REQUIREMENTS:
+- Generate 4-5 FAQs that contractors would actually ask about this topic
+- Questions should be natural language (how, what, why, when, which)
+- Answers should be direct, helpful, and 2-4 sentences
+- Include at least one question about cost/pricing and one about rental process
+- These will be used for FAQPage schema markup (AEO optimization)
 
 CRITICAL REQUIREMENTS:
 1. Return ONLY the JSON object - no markdown code blocks, no backticks, just pure JSON

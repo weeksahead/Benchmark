@@ -10,7 +10,9 @@ export async function POST(request: NextRequest) {
       category,
       readTime,
       slug,
-      featuredImage
+      featuredImage,
+      faqs,
+      keywords
     } = await request.json()
 
     if (!title || !content) {
@@ -24,11 +26,26 @@ export async function POST(request: NextRequest) {
       day: 'numeric'
     })
 
+    // Build FAQ section HTML if FAQs provided
+    let finalContent = content
+    if (faqs && Array.isArray(faqs) && faqs.length > 0) {
+      const faqHtml = `
+<h2 style="font-weight: bold; font-size: 1.5em; margin-top: 2em; margin-bottom: 1em;">Frequently Asked Questions</h2>
+${faqs.map((faq: { question: string; answer: string }) => `
+<div style="margin-bottom: 1.5em;">
+  <h3 style="font-weight: 600; font-size: 1.1em; margin-bottom: 0.5em; color: #ef4444;">${faq.question}</h3>
+  <p style="margin-bottom: 1em; line-height: 1.8;">${faq.answer}</p>
+</div>
+`).join('')}
+`
+      finalContent = content + faqHtml
+    }
+
     // Create new blog post object
     const newPost = {
       title: title,
       excerpt: excerpt || title,
-      content: content,
+      content: finalContent,
       author: 'Benchmark Equipment',
       date: today,
       category: category || 'Equipment Guides',

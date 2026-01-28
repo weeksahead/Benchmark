@@ -5,6 +5,17 @@ import { Wand2, FileText, Eye, Save, Loader2, Lightbulb, RefreshCw, Upload, Imag
 import imageCompression from 'browser-image-compression';
 import ImageCropModal from './ImageCropModal';
 
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
+interface Keywords {
+  short: string[];
+  medium: string[];
+  longtail: string[];
+}
+
 interface GeneratedContent {
   title: string;
   excerpt: string;
@@ -12,7 +23,8 @@ interface GeneratedContent {
   category: string;
   readTime: string;
   slug: string;
-  keywords: string[];
+  keywords: Keywords | string[]; // Support both old and new format
+  faqs?: FAQ[];
 }
 
 const ContentFactory = () => {
@@ -143,7 +155,9 @@ const ContentFactory = () => {
           category: generatedContent.category,
           readTime: generatedContent.readTime,
           slug: generatedContent.slug,
-          featuredImage: imageUrl
+          featuredImage: imageUrl,
+          faqs: generatedContent.faqs,
+          keywords: generatedContent.keywords
         })
       });
 
@@ -625,10 +639,42 @@ const ContentFactory = () => {
               {/* Keywords */}
               <div>
                 <label className="block text-sm font-medium text-gray-400 mb-2">SEO Keywords</label>
-                <div className="px-4 py-3 bg-gray-800 rounded-lg text-white">
-                  {generatedContent.keywords.join(', ')}
-                </div>
+                {Array.isArray(generatedContent.keywords) ? (
+                  <div className="px-4 py-3 bg-gray-800 rounded-lg text-white">
+                    {generatedContent.keywords.join(', ')}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="px-4 py-3 bg-gray-800 rounded-lg">
+                      <span className="text-xs text-green-400 font-semibold uppercase">Short-tail</span>
+                      <p className="text-white mt-1">{generatedContent.keywords.short?.join(', ') || 'None'}</p>
+                    </div>
+                    <div className="px-4 py-3 bg-gray-800 rounded-lg">
+                      <span className="text-xs text-yellow-400 font-semibold uppercase">Medium-tail</span>
+                      <p className="text-white mt-1">{generatedContent.keywords.medium?.join(', ') || 'None'}</p>
+                    </div>
+                    <div className="px-4 py-3 bg-gray-800 rounded-lg">
+                      <span className="text-xs text-blue-400 font-semibold uppercase">Long-tail</span>
+                      <p className="text-white mt-1">{generatedContent.keywords.longtail?.join(', ') || 'None'}</p>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* FAQs */}
+              {generatedContent.faqs && generatedContent.faqs.length > 0 && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Generated FAQs (for AEO)</label>
+                  <div className="space-y-3">
+                    {generatedContent.faqs.map((faq, index) => (
+                      <div key={index} className="px-4 py-3 bg-gray-800 rounded-lg">
+                        <p className="text-red-400 font-medium mb-1">Q: {faq.question}</p>
+                        <p className="text-gray-300 text-sm">A: {faq.answer}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Featured Image Upload */}
               <div>

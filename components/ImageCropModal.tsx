@@ -124,9 +124,11 @@ export default function ImageCropModal({
             crop={crop}
             zoom={zoom}
             aspect={4 / 3}
+            minZoom={0.3}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}
+            objectFit="contain"
           />
         </div>
 
@@ -139,7 +141,7 @@ export default function ImageCropModal({
             </label>
             <input
               type="range"
-              min={1}
+              min={0.3}
               max={3}
               step={0.1}
               value={zoom}

@@ -1,5 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import Cropper from 'react-easy-crop';
+'use client'
+
+import React, { useState, useRef } from 'react';
+import ReactCrop, { Crop, PixelCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 import { X } from 'lucide-react';
 
 interface ImageCropModalProps {
@@ -9,26 +12,10 @@ interface ImageCropModalProps {
   fileName: string;
 }
 
-interface CroppedArea {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-const createImage = (url: string): Promise<HTMLImageElement> =>
-  new Promise((resolve, reject) => {
-    const image = new Image();
-    image.addEventListener('load', () => resolve(image));
-    image.addEventListener('error', (error) => reject(error));
-    image.src = url;
-  });
-
-async function getCroppedImg(
-  imageSrc: string,
-  pixelCrop: CroppedArea
+function getCroppedImg(
+  image: HTMLImageElement,
+  crop: PixelCrop
 ): Promise<string> {
-  const image = await createImage(imageSrc);
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
 
@@ -36,19 +23,21 @@ async function getCroppedImg(
     throw new Error('No 2d context');
   }
 
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
+  // Set canvas size to the crop size
+  canvas.width = crop.width;
+  canvas.height = crop.height;
 
+  // Draw the cropped image
   ctx.drawImage(
     image,
-    pixelCrop.x,
-    pixelCrop.y,
-    pixelCrop.width,
-    pixelCrop.height,
+    crop.x,
+    crop.y,
+    crop.width,
+    crop.height,
     0,
     0,
-    pixelCrop.width,
-    pixelCrop.height
+    crop.width,
+    crop.height
   );
 
   return new Promise((resolve) => {
@@ -71,24 +60,23 @@ export default function ImageCropModal({
   onCancel,
   fileName,
 }: ImageCropModalProps) {
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CroppedArea | null>(null);
+  const [crop, setCrop] = useState<Crop>({
+    unit: '%',
+    x: 10,
+    y: 10,
+    width: 80,
+    height: 80,
+  });
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-
-  const onCropComplete = useCallback(
-    (croppedArea: CroppedArea, croppedAreaPixels: CroppedArea) => {
-      setCroppedAreaPixels(croppedAreaPixels);
-    },
-    []
-  );
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const handleSave = async () => {
-    if (!croppedAreaPixels) return;
+    if (!completedCrop || !imgRef.current) return;
 
     setIsSaving(true);
     try {
-      const croppedImage = await getCroppedImg(image, croppedAreaPixels);
+      const croppedImage = await getCroppedImg(imgRef.current, completedCrop);
       onSave(croppedImage);
     } catch (error) {
       console.error('Error cropping image:', error);
@@ -117,58 +105,44 @@ export default function ImageCropModal({
           {fileName}
         </div>
 
-        {/* Cropper */}
-        <div className="relative flex-1 min-h-[400px] bg-gray-900">
-          <Cropper
-            image={image}
-            crop={crop}
-            zoom={zoom}
-            aspect={4 / 3}
-            minZoom={0.3}
-            maxZoom={3}
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropComplete}
-            objectFit="contain"
-            restrictPosition={false}
-          />
+        {/* Instructions */}
+        <div className="px-4 py-2 bg-blue-50 text-sm text-blue-700">
+          Drag corners or edges to resize the crop area. Drag inside to move it.
         </div>
 
-        {/* Controls */}
-        <div className="p-4 border-t space-y-4">
-          {/* Zoom slider */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
-              Zoom: {zoom.toFixed(1)}x
-            </label>
-            <input
-              type="range"
-              min={0.3}
-              max={3}
-              step={0.1}
-              value={zoom}
-              onChange={(e) => setZoom(parseFloat(e.target.value))}
-              className="w-full"
+        {/* Cropper */}
+        <div className="flex-1 overflow-auto p-4 bg-gray-900 flex items-center justify-center">
+          <ReactCrop
+            crop={crop}
+            onChange={(c) => setCrop(c)}
+            onComplete={(c) => setCompletedCrop(c)}
+            className="max-h-[60vh]"
+          >
+            <img
+              ref={imgRef}
+              src={image}
+              alt="Crop preview"
+              style={{ maxHeight: '60vh', maxWidth: '100%' }}
             />
-          </div>
+          </ReactCrop>
+        </div>
 
-          {/* Action buttons */}
-          <div className="flex justify-end space-x-3">
-            <button
-              onClick={onCancel}
-              disabled={isSaving}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-            >
-              {isSaving ? 'Saving...' : 'Save & Upload'}
-            </button>
-          </div>
+        {/* Action buttons */}
+        <div className="p-4 border-t flex justify-end space-x-3">
+          <button
+            onClick={onCancel}
+            disabled={isSaving}
+            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={isSaving || !completedCrop}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+          >
+            {isSaving ? 'Saving...' : 'Save & Upload'}
+          </button>
         </div>
       </div>
     </div>

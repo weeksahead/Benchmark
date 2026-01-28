@@ -55,21 +55,33 @@ function getCroppedImg(
     throw new Error('No 2d context');
   }
 
-  // Set canvas size to the crop size
-  canvas.width = crop.width;
-  canvas.height = crop.height;
+  // Calculate scale ratio between displayed size and natural size
+  const scaleX = image.naturalWidth / image.width;
+  const scaleY = image.naturalHeight / image.height;
 
-  // Draw the cropped image
+  // Scale crop coordinates to match natural image dimensions
+  const scaledCrop = {
+    x: crop.x * scaleX,
+    y: crop.y * scaleY,
+    width: crop.width * scaleX,
+    height: crop.height * scaleY,
+  };
+
+  // Set canvas size to the scaled crop size
+  canvas.width = scaledCrop.width;
+  canvas.height = scaledCrop.height;
+
+  // Draw the cropped image using scaled coordinates
   ctx.drawImage(
     image,
-    crop.x,
-    crop.y,
-    crop.width,
-    crop.height,
+    scaledCrop.x,
+    scaledCrop.y,
+    scaledCrop.width,
+    scaledCrop.height,
     0,
     0,
-    crop.width,
-    crop.height
+    scaledCrop.width,
+    scaledCrop.height
   );
 
   return new Promise((resolve) => {

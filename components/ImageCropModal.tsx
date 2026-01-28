@@ -125,10 +125,12 @@ export default function ImageCropModal({
             zoom={zoom}
             aspect={4 / 3}
             minZoom={0.3}
+            maxZoom={3}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}
             objectFit="contain"
+            restrictPosition={false}
           />
         </div>
 

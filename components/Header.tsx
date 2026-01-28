@@ -38,7 +38,7 @@ const Header = () => {
   return (
     <header className="bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-5">
           {/* Left - Menu Button */}
           <div className="relative" ref={menuRef}>
             <button
@@ -46,8 +46,8 @@ const Header = () => {
               className="p-2 hover:bg-gray-800 rounded-lg transition-colors flex items-center space-x-2"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              <span className="hidden sm:inline text-sm font-medium">Menu</span>
+              {isMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+              <span className="hidden sm:inline font-medium">Menu</span>
             </button>
 
             {/* Dropdown Menu */}
@@ -88,7 +88,7 @@ const Header = () => {
               <img
                 src="/assets/Benchmark Logo (RGB Color Reverse).png"
                 alt="Benchmark Equipment Rental & Sales"
-                className="h-10 sm:h-12 w-auto cursor-pointer"
+                className="h-12 sm:h-14 w-auto cursor-pointer"
               />
             </Link>
           </div>
@@ -99,7 +99,7 @@ const Header = () => {
             className="flex items-center space-x-2 hover:text-red-500 transition-colors"
           >
             <Phone className="w-5 h-5 text-red-500" />
-            <span className="hidden sm:inline text-sm font-medium">817-403-4334</span>
+            <span className="hidden sm:inline font-medium">817-403-4334</span>
           </a>
         </div>
       </div>

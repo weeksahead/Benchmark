@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Calendar, User, ArrowRight, Tag } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Breadcrumb from '@/components/Breadcrumb'
 import { BlogPost } from '@/data/blogPosts'
 
 interface BlogPostClientProps {
@@ -61,14 +62,10 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
         />
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Back Button */}
-          <Link
-            href="/blog"
-            className="mb-8 text-red-500 hover:text-red-400 transition-colors flex items-center space-x-2 inline-flex"
-          >
-            <ArrowRight className="w-4 h-4 rotate-180" />
-            <span>Back to Blog</span>
-          </Link>
+          <Breadcrumb items={[
+            { label: 'Blog', href: '/blog' },
+            { label: post.title }
+          ]} />
 
           {/* Article Header */}
           <div className="mb-8">

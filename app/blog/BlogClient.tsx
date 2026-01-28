@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Calendar, Search } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import Breadcrumb from '@/components/Breadcrumb'
 
 interface BlogPost {
   id: number
@@ -64,6 +65,7 @@ export default function BlogClient() {
       <Header />
       <section className="bg-black text-white min-h-screen py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Breadcrumb items={[{ label: 'Blog' }]} />
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-5xl font-bold mb-4">Equipment & Industry Blog</h1>

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Camera, Filter } from 'lucide-react';
 import photosData from '../config/photos.json';
+import Breadcrumb from './Breadcrumb';
 
 interface PhotoGalleryImage {
   id: number;
@@ -27,6 +28,7 @@ const Photos = () => {
   return (
     <section className="bg-black text-white min-h-screen py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Breadcrumb items={[{ label: 'Photos' }]} />
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-4 flex items-center justify-center">

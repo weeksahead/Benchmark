@@ -1,9 +1,11 @@
 import React from 'react';
+import Breadcrumb from './Breadcrumb';
 
 const About = () => {
   return (
     <section className="bg-black text-white min-h-screen py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Breadcrumb items={[{ label: 'About' }]} />
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-12">About Benchmark Equipment</h1>

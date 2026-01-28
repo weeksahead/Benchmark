@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import Breadcrumb from './Breadcrumb'
 
 interface FAQItem {
   question: string
@@ -553,6 +554,7 @@ const FAQ = () => {
       />
       <main className="bg-black text-white min-h-screen">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <Breadcrumb items={[{ label: 'FAQ' }]} />
           <div className="text-center mb-16">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Frequently Asked Questions

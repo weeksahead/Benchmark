@@ -34,6 +34,7 @@ const Header = () => {
               <Link href="/photos" className="hover:text-red-500 transition-colors font-medium">Photos</Link>
               <Link href="/blog" className="hover:text-red-500 transition-colors font-medium">Blog</Link>
               <Link href="/about" className="hover:text-red-500 transition-colors font-medium">About</Link>
+              <Link href="/faq" className="hover:text-red-500 transition-colors font-medium">FAQ</Link>
               <Link href="/contact" className="hover:text-red-500 transition-colors font-medium">Contact</Link>
             </nav>
             <a href="tel:8174034334" className="flex items-center space-x-2 hover:text-red-500 transition-colors">
@@ -60,6 +61,7 @@ const Header = () => {
               <Link href="/photos" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">Photos</Link>
               <Link href="/blog" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">Blog</Link>
               <Link href="/about" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">About</Link>
+              <Link href="/faq" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">FAQ</Link>
               <Link href="/contact" onClick={() => setIsMenuOpen(false)} className="hover:text-red-500 transition-colors font-medium text-left block">Contact</Link>
               <a href="tel:8174034334" className="flex items-center space-x-2 hover:text-red-500 transition-colors">
                 <Phone className="w-4 h-4 text-red-500" />

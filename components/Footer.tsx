@@ -48,6 +48,7 @@ const Footer = ({ setCurrentPage }: FooterProps) => {
               <li><button onClick={() => handleNavClick('photos')} className="text-gray-400 hover:text-red-500 transition-colors">Photos</button></li>
               <li><button onClick={() => handleNavClick('blog')} className="text-gray-400 hover:text-red-500 transition-colors">Blog</button></li>
               <li><button onClick={() => handleNavClick('about')} className="text-gray-400 hover:text-red-500 transition-colors">About</button></li>
+              <li><a href="/faq" className="text-gray-400 hover:text-red-500 transition-colors">FAQ</a></li>
               <li><button onClick={() => handleNavClick('contact')} className="text-gray-400 hover:text-red-500 transition-colors">Contact</button></li>
             </ul>
           </div>

@@ -1,0 +1,706 @@
+{
+  "description": "Auto-generated blog topic queue for Benchmark Equipment. Posts publish Tuesday and Friday.",
+  "lastUpdated": "2025-01-28",
+  "topics": [
+    {
+      "id": 1,
+      "topic": "CAT 336 Excavator: The Workhorse for North Texas Commercial Projects",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 2,
+      "topic": "Skid Steer vs Compact Track Loader: Which is Right for Your DFW Job Site?",
+      "category": "Comparisons",
+      "photoMatch": "skid steer",
+      "status": "pending"
+    },
+    {
+      "id": 3,
+      "topic": "How to Choose the Right Excavator Size for Utility Trenching in North Texas",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 4,
+      "topic": "Water Truck Rental Guide: Dust Control and Compaction in DFW's Dry Season",
+      "category": "Equipment Guides",
+      "photoMatch": "water truck",
+      "status": "pending"
+    },
+    {
+      "id": 5,
+      "topic": "Working in North Texas Clay: Equipment Tips for Black Gumbo Soil Conditions",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 6,
+      "topic": "CAT Wheel Loader Rental: Best Applications for Site Development Projects",
+      "category": "Equipment Guides",
+      "photoMatch": "wheel loader",
+      "status": "pending"
+    },
+    {
+      "id": 7,
+      "topic": "Articulated Dump Truck vs Rigid Frame: When to Use Each in Mass Earthmoving",
+      "category": "Comparisons",
+      "photoMatch": "articulated truck",
+      "status": "pending"
+    },
+    {
+      "id": 8,
+      "topic": "Breaking Through Caliche: Equipment and Techniques for North Texas Rock Layers",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 9,
+      "topic": "Roller and Compactor Selection Guide for Road Base and Pad Prep",
+      "category": "Equipment Guides",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 10,
+      "topic": "Equipment Rental Rates Explained: What's Included and What's Extra",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 11,
+      "topic": "CAT 320 vs 323 vs 326: Choosing the Right Mid-Size Excavator",
+      "category": "Comparisons",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 12,
+      "topic": "Summer Heat and Heavy Equipment: Preventing Overheating in 100°+ Texas Weather",
+      "category": "Seasonal",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 13,
+      "topic": "DOT and Municipal Projects: Equipment Requirements and Compliance",
+      "category": "Industry",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 14,
+      "topic": "Compact Track Loader Attachments: Maximizing Versatility on Job Sites",
+      "category": "Equipment Guides",
+      "photoMatch": "skid steer",
+      "status": "pending"
+    },
+    {
+      "id": 15,
+      "topic": "Site Prep Equipment Package: What You Need for Residential Development",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 16,
+      "topic": "Why Local Equipment Rental Beats National Chains for North Texas Contractors",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 17,
+      "topic": "Excavator Bucket Types: Matching the Right Bucket to North Texas Soil",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 18,
+      "topic": "Monthly vs Weekly Equipment Rental: Calculating the Best Value",
+      "category": "Cost/ROI",
+      "photoMatch": "wheel loader",
+      "status": "pending"
+    },
+    {
+      "id": 19,
+      "topic": "Pipeline and Utility Contractor Equipment Guide for North Texas Projects",
+      "category": "Industry",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 20,
+      "topic": "CAT D6 Dozer: Applications and Best Practices for Site Grading",
+      "category": "Equipment Guides",
+      "photoMatch": "dozer",
+      "status": "pending"
+    },
+    {
+      "id": 21,
+      "topic": "Preventing Equipment Downtime: Maintenance Tips for Rental Customers",
+      "category": "Maintenance",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 22,
+      "topic": "Soil Compaction Testing: Why Proper Compaction Matters in North Texas",
+      "category": "Use Cases",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 23,
+      "topic": "Equipment for Commercial Building Pads: Excavation to Final Grade",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 24,
+      "topic": "Late-Model Equipment Advantage: Why Machine Age Matters for Uptime",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 25,
+      "topic": "Hauling and Logistics: Getting Equipment to Your North Texas Job Site",
+      "category": "Business",
+      "photoMatch": "articulated truck",
+      "status": "pending"
+    },
+    {
+      "id": 26,
+      "topic": "CAT 730 Articulated Truck: Ideal Applications for Mass Earthmoving",
+      "category": "Equipment Guides",
+      "photoMatch": "articulated truck",
+      "status": "pending"
+    },
+    {
+      "id": 27,
+      "topic": "Excavator Operating Costs: Fuel, Maintenance, and Productivity Factors",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 28,
+      "topic": "Winter Equipment Operation: Cold Weather Tips for North Texas",
+      "category": "Seasonal",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 29,
+      "topic": "Grading and Finish Work: Equipment Selection for Precision Results",
+      "category": "Use Cases",
+      "photoMatch": "skid steer",
+      "status": "pending"
+    },
+    {
+      "id": 30,
+      "topic": "Equipment Insurance Requirements: What Renters Need to Know",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 31,
+      "topic": "Padfoot vs Smooth Drum Rollers: Choosing the Right Compactor",
+      "category": "Comparisons",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 32,
+      "topic": "Road Construction Equipment Lineup: From Subgrade to Final Surface",
+      "category": "Industry",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 33,
+      "topic": "Hydraulic Breaker Attachments: When and How to Use Rock Breakers",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 34,
+      "topic": "Equipment Productivity Rates: How to Estimate Production for Bidding",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 35,
+      "topic": "Denton County Development Boom: Equipment Trends for Local Contractors",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 36,
+      "topic": "Mini Excavator vs Standard Excavator: Right-Sizing for Your Project",
+      "category": "Comparisons",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 37,
+      "topic": "Stormwater Management: Equipment for Retention Ponds and Drainage",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 38,
+      "topic": "Operator Tips: Getting Maximum Production from Rental Equipment",
+      "category": "Maintenance",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 39,
+      "topic": "Material Handling with Wheel Loaders: Loading, Stockpiling, and Transport",
+      "category": "Use Cases",
+      "photoMatch": "wheel loader",
+      "status": "pending"
+    },
+    {
+      "id": 40,
+      "topic": "Pre-Rental Equipment Inspection: What We Check Before Every Delivery",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 41,
+      "topic": "Foundation Excavation: Equipment and Techniques for Residential Builds",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 42,
+      "topic": "GPS and Machine Control: Modern Technology in CAT Equipment",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 43,
+      "topic": "Rental Equipment Care: Customer Responsibilities During Rental Period",
+      "category": "Business",
+      "photoMatch": "skid steer",
+      "status": "pending"
+    },
+    {
+      "id": 44,
+      "topic": "Parking Lot and Paving Prep: Equipment for Commercial Hardscape Projects",
+      "category": "Use Cases",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 45,
+      "topic": "CAT Equipment Telematics: How Product Link Improves Fleet Management",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 46,
+      "topic": "Trenching Safety: OSHA Requirements and Best Practices",
+      "category": "Industry",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 47,
+      "topic": "Long-Term Rental Advantages: When Monthly Rentals Make Sense",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 48,
+      "topic": "McKinney and Prosper Growth: Equipment Needs for North Texas Subdivisions",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 49,
+      "topic": "Demolition Equipment: Safe and Efficient Structure Removal",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 50,
+      "topic": "Credit Application Process: Getting Set Up for Equipment Rental",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 51,
+      "topic": "Skid Steer Rental Guide: Versatile Solutions for Tight Job Sites",
+      "category": "Equipment Guides",
+      "photoMatch": "skid steer",
+      "status": "pending"
+    },
+    {
+      "id": 52,
+      "topic": "Calculating Equipment Hours: Understanding Single-Shift Operation",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 53,
+      "topic": "Pond and Lake Construction: Excavation Equipment for Water Features",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 54,
+      "topic": "Emergency Equipment Needs: How We Handle Urgent Rental Requests",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 55,
+      "topic": "Dust Control Best Practices: Water Trucks and Environmental Compliance",
+      "category": "Use Cases",
+      "photoMatch": "water truck",
+      "status": "pending"
+    },
+    {
+      "id": 56,
+      "topic": "Equipment Fleet Planning: Right-Sizing for Multi-Phase Projects",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 57,
+      "topic": "Fort Worth Infrastructure Projects: Equipment for Urban Construction",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 58,
+      "topic": "Track vs Wheel Equipment: Choosing Based on Site Conditions",
+      "category": "Comparisons",
+      "photoMatch": "skid steer",
+      "status": "pending"
+    },
+    {
+      "id": 59,
+      "topic": "Sewer and Water Line Installation: Equipment for Underground Utilities",
+      "category": "Industry",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 60,
+      "topic": "Rent-to-Own Options: When Purchasing Makes Sense",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 61,
+      "topic": "Land Clearing Equipment: Preparing Raw Land for Development",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 62,
+      "topic": "Equipment Delivery Logistics: What to Expect on Delivery Day",
+      "category": "Business",
+      "photoMatch": "articulated truck",
+      "status": "pending"
+    },
+    {
+      "id": 63,
+      "topic": "Erosion Control and Grading: Protecting Sites During Construction",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 64,
+      "topic": "CAT vs Other Brands: Why We Choose Caterpillar for Our Fleet",
+      "category": "Comparisons",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 65,
+      "topic": "Celina and Gunter Development: Equipment for Rural Subdivision Work",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 66,
+      "topic": "Loader Bucket Sizes: Matching Capacity to Your Material Handling Needs",
+      "category": "Equipment Guides",
+      "photoMatch": "wheel loader",
+      "status": "pending"
+    },
+    {
+      "id": 67,
+      "topic": "Job Site Safety: Equipment Inspection and Operator Responsibilities",
+      "category": "Maintenance",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 68,
+      "topic": "Commercial Excavation Timelines: Planning Equipment for Project Phases",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 69,
+      "topic": "Fuel Efficiency in Modern CAT Equipment: Saving Money on Operations",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 70,
+      "topic": "Sherman-Denison Corridor: Equipment for Growing North Texas Markets",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 71,
+      "topic": "Excavator Thumb Attachments: When and Why You Need One",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 72,
+      "topic": "Rainy Season Equipment Tips: Working in Wet North Texas Conditions",
+      "category": "Seasonal",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 73,
+      "topic": "Data Center Site Prep: Equipment for Large Commercial Projects",
+      "category": "Industry",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 74,
+      "topic": "Building Strong Contractor Relationships: The Benchmark Approach",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 75,
+      "topic": "Compaction Testing and Equipment: Achieving Spec Density",
+      "category": "Use Cases",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 76,
+      "topic": "Equipment Financing vs Renting: Making the Right Choice",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 77,
+      "topic": "Weatherford and West Fort Worth: Equipment for Western DFW Growth",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 78,
+      "topic": "Quick Coupler Systems: Faster Attachment Changes on Excavators",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 79,
+      "topic": "Site Superintendent Equipment Guide: What to Request for Your Project",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 80,
+      "topic": "Growing Your Construction Business: Scaling with Rental Equipment",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 81,
+      "topic": "Concrete Removal and Recycling: Equipment for Demolition Projects",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 82,
+      "topic": "CAT Grade Control: Precision Grading Technology Explained",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 83,
+      "topic": "Municipal Projects in Denton County: Equipment Requirements",
+      "category": "Industry",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 84,
+      "topic": "Bidding Equipment Costs: Accurate Estimating for Rental Equipment",
+      "category": "Cost/ROI",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 85,
+      "topic": "After-Hours Equipment Support: What Happens When Issues Arise",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 86,
+      "topic": "Retaining Wall Construction: Equipment for Structural Earthwork",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 87,
+      "topic": "I-35 Corridor Construction: Equipment for Highway-Adjacent Projects",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 88,
+      "topic": "Dozer vs Scraper: Choosing the Right Mass Earthmoving Equipment",
+      "category": "Comparisons",
+      "photoMatch": "dozer",
+      "status": "pending"
+    },
+    {
+      "id": 89,
+      "topic": "Equipment for Golf Course Construction: Specialized Earthwork Needs",
+      "category": "Industry",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 90,
+      "topic": "Preventive Maintenance Schedules: Maximizing Equipment Life",
+      "category": "Maintenance",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 91,
+      "topic": "Frisco Development Projects: Equipment for High-Growth Areas",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 92,
+      "topic": "Excavator Tilt Buckets: Precision Grading Without Repositioning",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 93,
+      "topic": "Subdivision Infrastructure: Complete Equipment Package Guide",
+      "category": "Use Cases",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 94,
+      "topic": "Understanding Equipment Specs: What the Numbers Mean",
+      "category": "Equipment Guides",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 95,
+      "topic": "Industrial Site Preparation: Equipment for Manufacturing Facilities",
+      "category": "Industry",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 96,
+      "topic": "Equipment Operator Shortage: How Rentals Help Manage Labor Challenges",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 97,
+      "topic": "Sports Field Construction: Equipment for Athletic Facility Earthwork",
+      "category": "Use Cases",
+      "photoMatch": "roller",
+      "status": "pending"
+    },
+    {
+      "id": 98,
+      "topic": "Spring Construction Season: Preparing Your Equipment Strategy",
+      "category": "Seasonal",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 99,
+      "topic": "Trophy Club and Southlake: Equipment for Premium Residential Projects",
+      "category": "Regional",
+      "photoMatch": "excavator",
+      "status": "pending"
+    },
+    {
+      "id": 100,
+      "topic": "Building a Relationship with Your Equipment Rental Partner",
+      "category": "Business",
+      "photoMatch": "excavator",
+      "status": "pending"
+    }
+  ]
+}

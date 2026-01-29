@@ -1,3 +1,9 @@
 {
-  "installCommand": "npm install --legacy-peer-deps"
+  "installCommand": "npm install --legacy-peer-deps",
+  "crons": [
+    {
+      "path": "/api/cron/blog-auto-publish",
+      "schedule": "0 14 * * 2,5"
+    }
+  ]
 }

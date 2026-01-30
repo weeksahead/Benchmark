@@ -333,6 +333,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
     // Save to database
     try {
+      console.log('Updating photo:', { id, field, value });
       const response = await fetch('/api/gallery-photos-admin', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -340,14 +341,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       });
 
       if (!response.ok) {
-        // Revert on error
+        const data = await response.json();
+        console.error('Update failed:', data);
         fetchGalleryPhotos();
-        setSaveMessage('❌ Failed to update photo');
-        setTimeout(() => setSaveMessage(''), 3000);
+        setSaveMessage(`❌ Update failed: ${data.error || 'Unknown error'}`);
+        setTimeout(() => setSaveMessage(''), 5000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating photo:', error);
       fetchGalleryPhotos();
+      setSaveMessage(`❌ Error: ${error.message || 'Failed to connect to server'}`);
+      setTimeout(() => setSaveMessage(''), 5000);
     }
   };
 

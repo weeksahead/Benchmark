@@ -31,21 +31,25 @@ export async function PATCH(request: Request) {
     const body = await request.json()
     const { id, ...updates } = body
 
+    console.log('PATCH request received:', { id, updates })
+
     if (!id) {
       return NextResponse.json({ error: 'Photo ID required' }, { status: 400 })
     }
 
-    const { error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('gallery_photos')
       .update(updates)
       .eq('id', id)
+      .select()
 
     if (error) {
       console.error('Error updating photo:', error)
       throw error
     }
 
-    return NextResponse.json({ success: true })
+    console.log('Photo updated:', data)
+    return NextResponse.json({ success: true, updated: data })
 
   } catch (error: any) {
     console.error('Error updating photo:', error)

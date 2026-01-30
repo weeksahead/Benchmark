@@ -9,6 +9,9 @@ export interface BlogPost {
   image: string;
   readTime: string;
   slug: string;
+  // GEO optimization fields - stored as JSON strings from DB, optional for static posts
+  faqs?: string | null;
+  keywords?: string | null;
 }
 
 export const blogPosts: BlogPost[] = [

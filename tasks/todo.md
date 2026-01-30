@@ -1,3 +1,77 @@
+# Photo Management System - Visibility Controls
+
+## Goal
+Allow admin to control which photos appear on the public Photos page and Hero slider, with ability to delete photos from Supabase.
+
+---
+
+## Todo Items
+
+- [x] **1. Create `gallery_photos` table in Supabase**
+- [x] **2. Sync existing photos to database** (22 gallery photos synced)
+- [x] **3. Update admin gallery UI** - checkboxes for Photos Page and Hero
+- [x] **4. Create API routes for photo management** (`/api/gallery-photos-admin`)
+- [x] **5. Update photo upload to insert into database**
+- [x] **6. Update public Photos page** - only shows `show_on_photos = true`
+- [x] **7. Add "Select from Gallery" for Hero slides** - can pick gallery photos for hero
+
+---
+
+## Review - Completed 2025-01-30
+
+### Changes Made
+
+**1. Database Setup**
+- Created `gallery_photos` table in Supabase with columns: id, filename, url, alt_text, category, show_on_photos, show_on_hero, hero_title, hero_subtitle, created_at
+- Added RLS policies for authenticated users and public read access
+- Synced 22 existing gallery photos from storage to database
+
+**2. New API Routes**
+- `/api/gallery-photos-admin` - GET (fetch all), PATCH (update), DELETE (remove from storage + db)
+- `/api/gallery-setup` - one-time setup/sync route
+- Updated `/api/gallery-photos` - now fetches from database, filters by `show_on_photos = true`
+- Updated `/api/gallery-photo-add` - now inserts into database after upload
+
+**3. Admin Dashboard Updates** (`components/AdminDashboard.tsx`)
+- Photo Gallery tab now fetches from database
+- Added "Photos Page" checkbox - controls visibility on public /photos page
+- Added "Hero" checkbox - flags photo for hero use
+- Delete button now removes from both Supabase Storage AND database
+- Added "Add from Gallery" button in Hero Slider tab - opens picker to select existing photos
+- Gallery picker modal for selecting photos to add as hero slides
+
+**4. Scripts**
+- `scripts/sync-gallery.js` - syncs existing storage photos to database
+
+### Files Created/Modified
+- `app/api/gallery-photos-admin/route.ts` (new)
+- `app/api/gallery-setup/route.ts` (new)
+- `app/api/gallery-photos/route.ts` (updated)
+- `app/api/gallery-photo-add/route.ts` (updated)
+- `components/AdminDashboard.tsx` (updated)
+- `scripts/sync-gallery.js` (new)
+
+### How It Works Now
+1. **Upload photos** → goes to storage + database, defaults to showing on Photos page
+2. **Admin gallery** → shows ALL photos from database with checkboxes
+3. **Check "Photos Page"** → photo appears on public /photos page
+4. **Check "Hero"** → photo can be selected for hero slides
+5. **Delete** → removes from both storage and database
+6. **Hero slides** → click "Add from Gallery" to pick existing photos, or upload new ones
+7. **Blog images** → copied to `blog-posts/` folder so deleting gallery photos won't break blogs
+
+---
+
+# Future Improvements
+
+## Image Alt Text for Blogs
+- [ ] Add `image_alt` field to blog_posts table
+- [ ] Update Content Factory to allow entering custom alt text
+- [ ] Update BlogPostClient to use image_alt instead of title for alt attribute
+- [ ] Better for SEO/AEO - specific image descriptions instead of generic title
+
+---
+
 # Admin Authentication - Supabase Auth Implementation
 
 ## Goal

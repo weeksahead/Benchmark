@@ -14,6 +14,8 @@ interface BlogPost {
   image: string
   read_time: string
   slug: string
+  faqs?: string | null
+  keywords?: string | null
 }
 
 // Revalidate blog posts every 60 seconds to show updates

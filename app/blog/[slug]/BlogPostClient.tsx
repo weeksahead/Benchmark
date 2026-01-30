@@ -11,6 +11,30 @@ interface BlogPostClientProps {
   post: BlogPost
 }
 
+// Helper to parse JSON fields that may be strings or objects
+function parseJsonField<T>(field: string | T | null | undefined): T | null {
+  if (!field) return null
+  if (typeof field === 'string') {
+    try {
+      return JSON.parse(field)
+    } catch {
+      return null
+    }
+  }
+  return field as T
+}
+
+interface FAQ {
+  question: string
+  answer: string
+}
+
+interface Keywords {
+  short?: string[]
+  medium?: string[]
+  longtail?: string[]
+}
+
 export default function BlogPostClient({ post }: BlogPostClientProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -21,13 +45,29 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
   }
 
   const postUrl = `https://benchmarkequip.com/blog/${post.slug}`
-  const postImageUrl = `https://benchmarkequip.com${post.image}`
+  // Handle both relative paths and full URLs for images
+  const postImageUrl = post.image.startsWith('http')
+    ? post.image
+    : `https://benchmarkequip.com${post.image}`
+
+  // Parse FAQs and keywords from JSON strings (GEO optimization)
+  const faqs = parseJsonField<FAQ[]>(post.faqs)
+  const keywords = parseJsonField<Keywords>(post.keywords)
+
+  // Build keywords string for schema
+  const keywordsList = keywords
+    ? [
+        ...(keywords.short || []),
+        ...(keywords.medium || []),
+        ...(keywords.longtail || [])
+      ].join(', ')
+    : `construction equipment, heavy equipment, equipment rental, Cat equipment, ${post.category.toLowerCase()}`
 
   return (
     <>
       <Header />
       <section className="bg-black text-white min-h-screen py-20">
-        {/* BlogPosting Schema */}
+        {/* BlogPosting Schema - Enhanced for GEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -40,15 +80,31 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
               "datePublished": post.date,
               "dateModified": post.date,
               "author": {
-                "@type": "Person",
-                "name": post.author
+                "@type": "Organization",
+                "name": post.author,
+                "url": "https://benchmarkequip.com/about",
+                "description": "Heavy equipment rental specialists serving North Texas since 2020",
+                "knowsAbout": [
+                  "CAT excavators",
+                  "heavy equipment rental",
+                  "construction equipment",
+                  "earthmoving equipment",
+                  "North Texas construction"
+                ]
               },
               "publisher": {
                 "@type": "Organization",
                 "name": "Benchmark Equipment Rental & Sales",
+                "url": "https://benchmarkequip.com",
                 "logo": {
                   "@type": "ImageObject",
                   "url": "https://benchmarkequip.com/assets/Benchmark%20Logo%20(RGB%20Color%20Reverse).png"
+                },
+                "address": {
+                  "@type": "PostalAddress",
+                  "addressLocality": "Denton",
+                  "addressRegion": "TX",
+                  "addressCountry": "US"
                 }
               },
               "mainEntityOfPage": {
@@ -56,10 +112,33 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
                 "@id": postUrl
               },
               "articleSection": post.category,
-              "keywords": `construction equipment, heavy equipment, equipment rental, Cat equipment, ${post.category.toLowerCase()}`
+              "keywords": keywordsList,
+              "inLanguage": "en-US",
+              "isAccessibleForFree": true
             })
           }}
         />
+
+        {/* FAQPage Schema - For AI answer engines (GEO optimization) */}
+        {faqs && faqs.length > 0 && (
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                "mainEntity": faqs.map(faq => ({
+                  "@type": "Question",
+                  "name": faq.question,
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": faq.answer
+                  }
+                }))
+              })
+            }}
+          />
+        )}
 
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Breadcrumb items={[

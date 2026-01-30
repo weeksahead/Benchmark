@@ -45,7 +45,7 @@ const ContentFactory = () => {
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [loadingImages, setLoadingImages] = useState(false);
-  const [selectedBucket, setSelectedBucket] = useState<'Blog-images' | 'AI generated photos'>('Blog-images');
+  const [selectedBucket, setSelectedBucket] = useState<'Gallery' | 'Blog-images' | 'AI generated photos'>('Gallery');
 
   // Image generation states
   const [imagePrompt, setImagePrompt] = useState('');
@@ -310,15 +310,27 @@ const ContentFactory = () => {
     setTimeout(() => setSaveMessage(''), 3000);
   };
 
-  const loadExistingImages = async (bucket: 'Blog-images' | 'AI generated photos') => {
+  const loadExistingImages = async (bucket: 'Gallery' | 'Blog-images' | 'AI generated photos') => {
     setLoadingImages(true);
     setSelectedBucket(bucket);
     try {
-      const response = await fetch(`/api/blog-images-list?bucket=${encodeURIComponent(bucket)}`);
-      if (!response.ok) throw new Error('Failed to load images');
+      let images: string[] = [];
 
-      const data = await response.json();
-      setExistingImages(data.images || []);
+      if (bucket === 'Gallery') {
+        // Fetch from gallery_photos table
+        const response = await fetch('/api/gallery-photos-admin');
+        if (!response.ok) throw new Error('Failed to load gallery photos');
+        const data = await response.json();
+        images = (data.photos || []).map((p: any) => p.url);
+      } else {
+        // Fetch from storage bucket
+        const response = await fetch(`/api/blog-images-list?bucket=${encodeURIComponent(bucket)}`);
+        if (!response.ok) throw new Error('Failed to load images');
+        const data = await response.json();
+        images = data.images || [];
+      }
+
+      setExistingImages(images);
       setShowImagePicker(true);
     } catch (error) {
       console.error('Error loading images:', error);
@@ -328,12 +340,35 @@ const ContentFactory = () => {
     }
   };
 
-  const selectExistingImage = (imageUrl: string) => {
-    setFeaturedImage(imageUrl);
-    setImagePreview(imageUrl);
+  const selectExistingImage = async (imageUrl: string) => {
     setShowImagePicker(false);
-    setSaveMessage('✅ Image selected!');
-    setTimeout(() => setSaveMessage(''), 2000);
+    setSaveMessage('Copying image to blog folder...');
+
+    try {
+      // Copy the image to blog-posts folder so it's safe from gallery deletions
+      const response = await fetch('/api/blog-image-copy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageUrl })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to copy image');
+      }
+
+      const data = await response.json();
+      setFeaturedImage(data.imageUrl);
+      setImagePreview(data.imageUrl);
+      setSaveMessage('✅ Image ready for blog!');
+    } catch (error) {
+      console.error('Error copying image:', error);
+      // Fall back to using original URL
+      setFeaturedImage(imageUrl);
+      setImagePreview(imageUrl);
+      setSaveMessage('⚠️ Using original image (copy failed)');
+    }
+
+    setTimeout(() => setSaveMessage(''), 3000);
   };
 
   const handleGenerateImage = async () => {
@@ -693,7 +728,7 @@ const ContentFactory = () => {
                     </button>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <label className="flex flex-col items-center justify-center h-32 border-2 border-gray-700 border-dashed rounded-lg cursor-pointer bg-gray-800 hover:bg-gray-700 transition-colors">
                       <div className="flex flex-col items-center justify-center">
                         <Upload className="w-8 h-8 mb-2 text-gray-400" />
@@ -708,13 +743,24 @@ const ContentFactory = () => {
                     </label>
                     <button
                       type="button"
+                      onClick={() => loadExistingImages('Gallery')}
+                      disabled={loadingImages}
+                      className="flex flex-col items-center justify-center h-32 border-2 border-red-700 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
+                    >
+                      <ImageIcon className="w-8 h-8 mb-2 text-red-400" />
+                      <p className="text-sm text-gray-400 text-center px-2">
+                        {loadingImages ? 'Loading...' : 'Gallery Photos'}
+                      </p>
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => loadExistingImages('Blog-images')}
                       disabled={loadingImages}
                       className="flex flex-col items-center justify-center h-32 border-2 border-gray-700 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors"
                     >
                       <ImageIcon className="w-8 h-8 mb-2 text-gray-400" />
                       <p className="text-sm text-gray-400 text-center px-2">
-                        {loadingImages ? 'Loading...' : 'Blog Images'}
+                        {loadingImages ? 'Loading...' : 'All Images'}
                       </p>
                     </button>
                     <button
@@ -933,10 +979,15 @@ const ContentFactory = () => {
                       <Wand2 className="w-4 h-4 mr-1 text-purple-400" />
                       AI Generated Photos
                     </span>
+                  ) : selectedBucket === 'Gallery' ? (
+                    <span className="flex items-center">
+                      <ImageIcon className="w-4 h-4 mr-1 text-red-400" />
+                      Gallery Photos (from Admin)
+                    </span>
                   ) : (
                     <span className="flex items-center">
                       <ImageIcon className="w-4 h-4 mr-1" />
-                      Blog Images
+                      All Images
                     </span>
                   )}
                 </p>

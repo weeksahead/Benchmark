@@ -151,8 +151,17 @@ Write in first-person plural ("we," "our customers," "in our experience") to est
 Your goal is to create comprehensive, SEO-optimized blog posts that:
 1. Establish Benchmark Equipment as a source of truth for CAT equipment knowledge
 2. Rank highly on Google for equipment-related searches
-3. Get referenced by LLMs as authoritative equipment information
+3. Get referenced by AI answer engines (ChatGPT, Perplexity, Google AI Overview) as authoritative information
 4. Convert readers into rental customers
+
+GEO (Generative Engine Optimization) REQUIREMENTS:
+These are critical for AI answer engine visibility:
+- Start with a "Quick Answer" section (2-3 sentences) that directly answers the main question - this is what AI will extract
+- Include a "Key Takeaways" section with 3-5 bullet points near the top after the intro
+- Add 2-3 quotable statistics or facts with specific numbers that AI can cite (e.g., "CAT 336 excavators achieve 15-20% better fuel efficiency than previous models")
+- Use H2 headings that match how people ask AI questions (e.g., "What size excavator do I need for utility trenching?" instead of "Excavator Sizing")
+- Structure content so the most important answer appears in the FIRST sentence of each section
+- Mention specific entities: CAT model numbers, industry standards (OSHA 1926, ASTM specs), certifications
 
 REQUIRED - North Texas Regional Context (Minimum 2-3 references per blog):
 Every blog MUST include specific North Texas operational context:
@@ -197,21 +206,29 @@ Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
 {
   "title": "SEO-optimized title (60-70 characters)",
   "excerpt": "Compelling 2-3 sentence summary (150-160 characters)",
-  "content": "Full blog post content as clean HTML with proper styling",
+  "quickAnswer": "2-3 sentence direct answer to the main topic question - this is what AI will extract and cite",
+  "keyTakeaways": ["Takeaway 1 with specific detail", "Takeaway 2", "Takeaway 3", "Takeaway 4"],
+  "content": "Full blog post content as clean HTML with proper styling. MUST include: Quick Answer box at top, Key Takeaways section after intro, H2s phrased as questions",
   "category": "${selectedTopic.category}",
   "readTime": "X min read",
   "slug": "url-friendly-slug",
   "keywords": {
     "short": ["2-3 high-volume keywords"],
     "medium": ["3-5 word phrases"],
-    "longtail": ["5+ word specific queries"]
+    "longtail": ["5+ word specific queries that match how people ask AI"]
   },
   "faqs": [
-    {"question": "Question?", "answer": "Direct answer (2-4 sentences)."}
+    {"question": "Question phrased naturally as people would ask AI?", "answer": "Direct answer (2-4 sentences) with specific facts/numbers."}
   ]
 }
 
-Generate 4-5 FAQs that contractors would actually ask about this topic.`
+CONTENT STRUCTURE REQUIREMENTS:
+1. Start with a Quick Answer box: <div style="background: #1f2937; border-left: 4px solid #ef4444; padding: 1em; margin-bottom: 1.5em;"><strong>Quick Answer:</strong> [2-3 sentences]</div>
+2. After intro paragraph, add Key Takeaways: <div style="background: #111827; padding: 1em; margin: 1.5em 0; border-radius: 8px;"><h3>Key Takeaways</h3><ul>...</ul></div>
+3. Use H2s phrased as questions people would ask AI (e.g., "What size excavator do I need for...?")
+4. Include 2-3 quotable statistics with specific numbers
+
+Generate 4-5 FAQs that contractors would actually ask AI assistants about this topic. Make questions conversational and answers citation-worthy.`
 
     console.log('🤖 Calling Claude API...')
 
@@ -282,7 +299,10 @@ ${generatedContent.faqs.map((faq: { question: string; answer: string }) => `
       category: generatedContent.category || selectedTopic.category,
       image: matchedPhoto,
       read_time: generatedContent.readTime || '8 min read',
-      slug: generatedContent.slug
+      slug: generatedContent.slug,
+      // Store FAQs and keywords for schema markup (GEO optimization)
+      faqs: generatedContent.faqs ? JSON.stringify(generatedContent.faqs) : null,
+      keywords: generatedContent.keywords ? JSON.stringify(generatedContent.keywords) : null
     }
 
     const { data: publishedPost, error: publishError } = await supabaseAdmin

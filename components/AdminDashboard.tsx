@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive, Wand2, FileText } from 'lucide-react';
 import slidesData from '../config/slides.json';
-import photosData from '../config/photos.json';
 import PurchaseCalculator from './PurchaseCalculator';
 import SavedCalculations from './SavedCalculations';
 import ContentFactory from './ContentFactory';
@@ -36,10 +35,15 @@ interface SlideImage {
 }
 
 interface PhotoGalleryImage {
-  id: number;
-  src: string;
-  alt: string;
+  id: string;
+  filename: string;
+  url: string;
+  alt_text: string;
   category: string;
+  show_on_photos: boolean;
+  show_on_hero: boolean;
+  hero_title?: string;
+  hero_subtitle?: string;
 }
 
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
@@ -48,11 +52,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [isLoadingCalculations, setIsLoadingCalculations] = useState(false);
-  const [isMigrating, setIsMigrating] = useState(false);
 
   // Load from JSON configs
   const [sliderImages, setSliderImages] = useState<SlideImage[]>(slidesData);
-  const [galleryImages, setGalleryImages] = useState<PhotoGalleryImage[]>(photosData);
+  const [galleryImages, setGalleryImages] = useState<PhotoGalleryImage[]>([]);
+  const [isLoadingGallery, setIsLoadingGallery] = useState(false);
 
   // Machine Trader search state
   const [searchQuery, setSearchQuery] = useState('');
@@ -66,10 +70,32 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [currentFileIndex, setCurrentFileIndex] = useState(0);
 
+  // Gallery picker modal state (for selecting photos for hero slides)
+  const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
+
   // Load calculations from Monday.com when component mounts
   useEffect(() => {
     fetchCalculations();
+    fetchGalleryPhotos();
   }, []);
+
+  // Fetch gallery photos from Supabase
+  const fetchGalleryPhotos = async () => {
+    setIsLoadingGallery(true);
+    try {
+      const response = await fetch('/api/gallery-photos-admin');
+      if (response.ok) {
+        const data = await response.json();
+        setGalleryImages(data.photos || []);
+      } else {
+        console.error('Failed to fetch gallery photos');
+      }
+    } catch (error) {
+      console.error('Error fetching gallery photos:', error);
+    } finally {
+      setIsLoadingGallery(false);
+    }
+  };
 
   // Fetch calculations from Monday.com
   const fetchCalculations = async () => {
@@ -131,61 +157,6 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   // Handle deleting calculations
   const handleDeleteCalculation = (id: string) => {
     setSavedCalculations(prev => prev.filter(calc => calc.id !== id));
-  };
-
-  // Handle migrating existing photos to Supabase
-  const handleMigratePhotos = async () => {
-    console.log('Migrate button clicked');
-
-    const confirmed = confirm('This will upload all existing photos from /public/assets to Supabase. Continue?');
-    console.log('User confirmation:', confirmed);
-
-    if (!confirmed) {
-      setSaveMessage('Migration cancelled');
-      setTimeout(() => setSaveMessage(''), 2000);
-      return;
-    }
-
-    setIsMigrating(true);
-    setSaveMessage('Migrating photos to Supabase...');
-    console.log('Starting migration...');
-
-    try {
-      const response = await fetch('/api/migrate-photos', {
-        method: 'POST'
-      });
-
-      console.log('Migration response:', response.status);
-
-      if (!response.ok) {
-        throw new Error('Failed to migrate photos');
-      }
-
-      const data = await response.json();
-      setSaveMessage(`✅ ${data.message}`);
-
-      // Update gallery images with new Supabase URLs
-      if (data.results) {
-        const newImages = data.results
-          .filter((r: any) => r.status === 'success')
-          .map((r: any, index: number) => ({
-            id: index + 1,
-            src: r.newSrc,
-            alt: galleryImages.find(img => img.src === r.originalSrc)?.alt || 'Equipment Photo',
-            category: galleryImages.find(img => img.src === r.originalSrc)?.category || 'Other'
-          }));
-
-        if (newImages.length > 0) {
-          setGalleryImages(newImages);
-        }
-      }
-    } catch (error) {
-      console.error('Migration error:', error);
-      setSaveMessage('❌ Failed to migrate photos');
-    } finally {
-      setIsMigrating(false);
-      setTimeout(() => setSaveMessage(''), 5000);
-    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'slider' | 'gallery') => {
@@ -289,14 +260,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
       const data = await response.json();
 
-      const newImage: PhotoGalleryImage = {
-        id: Date.now() + Math.random(),
-        src: data.photo.src,
-        alt: data.photo.alt,
-        category: data.photo.category
-      };
-
-      setGalleryImages(prev => [...prev, newImage]);
+      // Refresh gallery from database to get the new photo with proper ID
+      await fetchGalleryPhotos();
       setSaveMessage('✅ Photo uploaded successfully!');
       setTimeout(() => setSaveMessage(''), 3000);
 
@@ -358,20 +323,82 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     );
   };
 
-  const updateGalleryImage = (id: number, field: keyof PhotoGalleryImage, value: string) => {
-    setGalleryImages(prev => 
-      prev.map(image => 
+  const updateGalleryImage = async (id: string, field: keyof PhotoGalleryImage, value: string | boolean) => {
+    // Optimistic update
+    setGalleryImages(prev =>
+      prev.map(image =>
         image.id === id ? { ...image, [field]: value } : image
       )
     );
+
+    // Save to database
+    try {
+      const response = await fetch('/api/gallery-photos-admin', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, [field]: value })
+      });
+
+      if (!response.ok) {
+        // Revert on error
+        fetchGalleryPhotos();
+        setSaveMessage('❌ Failed to update photo');
+        setTimeout(() => setSaveMessage(''), 3000);
+      }
+    } catch (error) {
+      console.error('Error updating photo:', error);
+      fetchGalleryPhotos();
+    }
   };
 
   const deleteSliderImage = (id: number) => {
     setSliderImages(prev => prev.filter(slide => slide.id !== id));
   };
 
-  const deleteGalleryImage = (id: number) => {
+  // Add a new hero slide from a gallery photo
+  const addSlideFromGallery = (photo: PhotoGalleryImage) => {
+    const newSlide: SlideImage = {
+      id: Date.now() + Math.random(),
+      image: photo.url,
+      title: 'New Slide Title',
+      subtitle: 'Edit this subtitle',
+      buttonText: 'View Equipment'
+    };
+    setSliderImages(prev => [...prev, newSlide]);
+    setGalleryPickerOpen(false);
+    setSaveMessage('✅ Slide added from gallery! Remember to save changes.');
+    setTimeout(() => setSaveMessage(''), 3000);
+  };
+
+  const deleteGalleryImage = async (id: string, filename: string) => {
+    if (!confirm('Are you sure you want to delete this photo? This cannot be undone.')) {
+      return;
+    }
+
+    // Optimistic update
     setGalleryImages(prev => prev.filter(image => image.id !== id));
+    setSaveMessage('Deleting photo...');
+
+    try {
+      const response = await fetch('/api/gallery-photos-admin', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, filename })
+      });
+
+      if (response.ok) {
+        setSaveMessage('✅ Photo deleted');
+      } else {
+        // Revert on error
+        fetchGalleryPhotos();
+        setSaveMessage('❌ Failed to delete photo');
+      }
+    } catch (error) {
+      console.error('Error deleting photo:', error);
+      fetchGalleryPhotos();
+      setSaveMessage('❌ Failed to delete photo');
+    }
+    setTimeout(() => setSaveMessage(''), 3000);
   };
 
   const handleMachineSearch = async () => {
@@ -572,17 +599,31 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           <div>
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Hero Slider Images</h2>
-              <label className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer flex items-center space-x-2">
-                <Upload className="w-4 h-4" />
-                <span>Upload New Slide</span>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e, 'slider')}
-                  className="hidden"
-                />
-              </label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (galleryImages.length === 0) {
+                      fetchGalleryPhotos();
+                    }
+                    setGalleryPickerOpen(true);
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                >
+                  <Image className="w-4 h-4" />
+                  <span>Add from Gallery</span>
+                </button>
+                <label className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer flex items-center space-x-2">
+                  <Upload className="w-4 h-4" />
+                  <span>Upload New Slide</span>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, 'slider')}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -662,12 +703,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <h2 className="text-2xl font-bold">Photo Gallery</h2>
               <div className="flex gap-2">
                 <button
-                  onClick={handleMigratePhotos}
-                  disabled={isMigrating}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
+                  onClick={fetchGalleryPhotos}
+                  disabled={isLoadingGallery}
+                  className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors flex items-center space-x-2"
                 >
                   <Archive className="w-4 h-4" />
-                  <span>{isMigrating ? 'Migrating...' : 'Migrate to Supabase'}</span>
+                  <span>{isLoadingGallery ? 'Loading...' : 'Refresh'}</span>
                 </button>
                 <label className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors cursor-pointer flex items-center space-x-2">
                   <Upload className="w-4 h-4" />
@@ -683,55 +724,112 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {galleryImages.map((image) => (
-                <div key={image.id} className="bg-gray-900 rounded-lg p-4">
-                  <div className="aspect-[4/3] mb-4 rounded-lg overflow-hidden bg-gray-800">
-                    <img
-                      src={image.src}
-                      alt={image.alt}
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Alt Text</label>
-                      <input
-                        type="text"
-                        value={image.alt}
-                        onChange={(e) => updateGalleryImage(image.id, 'alt', e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-sm"
+            {isLoadingGallery ? (
+              <div className="text-center py-12 text-gray-400">Loading photos...</div>
+            ) : galleryImages.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">No photos in gallery. Upload some photos to get started.</div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {galleryImages.map((image) => (
+                  <div key={image.id} className="bg-gray-900 rounded-lg p-4">
+                    <div className="aspect-[4/3] mb-4 rounded-lg overflow-hidden bg-gray-800">
+                      <img
+                        src={image.url}
+                        alt={image.alt_text}
+                        className="w-full h-full object-contain"
                       />
                     </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Category</label>
-                      <select
-                        value={image.category}
-                        onChange={(e) => updateGalleryImage(image.id, 'category', e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-sm"
+
+                    <div className="space-y-3">
+                      {/* Visibility Checkboxes */}
+                      <div className="flex gap-4">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={image.show_on_photos}
+                            onChange={(e) => updateGalleryImage(image.id, 'show_on_photos', e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-red-500 focus:ring-red-500"
+                          />
+                          <span className="text-sm">Photos Page</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={image.show_on_hero}
+                            onChange={(e) => updateGalleryImage(image.id, 'show_on_hero', e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-600 bg-gray-800 text-red-500 focus:ring-red-500"
+                          />
+                          <span className="text-sm">Hero Slider</span>
+                        </label>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Alt Text</label>
+                        <input
+                          type="text"
+                          value={image.alt_text}
+                          onChange={(e) => updateGalleryImage(image.id, 'alt_text', e.target.value)}
+                          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-sm"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Category</label>
+                        <select
+                          value={image.category}
+                          onChange={(e) => updateGalleryImage(image.id, 'category', e.target.value)}
+                          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-sm"
+                        >
+                          <option value="Excavators">Excavators</option>
+                          <option value="Skid Steers">Skid Steers</option>
+                          <option value="Rollers">Rollers</option>
+                          <option value="Wheel Loaders">Wheel Loaders</option>
+                          <option value="Water Trucks">Water Trucks</option>
+                          <option value="Dozers">Dozers</option>
+                          <option value="Articulated Trucks">Articulated Trucks</option>
+                          <option value="Equipment">Equipment</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+
+                      {/* Hero fields - only show when hero is checked */}
+                      {image.show_on_hero && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Hero Title</label>
+                            <input
+                              type="text"
+                              value={image.hero_title || ''}
+                              onChange={(e) => updateGalleryImage(image.id, 'hero_title', e.target.value)}
+                              placeholder="Heavy Equipment Rentals"
+                              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Hero Subtitle</label>
+                            <input
+                              type="text"
+                              value={image.hero_subtitle || ''}
+                              onChange={(e) => updateGalleryImage(image.id, 'hero_subtitle', e.target.value)}
+                              placeholder="Serving North Texas since 2010"
+                              className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white text-sm"
+                            />
+                          </div>
+                        </>
+                      )}
+
+                      <button
+                        onClick={() => deleteGalleryImage(image.id, image.filename)}
+                        className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 text-sm"
                       >
-                        <option value="Excavators">Excavators</option>
-                        <option value="Skid Steers">Skid Steers</option>
-                        <option value="Rollers">Rollers</option>
-                        <option value="Wheel Loaders">Wheel Loaders</option>
-                        <option value="Water Trucks">Water Trucks</option>
-                        <option value="Other">Other</option>
-                      </select>
+                        <Trash2 className="w-4 h-4" />
+                        <span>Delete</span>
+                      </button>
                     </div>
-                    
-                    <button
-                      onClick={() => deleteGalleryImage(image.id)}
-                      className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 text-sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      <span>Delete</span>
-                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -895,6 +993,46 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           onSave={handleCropSave}
           onCancel={handleCropCancel}
         />
+      )}
+
+      {/* Gallery Picker Modal */}
+      {galleryPickerOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-lg max-w-4xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-4 border-b border-gray-700 flex justify-between items-center">
+              <h3 className="text-xl font-bold">Select Photo for Hero Slide</h3>
+              <button
+                onClick={() => setGalleryPickerOpen(false)}
+                className="text-gray-400 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex-1">
+              {galleryImages.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">
+                  {isLoadingGallery ? 'Loading photos...' : 'No photos in gallery. Upload some photos first.'}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {galleryImages.map((photo) => (
+                    <button
+                      key={photo.id}
+                      onClick={() => addSlideFromGallery(photo)}
+                      className="aspect-[4/3] rounded-lg overflow-hidden bg-gray-800 hover:ring-2 hover:ring-red-500 transition-all"
+                    >
+                      <img
+                        src={photo.url}
+                        alt={photo.alt_text}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

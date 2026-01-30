@@ -23,8 +23,17 @@ Write in first-person plural ("we," "our customers," "in our experience") to est
 Your goal is to create comprehensive, SEO-optimized blog posts that:
 1. Establish Benchmark Equipment as a source of truth for CAT equipment knowledge
 2. Rank highly on Google for equipment-related searches
-3. Get referenced by LLMs as authoritative equipment information
+3. Get referenced by AI answer engines (ChatGPT, Perplexity, Google AI Overview) as authoritative information
 4. Convert readers into rental customers
+
+GEO (Generative Engine Optimization) REQUIREMENTS:
+These are critical for AI answer engine visibility:
+- Start with a "Quick Answer" section (2-3 sentences) that directly answers the main question - this is what AI will extract
+- Include a "Key Takeaways" section with 3-5 bullet points near the top after the intro
+- Add 2-3 quotable statistics or facts with specific numbers that AI can cite (e.g., "CAT 336 excavators achieve 15-20% better fuel efficiency than previous models")
+- Use H2 headings that match how people ask AI questions (e.g., "What size excavator do I need for utility trenching?" instead of "Excavator Sizing")
+- Structure content so the most important answer appears in the FIRST sentence of each section
+- Mention specific entities: CAT model numbers, industry standards (OSHA 1926, ASTM specs), certifications
 
 REQUIRED - North Texas Regional Context (Minimum 2-3 references per blog):
 Every blog MUST include specific North Texas operational context:
@@ -80,8 +89,10 @@ SEO Best Practices - External Links:
 - Link naturally within sentences, not as standalone references
 
 Content Structure:
+- Quick Answer box at the very top
 - Engaging introduction with the problem/need
-- Clear section headings (H2, H3)
+- Key Takeaways section (3-5 bullets)
+- Clear section headings (H2 phrased as questions, H3 for sub-sections)
 - Specific equipment details and specifications
 - Practical use cases and applications
 - Expert tips and best practices
@@ -119,11 +130,13 @@ Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
 {
   "title": "SEO-optimized title (60-70 characters)",
   "excerpt": "Compelling 2-3 sentence summary (150-160 characters)",
-  "content": "Full blog post content as clean HTML. Use DOUBLE QUOTES for all HTML attributes. Format:
-    - <h2 style=\"font-weight: bold; font-size: 1.5em; margin-top: 2em; margin-bottom: 1em;\">Section Heading</h2>
-    - <p style=\"margin-bottom: 1.5em; line-height: 1.8;\">Paragraph text here.</p>
-    - Each paragraph in its own <p> tag
-    - Use <ul><li>items</li></ul> for lists
+  "quickAnswer": "2-3 sentence direct answer to the main topic question - this is what AI will extract and cite",
+  "keyTakeaways": ["Takeaway 1 with specific detail", "Takeaway 2", "Takeaway 3", "Takeaway 4"],
+  "content": "Full blog post content as clean HTML. Use DOUBLE QUOTES for all HTML attributes. MUST include Quick Answer box and Key Takeaways section. Format:
+    - Quick Answer box: <div style=\"background: #1f2937; border-left: 4px solid #ef4444; padding: 1em; margin-bottom: 1.5em;\"><strong>Quick Answer:</strong> [2-3 sentences]</div>
+    - Key Takeaways: <div style=\"background: #111827; padding: 1em; margin: 1.5em 0; border-radius: 8px;\"><h3 style=\"margin-top: 0;\">Key Takeaways</h3><ul>...</ul></div>
+    - <h2 style=\"font-weight: bold; font-size: 1.5em; margin-top: 2em; margin-bottom: 1em;\">Section Heading Phrased as Question?</h2>
+    - <p style=\"margin-bottom: 1.5em; line-height: 1.8;\">Start with direct answer, then elaborate.</p>
     - Include 4-7 external links: <a href=\"https://example.com\" target=\"_blank\" rel=\"noopener noreferrer\">anchor text</a>
     - Link to authoritative sources (.gov, .edu, OSHA, AGC, ASCE, etc.)
     - NO markdown syntax",
@@ -133,27 +146,34 @@ Return ONLY a valid JSON object (no markdown, no code blocks, just raw JSON):
   "keywords": {
     "short": ["2-3 word high-volume keywords", "equipment rental", "cat excavator"],
     "medium": ["3-5 word more specific phrases", "cat 320 excavator rental", "heavy equipment denton tx"],
-    "longtail": ["5+ word specific queries people search", "best excavator for clay soil north texas", "how much does cat 336 rental cost"]
+    "longtail": ["5+ word specific queries matching how people ask AI", "best excavator for clay soil north texas", "how much does cat 336 rental cost"]
   },
   "faqs": [
     {
-      "question": "Specific question a contractor would ask about this topic?",
-      "answer": "Direct, helpful answer (2-4 sentences) that provides real value."
+      "question": "Question phrased naturally as people would ask AI?",
+      "answer": "Direct, helpful answer (2-4 sentences) with specific facts/numbers that AI can cite."
     }
   ]
 }
 
+GEO CONTENT STRUCTURE REQUIREMENTS:
+1. Start content with Quick Answer box (styled div with red left border)
+2. After intro paragraph, add Key Takeaways section (styled div with bullet list)
+3. Use H2 headings phrased as questions people would ask AI
+4. First sentence of each section should directly answer the H2 question
+5. Include 2-3 quotable statistics with specific numbers
+
 KEYWORD REQUIREMENTS:
 - short: 3-4 high-volume, competitive keywords (2-3 words)
 - medium: 4-5 moderately specific phrases (3-5 words)
-- longtail: 3-4 very specific queries (5+ words) that match how people actually search
+- longtail: 3-4 very specific queries (5+ words) that match how people ask AI assistants
 
 FAQ REQUIREMENTS:
-- Generate 4-5 FAQs that contractors would actually ask about this topic
-- Questions should be natural language (how, what, why, when, which)
-- Answers should be direct, helpful, and 2-4 sentences
+- Generate 4-5 FAQs that contractors would actually ask AI assistants about this topic
+- Questions should be conversational natural language (how, what, why, when, which)
+- Answers should be direct, helpful, 2-4 sentences with specific numbers/facts
 - Include at least one question about cost/pricing and one about rental process
-- These will be used for FAQPage schema markup (AEO optimization)
+- These will be used for FAQPage schema markup (GEO optimization)
 
 CRITICAL REQUIREMENTS:
 1. Return ONLY the JSON object - no markdown code blocks, no backticks, just pure JSON
@@ -168,10 +188,10 @@ VOICE REMINDERS:
 - Include 2-3 operational experience scenarios from rental fleet perspective
 - Avoid generic AI phrases like "dive into," "delve into," "when it comes to"
 - Make CTAs conversational and context-specific, not generic
-- Start sections with real problems, not definitions
+- Start sections with direct answers, not definitions
 - Connect every technical detail to practical North Texas applications
 
-Make the content authoritative, detailed, and valuable for contractors researching equipment - written from the perspective of an experienced Denton-based equipment rental operator.`
+Make the content authoritative, detailed, and valuable for contractors researching equipment - written from the perspective of an experienced Denton-based equipment rental operator. Optimize for AI answer engines by making content easily extractable and citable.`
 
     console.log('Generating blog content with Claude...')
 

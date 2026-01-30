@@ -18,4 +18,7 @@ export interface BlogPost {
   slug: string
   created_at?: string
   updated_at?: string
+  // GEO optimization fields - stored as JSON strings
+  faqs?: string | null
+  keywords?: string | null
 }

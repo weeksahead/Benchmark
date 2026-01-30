@@ -57,14 +57,34 @@ export async function POST(request: NextRequest) {
       .from('Blog-images')
       .getPublicUrl(filename)
 
+    // Insert into database
+    const { data: dbData, error: dbError } = await supabaseAdmin
+      .from('gallery_photos')
+      .insert({
+        filename,
+        url: publicUrl,
+        alt_text: alt,
+        category: category || 'Equipment',
+        show_on_photos: true,  // Default to showing on photos page
+        show_on_hero: false
+      })
+      .select()
+      .single()
+
+    if (dbError) {
+      console.error('Database insert error:', dbError)
+      // Don't throw - photo is already uploaded, just log the error
+    }
+
     console.log('Gallery photo uploaded successfully:', publicUrl)
 
     return NextResponse.json({
       success: true,
       photo: {
+        id: dbData?.id,
         src: publicUrl,
         alt,
-        category: category || 'Other'
+        category: category || 'Equipment'
       }
     })
 

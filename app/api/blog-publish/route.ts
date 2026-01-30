@@ -51,7 +51,10 @@ ${faqs.map((faq: { question: string; answer: string }) => `
       category: category || 'Equipment Guides',
       image: featuredImage || '/images/equipment/cat-excavator-default.jpg',
       read_time: readTime || '5 min read',
-      slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      // Store FAQs and keywords for schema markup (GEO optimization)
+      faqs: faqs && Array.isArray(faqs) ? JSON.stringify(faqs) : null,
+      keywords: keywords ? JSON.stringify(keywords) : null
     }
 
     // Insert into Supabase

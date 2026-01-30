@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Upload, Image, Trash2, Save, LogOut, Home, Camera, Link, Search, ExternalLink, Calculator, Archive, Wand2, FileText } from 'lucide-react';
-import slidesData from '../config/slides.json';
 import PurchaseCalculator from './PurchaseCalculator';
 import SavedCalculations from './SavedCalculations';
 import ContentFactory from './ContentFactory';
@@ -30,8 +29,10 @@ interface SlideImage {
   image: string;
   title: string;
   subtitle: string;
-  buttonText: string;
-  buttonUrl?: string;
+  button_text: string;
+  button_url: string;
+  sort_order?: number;
+  is_active?: boolean;
 }
 
 interface PhotoGalleryImage {
@@ -53,8 +54,9 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [saveMessage, setSaveMessage] = useState('');
   const [isLoadingCalculations, setIsLoadingCalculations] = useState(false);
 
-  // Load from JSON configs
-  const [sliderImages, setSliderImages] = useState<SlideImage[]>(slidesData);
+  // Load from database
+  const [sliderImages, setSliderImages] = useState<SlideImage[]>([]);
+  const [isLoadingSlides, setIsLoadingSlides] = useState(false);
   const [galleryImages, setGalleryImages] = useState<PhotoGalleryImage[]>([]);
   const [isLoadingGallery, setIsLoadingGallery] = useState(false);
 
@@ -73,11 +75,30 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   // Gallery picker modal state (for selecting photos for hero slides)
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
-  // Load calculations from Monday.com when component mounts
+  // Load data when component mounts
   useEffect(() => {
     fetchCalculations();
     fetchGalleryPhotos();
+    fetchHeroSlides();
   }, []);
+
+  // Fetch hero slides from database
+  const fetchHeroSlides = async () => {
+    setIsLoadingSlides(true);
+    try {
+      const response = await fetch('/api/hero-slides');
+      if (response.ok) {
+        const data = await response.json();
+        setSliderImages(data.slides || []);
+      } else {
+        console.error('Failed to fetch hero slides');
+      }
+    } catch (error) {
+      console.error('Error fetching hero slides:', error);
+    } finally {
+      setIsLoadingSlides(false);
+    }
+  };
 
   // Fetch gallery photos from Supabase
   const fetchGalleryPhotos = async () => {
@@ -221,11 +242,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         });
 
         const newSlide: SlideImage = {
-          id: Date.now() + Math.random(),
+          id: -Date.now(), // Negative ID to indicate it's new (not yet saved)
           image: imageData,
           title: 'New Slide Title',
           subtitle: 'New Slide Subtitle',
-          buttonText: 'View Equipment'
+          button_text: 'View Equipment',
+          button_url: 'https://rent.benchmarkequip.com/items'
         };
         setSliderImages(prev => [...prev, newSlide]);
       } catch (error) {
@@ -355,18 +377,51 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     }
   };
 
-  const deleteSliderImage = (id: number) => {
+  const deleteSliderImage = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this slide?')) {
+      return;
+    }
+
+    // Optimistic update
     setSliderImages(prev => prev.filter(slide => slide.id !== id));
+
+    // If it's a saved slide (positive ID), delete from database
+    if (id > 0) {
+      try {
+        const response = await fetch('/api/hero-slides', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error('Failed to delete slide:', error);
+          fetchHeroSlides(); // Revert on error
+          setSaveMessage('❌ Failed to delete slide');
+          setTimeout(() => setSaveMessage(''), 3000);
+        } else {
+          setSaveMessage('✅ Slide deleted');
+          setTimeout(() => setSaveMessage(''), 3000);
+        }
+      } catch (error) {
+        console.error('Error deleting slide:', error);
+        fetchHeroSlides();
+        setSaveMessage('❌ Network error');
+        setTimeout(() => setSaveMessage(''), 3000);
+      }
+    }
   };
 
   // Add a new hero slide from a gallery photo
   const addSlideFromGallery = (photo: PhotoGalleryImage) => {
     const newSlide: SlideImage = {
-      id: Date.now() + Math.random(),
+      id: -Date.now(), // Negative ID to indicate it's new (not yet saved)
       image: photo.url,
       title: 'New Slide Title',
       subtitle: 'Edit this subtitle',
-      buttonText: 'View Equipment'
+      button_text: 'View Equipment',
+      button_url: 'https://rent.benchmarkequip.com/items'
     };
     setSliderImages(prev => [...prev, newSlide]);
     setGalleryPickerOpen(false);
@@ -438,44 +493,59 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   };
 
   const handleSave = async () => {
-    const password = prompt('Enter admin password:');
-    if (!password) return;
-    
     setIsSaving(true);
-    setSaveMessage('');
-    
+    setSaveMessage('Saving hero slides...');
+
     try {
-      // Save slider images
-      const slidesResponse = await fetch('/api/admin-save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'slides',
-          data: sliderImages,
-          password: password
-        })
-      });
-      
-      // Save gallery images
-      const photosResponse = await fetch('/api/admin-save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          type: 'photos',
-          data: galleryImages,
-          password: password
-        })
-      });
-      
-      if (slidesResponse.ok && photosResponse.ok) {
-        setSaveMessage('✅ Changes saved! They will be live in 1-2 minutes.');
-        setTimeout(() => setSaveMessage(''), 5000);
-      } else {
-        const error = !slidesResponse.ok ? await slidesResponse.json() : await photosResponse.json();
-        setSaveMessage('❌ Error: ' + (error.error || 'Failed to save'));
+      // Save each slide to the database
+      for (const slide of sliderImages) {
+        if (slide.id && slide.id > 0) {
+          // Update existing slide
+          const response = await fetch('/api/hero-slides', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: slide.id,
+              image: slide.image,
+              title: slide.title,
+              subtitle: slide.subtitle,
+              button_text: slide.button_text,
+              button_url: slide.button_url
+            })
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to update slide');
+          }
+        } else {
+          // Create new slide
+          const response = await fetch('/api/hero-slides', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: slide.image,
+              title: slide.title,
+              subtitle: slide.subtitle,
+              button_text: slide.button_text,
+              button_url: slide.button_url
+            })
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to create slide');
+          }
+        }
       }
-    } catch (error) {
-      setSaveMessage('❌ Error: Failed to connect to server');
+
+      // Refresh slides from database
+      await fetchHeroSlides();
+      setSaveMessage('✅ Hero slides saved successfully!');
+      setTimeout(() => setSaveMessage(''), 5000);
+    } catch (error: any) {
+      console.error('Error saving slides:', error);
+      setSaveMessage('❌ Error: ' + (error.message || 'Failed to save'));
     } finally {
       setIsSaving(false);
     }
@@ -636,6 +706,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               </div>
             </div>
 
+            {isLoadingSlides ? (
+              <div className="text-center py-12 text-gray-400">Loading slides...</div>
+            ) : sliderImages.length === 0 ? (
+              <div className="text-center py-12 text-gray-400">No slides. Add slides from your gallery or upload new images.</div>
+            ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {sliderImages.map((slide) => (
                 <div key={slide.id} className="bg-gray-900 rounded-lg p-6">
@@ -672,20 +747,20 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       <label className="block text-sm font-medium mb-2">Button Text</label>
                       <input
                         type="text"
-                        value={slide.buttonText}
-                        onChange={(e) => updateSliderImage(slide.id, 'buttonText', e.target.value)}
+                        value={slide.button_text}
+                        onChange={(e) => updateSliderImage(slide.id, 'button_text', e.target.value)}
                         className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium mb-2">Button URL</label>
                       <div className="flex items-center space-x-2">
                         <Link className="w-4 h-4 text-gray-400" />
                         <input
                           type="text"
-                          value={slide.buttonUrl || ''}
-                          onChange={(e) => updateSliderImage(slide.id, 'buttonUrl', e.target.value)}
+                          value={slide.button_url || ''}
+                          onChange={(e) => updateSliderImage(slide.id, 'button_url', e.target.value)}
                           placeholder="https://rent.benchmarkequip.com/items/..."
                           className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-white"
                         />
@@ -703,6 +778,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 </div>
               ))}
             </div>
+            )}
           </div>
         )}
 

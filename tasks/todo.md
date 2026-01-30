@@ -62,6 +62,59 @@ Allow admin to control which photos appear on the public Photos page and Hero sl
 
 ---
 
+# Hero Slides Database Migration - 2025-01-30
+
+## Goal
+Move Hero Slider storage from `config/slides.json` (which doesn't work on Vercel's read-only filesystem) to Supabase database.
+
+## Todo Items
+
+- [x] **1. Create `hero_slides` table in Supabase**
+- [x] **2. Create `/api/hero-slides` API route** - GET, POST, PATCH, DELETE
+- [x] **3. Update `components/Hero.tsx`** - Fetch from database instead of JSON
+- [x] **4. Update `components/AdminDashboard.tsx`** - Save to database instead of file
+
+---
+
+## Review - Completed 2025-01-30
+
+### Changes Made
+
+**1. Database Setup**
+- Created `hero_slides` table with columns: id, image, title, subtitle, button_text, button_url, sort_order, is_active, created_at
+- Migrated 5 existing slides from config/slides.json to database
+
+**2. Created `/api/hero-slides/route.ts`**
+- GET: Fetches active slides ordered by sort_order
+- POST: Creates new slide with auto-incrementing sort_order
+- PATCH: Updates existing slide by ID
+- DELETE: Removes slide by ID
+
+**3. Updated `components/Hero.tsx`**
+- Removed JSON import
+- Added state for slides and loading
+- Fetches from `/api/hero-slides` on mount
+- Updated field names to snake_case (button_text, button_url)
+- Added loading/empty state fallback
+
+**4. Updated `components/AdminDashboard.tsx`**
+- Removed slides.json import
+- Added fetchHeroSlides() to load from database
+- Updated SlideImage interface to use snake_case
+- Updated handleSave() to save each slide to database (creates new or updates existing)
+- Updated deleteSliderImage() to delete from database
+- Added isLoadingSlides state for loading indicator
+
+### Files Modified
+- `app/api/hero-slides/route.ts` (new)
+- `components/Hero.tsx` (updated)
+- `components/AdminDashboard.tsx` (updated)
+
+### Build Status
+- Build passes successfully
+
+---
+
 # Future Improvements
 
 ## Image Alt Text for Blogs

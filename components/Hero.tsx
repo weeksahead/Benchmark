@@ -1,11 +1,37 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ArrowRight, Wrench, Truck, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
-import slidesData from '../config/slides.json';
+
+interface Slide {
+  id?: number;
+  image: string;
+  title: string;
+  subtitle: string;
+  button_text: string;
+  button_url: string;
+}
 
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  
-  const slides = slidesData;
+  const [slides, setSlides] = useState<Slide[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch slides from database
+  useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const response = await fetch('/api/hero-slides');
+        const data = await response.json();
+        if (data.slides && data.slides.length > 0) {
+          setSlides(data.slides);
+        }
+      } catch (error) {
+        console.error('Error fetching hero slides:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSlides();
+  }, []);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -20,6 +46,54 @@ const Hero = () => {
     const timer = setInterval(nextSlide, 5000);
     return () => clearInterval(timer);
   }, [nextSlide]);
+
+  // Show loading state or handle empty slides
+  if (loading || slides.length === 0) {
+    return (
+      <section className="bg-black text-white relative overflow-hidden h-screen">
+        <div className="relative w-full h-full flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">Benchmark Equipment Rental</h1>
+            <p className="text-xl text-gray-300">Quality Equipment for Every Job</p>
+          </div>
+        </div>
+        {/* Bottom Section with Features */}
+        <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="flex items-center space-x-3 justify-center">
+                <div className="bg-red-600 p-2 rounded-lg">
+                  <Wrench className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Professional Grade</h3>
+                  <p className="text-gray-300 text-sm">Quality equipment</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 justify-center">
+                <div className="bg-red-600 p-2 rounded-lg">
+                  <Truck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Delivery Available</h3>
+                  <p className="text-gray-300 text-sm">To your job site</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 justify-center">
+                <div className="bg-red-600 p-2 rounded-lg">
+                  <Clock className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Flexible Rental</h3>
+                  <p className="text-gray-300 text-sm">Daily to monthly</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="bg-black text-white relative overflow-hidden h-screen">
@@ -58,13 +132,13 @@ const Hero = () => {
                 <p className="text-base sm:text-xl md:text-2xl lg:text-3xl mb-8 sm:mb-12 text-white drop-shadow-lg">
                   {slide.subtitle}
                 </p>
-                <a 
-                  href={slide.buttonUrl || "https://rent.benchmarkequip.com/items"} 
-                  target="_blank" 
+                <a
+                  href={slide.button_url || "https://rent.benchmarkequip.com/items"}
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold text-sm sm:text-base transition-colors inline-flex items-center group"
                 >
-                  {slide.buttonText}
+                  {slide.button_text}
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </a>
               </div>

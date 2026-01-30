@@ -375,6 +375,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       return;
     }
 
+    console.log('Deleting photo:', { id, filename });
+
     // Optimistic update
     setGalleryImages(prev => prev.filter(image => image.id !== id));
     setSaveMessage('Deleting photo...');
@@ -386,19 +388,23 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         body: JSON.stringify({ id, filename })
       });
 
+      const data = await response.json();
+      console.log('Delete response:', data);
+
       if (response.ok) {
         setSaveMessage('✅ Photo deleted');
       } else {
         // Revert on error
+        console.error('Delete failed:', data);
         fetchGalleryPhotos();
-        setSaveMessage('❌ Failed to delete photo');
+        setSaveMessage(`❌ Failed: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error deleting photo:', error);
       fetchGalleryPhotos();
-      setSaveMessage('❌ Failed to delete photo');
+      setSaveMessage('❌ Network error - check console');
     }
-    setTimeout(() => setSaveMessage(''), 3000);
+    setTimeout(() => setSaveMessage(''), 5000);
   };
 
   const handleMachineSearch = async () => {

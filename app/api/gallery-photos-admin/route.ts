@@ -62,7 +62,10 @@ export async function DELETE(request: Request) {
     const body = await request.json()
     const { id, filename } = body
 
+    console.log('Delete request received:', { id, filename })
+
     if (!id || !filename) {
+      console.error('Missing id or filename:', { id, filename })
       return NextResponse.json({ error: 'Photo ID and filename required' }, { status: 400 })
     }
 
@@ -74,20 +77,25 @@ export async function DELETE(request: Request) {
     if (storageError) {
       console.error('Error deleting from storage:', storageError)
       // Continue anyway - file might not exist in storage
+    } else {
+      console.log('Deleted from storage:', filename)
     }
 
     // Delete from database
-    const { error: dbError } = await supabaseAdmin
+    const { data: deletedData, error: dbError } = await supabaseAdmin
       .from('gallery_photos')
       .delete()
       .eq('id', id)
+      .select()
 
     if (dbError) {
       console.error('Error deleting from database:', dbError)
       throw dbError
     }
 
-    return NextResponse.json({ success: true })
+    console.log('Deleted from database:', deletedData)
+
+    return NextResponse.json({ success: true, deleted: deletedData })
 
   } catch (error: any) {
     console.error('Error deleting photo:', error)

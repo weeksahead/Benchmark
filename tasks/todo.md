@@ -1,3 +1,66 @@
+# Fix Blog Auto-Publish Cron Job
+
+## Problem
+Blog cron job (`/api/cron/blog-auto-publish`) runs on Tuesdays/Fridays but no new blogs are appearing.
+
+## Root Causes Found
+
+### Bug 1: Function timeout (PRIMARY)
+The cron route has no `maxDuration` export. It calls the Claude API to generate a 1500-2000 word blog post, which takes 15-30+ seconds. Vercel's default serverless function timeout is 10 seconds, so the function times out silently every run before Claude finishes responding.
+
+**Fix:** Add `export const maxDuration = 60` to the route file.
+
+### Bug 2: Slug mismatch breaks duplicate detection
+Line 88 generates a slug from the raw topic title for duplicate checking:
+`cat-336-excavator-the-workhorse-for-north-texas-commercial-projects`
+
+But line 302 stores whatever slug Claude generates (`generatedContent.slug`), which is typically shorter:
+`cat-336-excavator-north-texas`
+
+These never match, so the cron always re-attempts the first topic. If the `slug` column has a unique constraint, it fails on insert. If not, it creates duplicates.
+
+**Fix:** Use the same slug-generation logic for both checking and publishing (don't rely on Claude's slug).
+
+---
+
+## Todo Items
+
+- [x] **1. Add `maxDuration` export to cron route** - Add `export const maxDuration = 60` so Vercel allows up to 60 seconds for the function
+- [x] **2. Fix slug mismatch** - Generate the slug deterministically from the topic title and use it for both duplicate detection AND the published post (ignore Claude's slug)
+- [x] **3. Verify build passes** - Run `npm run build` to confirm no errors
+
+---
+
+## Review - Completed 2025-02-09
+
+### Changes Made
+
+**File modified:** `app/api/cron/blog-auto-publish/route.ts`
+
+**1. Added `maxDuration` export (line 5)**
+- Added `export const maxDuration = 60` so Vercel allows the function up to 60 seconds
+- Previously defaulted to 10s, which was not enough time for the Claude API call
+
+**2. Fixed slug mismatch (lines 92 + 308)**
+- Extracted slug generation into a `generateSlug()` helper function
+- Duplicate detection now uses `generateSlug(t.topic)` to check against published slugs
+- Published post now uses `generateSlug(selectedTopic.topic)` instead of `generatedContent.slug`
+- Both paths now produce identical slugs, so duplicate detection works correctly
+
+**3. Enhanced duplicate detection with title keyword matching**
+- Also fetches existing post titles and compares keyword overlap (5+ shared words = duplicate)
+- Catches posts published with old Claude-generated slugs that don't match deterministic slugs
+
+**4. Loaded 100 topics into cron (interleaved by category)**
+- Replaced 43-topic pool with 100 topics organized by week
+- Topics alternate categories so no two consecutive posts share the same category
+- Covers ~50 weeks of content at 2 posts/week
+
+### Build Status
+- Build passes successfully
+
+---
+
 # Photo Management System - Visibility Controls
 
 ## Goal
@@ -112,6 +175,45 @@ Move Hero Slider storage from `config/slides.json` (which doesn't work on Vercel
 
 ### Build Status
 - Build passes successfully
+
+---
+
+# SEO/AEO/GEO Fixes - Dynamic Sitemap & Contact Fix - 2026-02-17
+
+## Todo Items
+
+- [x] **1. Dynamic Sitemap** - Delete static `public/sitemap.xml`, create `app/sitemap.ts` that queries Supabase for all blog posts and includes all static pages
+- [x] **2. Fix robots.txt** - Remove references to nonexistent `blog-sitemap.xml` and `images-sitemap.xml`
+- [x] **3. Fix Contact Page** - Update phone from `(940) 295-7100` to `(817) 403-4334` and address to `3310 Fort Worth Dr, Denton, TX 76205`
+- [x] **4. Verify build** - Build passes successfully
+
+---
+
+## Review - Completed 2026-02-17
+
+### Changes Made
+
+**1. Dynamic Sitemap** (`public/sitemap.xml` → `app/sitemap.ts`)
+- Deleted the static `public/sitemap.xml` (only had 6 blog posts hardcoded)
+- Created `app/sitemap.ts` using Next.js `MetadataRoute.Sitemap`
+- Queries Supabase `blog_posts` table for all posts (slug, updated_at, created_at)
+- Includes 9 static pages: homepage, blog, about, contact, faq, photos, rent-vs-buy, privacy, terms
+- All blog posts dynamically included with proper `lastModified` dates
+- Removed hash-fragment URLs (`/#equipment`, `/#services`) — Google ignores these
+- Removed external domain URL (`rent.benchmarkequip.com`) — doesn't belong in sitemap
+
+**2. Fixed robots.txt** (`public/robots.txt`)
+- Removed `Sitemap: https://benchmarkequip.com/blog-sitemap.xml` (doesn't exist)
+- Removed `Sitemap: https://benchmarkequip.com/images-sitemap.xml` (doesn't exist)
+- Kept single valid `Sitemap: https://benchmarkequip.com/sitemap.xml` reference
+
+**3. Fixed Contact Page** (`app/contact/page.tsx`)
+- Updated phone number in both `description` and `openGraph.description`
+- Updated address in `description`
+
+### Build Status
+- Build passes successfully (58 pages generated)
+- `/sitemap.xml` now generated dynamically by Next.js
 
 ---
 

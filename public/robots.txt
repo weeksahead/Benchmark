@@ -82,10 +82,6 @@ Crawl-delay: 1
 # Sitemap location
 Sitemap: https://benchmarkequip.com/sitemap.xml
 
-# Additional sitemaps for specific content types
-Sitemap: https://benchmarkequip.com/blog-sitemap.xml
-Sitemap: https://benchmarkequip.com/images-sitemap.xml
-
 # Clean param for analytics tracking
 Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&gclid&fbclid
 

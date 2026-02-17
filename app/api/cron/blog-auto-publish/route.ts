@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 
+// Allow up to 60 seconds for Claude API generation
+export const maxDuration = 60
+
 // Vercel Cron runs this on schedule
 // Verify the request is from Vercel Cron
 export async function GET(request: NextRequest) {
@@ -22,71 +25,187 @@ export async function GET(request: NextRequest) {
     // If can't fetch from URL, use hardcoded topics approach via Supabase
     // For now, we'll fetch topics from a Supabase table or use inline selection
 
-    // Get list of already published slugs to avoid duplicates
+    // Get list of already published slugs and titles to avoid duplicates
     const { data: existingPosts } = await supabaseAdmin
       .from('blog_posts')
-      .select('slug')
+      .select('slug, title')
 
     const publishedSlugs = new Set(existingPosts?.map(p => p.slug) || [])
+    const publishedTitles = new Set(existingPosts?.map(p => p.title.toLowerCase()) || [])
 
-    // Topic pool - these will be cycled through
+    // Topic pool - 100 topics interleaved by category for variety
     const topicPool = [
-      { topic: "CAT 336 Excavator: The Workhorse for North Texas Commercial Projects", photoMatch: "excavator", category: "Equipment Guides" },
-      { topic: "Skid Steer vs Compact Track Loader: Which is Right for Your DFW Job Site?", photoMatch: "skid steer", category: "Comparisons" },
-      { topic: "How to Choose the Right Excavator Size for Utility Trenching in North Texas", photoMatch: "excavator", category: "Use Cases" },
-      { topic: "Water Truck Rental Guide: Dust Control and Compaction in DFW's Dry Season", photoMatch: "water truck", category: "Equipment Guides" },
-      { topic: "Working in North Texas Clay: Equipment Tips for Black Gumbo Soil Conditions", photoMatch: "excavator", category: "Regional" },
+      // Week 1
       { topic: "CAT Wheel Loader Rental: Best Applications for Site Development Projects", photoMatch: "wheel loader", category: "Equipment Guides" },
       { topic: "Articulated Dump Truck vs Rigid Frame: When to Use Each in Mass Earthmoving", photoMatch: "articulated truck", category: "Comparisons" },
-      { topic: "Breaking Through Caliche: Equipment and Techniques for North Texas Rock Layers", photoMatch: "excavator", category: "Regional" },
-      { topic: "Roller and Compactor Selection Guide for Road Base and Pad Prep", photoMatch: "roller", category: "Equipment Guides" },
+      // Week 2
+      { topic: "How to Choose the Right Excavator Size for Utility Trenching in North Texas", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "Working in North Texas Clay: Equipment Tips for Black Gumbo Soil Conditions", photoMatch: "excavator", category: "Regional" },
+      // Week 3
       { topic: "Equipment Rental Rates Explained: What's Included and What's Extra", photoMatch: "excavator", category: "Cost/ROI" },
-      { topic: "CAT 320 vs 323 vs 326: Choosing the Right Mid-Size Excavator", photoMatch: "excavator", category: "Comparisons" },
+      { topic: "Why Local Equipment Rental Beats National Chains for North Texas Contractors", photoMatch: "excavator", category: "Business" },
+      // Week 4
       { topic: "Summer Heat and Heavy Equipment: Preventing Overheating in 100°+ Texas Weather", photoMatch: "excavator", category: "Seasonal" },
       { topic: "DOT and Municipal Projects: Equipment Requirements and Compliance", photoMatch: "roller", category: "Industry" },
-      { topic: "Compact Track Loader Attachments: Maximizing Versatility on Job Sites", photoMatch: "skid steer", category: "Equipment Guides" },
+      // Week 5
+      { topic: "Roller and Compactor Selection Guide for Road Base and Pad Prep", photoMatch: "roller", category: "Equipment Guides" },
+      { topic: "CAT 320 vs 323 vs 326: Choosing the Right Mid-Size Excavator", photoMatch: "excavator", category: "Comparisons" },
+      // Week 6
       { topic: "Site Prep Equipment Package: What You Need for Residential Development", photoMatch: "excavator", category: "Use Cases" },
-      { topic: "Why Local Equipment Rental Beats National Chains for North Texas Contractors", photoMatch: "excavator", category: "Business" },
-      { topic: "Excavator Bucket Types: Matching the Right Bucket to North Texas Soil", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "Breaking Through Caliche: Equipment and Techniques for North Texas Rock Layers", photoMatch: "excavator", category: "Regional" },
+      // Week 7
       { topic: "Monthly vs Weekly Equipment Rental: Calculating the Best Value", photoMatch: "wheel loader", category: "Cost/ROI" },
-      { topic: "Pipeline and Utility Contractor Equipment Guide for North Texas Projects", photoMatch: "excavator", category: "Industry" },
-      { topic: "CAT D6 Dozer: Applications and Best Practices for Site Grading", photoMatch: "dozer", category: "Equipment Guides" },
       { topic: "Preventing Equipment Downtime: Maintenance Tips for Rental Customers", photoMatch: "excavator", category: "Maintenance" },
-      { topic: "Soil Compaction Testing: Why Proper Compaction Matters in North Texas", photoMatch: "roller", category: "Use Cases" },
-      { topic: "Equipment for Commercial Building Pads: Excavation to Final Grade", photoMatch: "excavator", category: "Use Cases" },
-      { topic: "Late-Model Equipment Advantage: Why Machine Age Matters for Uptime", photoMatch: "excavator", category: "Business" },
-      { topic: "Hauling and Logistics: Getting Equipment to Your North Texas Job Site", photoMatch: "articulated truck", category: "Business" },
-      { topic: "CAT 730 Articulated Truck: Ideal Applications for Mass Earthmoving", photoMatch: "articulated truck", category: "Equipment Guides" },
-      { topic: "Excavator Operating Costs: Fuel, Maintenance, and Productivity Factors", photoMatch: "excavator", category: "Cost/ROI" },
-      { topic: "Winter Equipment Operation: Cold Weather Tips for North Texas", photoMatch: "excavator", category: "Seasonal" },
-      { topic: "Grading and Finish Work: Equipment Selection for Precision Results", photoMatch: "skid steer", category: "Use Cases" },
-      { topic: "Equipment Insurance Requirements: What Renters Need to Know", photoMatch: "excavator", category: "Business" },
+      // Week 8
+      { topic: "Compact Track Loader Attachments: Maximizing Versatility on Job Sites", photoMatch: "skid steer", category: "Equipment Guides" },
       { topic: "Padfoot vs Smooth Drum Rollers: Choosing the Right Compactor", photoMatch: "roller", category: "Comparisons" },
-      { topic: "Road Construction Equipment Lineup: From Subgrade to Final Surface", photoMatch: "roller", category: "Industry" },
-      { topic: "Hydraulic Breaker Attachments: When and How to Use Rock Breakers", photoMatch: "excavator", category: "Equipment Guides" },
-      { topic: "Equipment Productivity Rates: How to Estimate Production for Bidding", photoMatch: "excavator", category: "Cost/ROI" },
+      // Week 9
+      { topic: "Soil Compaction Testing: Why Proper Compaction Matters in North Texas", photoMatch: "roller", category: "Use Cases" },
+      { topic: "Late-Model Equipment Advantage: Why Machine Age Matters for Uptime", photoMatch: "excavator", category: "Business" },
+      // Week 10
+      { topic: "Pipeline and Utility Contractor Equipment Guide for North Texas Projects", photoMatch: "excavator", category: "Industry" },
       { topic: "Denton County Development Boom: Equipment Trends for Local Contractors", photoMatch: "excavator", category: "Regional" },
+      // Week 11
+      { topic: "Excavator Bucket Types: Matching the Right Bucket to North Texas Soil", photoMatch: "excavator", category: "Equipment Guides" },
       { topic: "Mini Excavator vs Standard Excavator: Right-Sizing for Your Project", photoMatch: "excavator", category: "Comparisons" },
+      // Week 12
+      { topic: "Equipment for Commercial Building Pads: Excavation to Final Grade", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "Excavator Operating Costs: Fuel, Maintenance, and Productivity Factors", photoMatch: "excavator", category: "Cost/ROI" },
+      // Week 13
+      { topic: "Hauling and Logistics: Getting Equipment to Your North Texas Job Site", photoMatch: "articulated truck", category: "Business" },
+      { topic: "Winter Equipment Operation: Cold Weather Tips for North Texas", photoMatch: "excavator", category: "Seasonal" },
+      // Week 14
+      { topic: "CAT D6 Dozer: Applications and Best Practices for Site Grading", photoMatch: "dozer", category: "Equipment Guides" },
+      { topic: "Renting vs Buying Heavy Equipment: The Complete Financial Breakdown", photoMatch: "excavator", category: "Comparisons" },
+      // Week 15
+      { topic: "Grading and Finish Work: Equipment Selection for Precision Results", photoMatch: "skid steer", category: "Use Cases" },
+      { topic: "McKinney and Prosper Growth: Equipment Needs for North Texas Subdivisions", photoMatch: "excavator", category: "Regional" },
+      // Week 16
+      { topic: "Equipment Insurance Requirements: What Renters Need to Know", photoMatch: "excavator", category: "Business" },
+      { topic: "Road Construction Equipment Lineup: From Subgrade to Final Surface", photoMatch: "roller", category: "Industry" },
+      // Week 17
+      { topic: "CAT 730 Articulated Truck: Ideal Applications for Mass Earthmoving", photoMatch: "articulated truck", category: "Equipment Guides" },
+      { topic: "CAT 308 vs 310 Mini Excavator: Which Compact Machine Wins?", photoMatch: "excavator", category: "Comparisons" },
+      // Week 18
       { topic: "Stormwater Management: Equipment for Retention Ponds and Drainage", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "Equipment Productivity Rates: How to Estimate Production for Bidding", photoMatch: "excavator", category: "Cost/ROI" },
+      // Week 19
       { topic: "Operator Tips: Getting Maximum Production from Rental Equipment", photoMatch: "excavator", category: "Maintenance" },
+      { topic: "Celina and Gunter Expansion: Construction Equipment Demand in Fast-Growing Cities", photoMatch: "excavator", category: "Regional" },
+      // Week 20
+      { topic: "Hydraulic Breaker Attachments: When and How to Use Rock Breakers", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "Dozer vs Scraper for Mass Grading: Cost and Productivity Comparison", photoMatch: "dozer", category: "Comparisons" },
+      // Week 21
       { topic: "Material Handling with Wheel Loaders: Loading, Stockpiling, and Transport", photoMatch: "wheel loader", category: "Use Cases" },
       { topic: "Pre-Rental Equipment Inspection: What We Check Before Every Delivery", photoMatch: "excavator", category: "Business" },
-      { topic: "Foundation Excavation: Equipment and Techniques for Residential Builds", photoMatch: "excavator", category: "Use Cases" },
-      { topic: "GPS and Machine Control: Modern Technology in CAT Equipment", photoMatch: "excavator", category: "Equipment Guides" },
-      { topic: "Rental Equipment Care: Customer Responsibilities During Rental Period", photoMatch: "skid steer", category: "Business" },
-      { topic: "Parking Lot and Paving Prep: Equipment for Commercial Hardscape Projects", photoMatch: "roller", category: "Use Cases" },
-      { topic: "CAT Equipment Telematics: How Product Link Improves Fleet Management", photoMatch: "excavator", category: "Equipment Guides" },
-      { topic: "Trenching Safety: OSHA Requirements and Best Practices", photoMatch: "excavator", category: "Industry" },
+      // Week 22
       { topic: "Long-Term Rental Advantages: When Monthly Rentals Make Sense", photoMatch: "excavator", category: "Cost/ROI" },
-      { topic: "McKinney and Prosper Growth: Equipment Needs for North Texas Subdivisions", photoMatch: "excavator", category: "Regional" },
+      { topic: "Trenching Safety: OSHA Requirements and Best Practices", photoMatch: "excavator", category: "Industry" },
+      // Week 23
+      { topic: "GPS and Machine Control: Modern Technology in CAT Equipment", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "Rubber Tracks vs Steel Tracks: Choosing the Right Undercarriage", photoMatch: "excavator", category: "Comparisons" },
+      // Week 24
+      { topic: "Foundation Excavation: Equipment and Techniques for Residential Builds", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "North Texas Flood Plain Construction: Equipment for Challenging Drainage Projects", photoMatch: "excavator", category: "Regional" },
+      // Week 25
+      { topic: "Rental Equipment Care: Customer Responsibilities During Rental Period", photoMatch: "skid steer", category: "Business" },
+      { topic: "Spring Rain and Mud Season: Equipment Tips for Wet North Texas Job Sites", photoMatch: "excavator", category: "Seasonal" },
+      // Week 26
+      { topic: "CAT Equipment Telematics: How Product Link Improves Fleet Management", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "Diesel vs Electric Equipment: Is Battery-Powered Construction Ready?", photoMatch: "excavator", category: "Comparisons" },
+      // Week 27
+      { topic: "Parking Lot and Paving Prep: Equipment for Commercial Hardscape Projects", photoMatch: "roller", category: "Use Cases" },
+      { topic: "Hidden Costs of Owning Heavy Equipment: Insurance, Storage, and Depreciation", photoMatch: "excavator", category: "Cost/ROI" },
+      // Week 28
       { topic: "Demolition Equipment: Safe and Efficient Structure Removal", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "Building in the DFW Metroplex: Why Equipment Availability Matters Most", photoMatch: "wheel loader", category: "Regional" },
+      // Week 29
       { topic: "Credit Application Process: Getting Set Up for Equipment Rental", photoMatch: "excavator", category: "Business" },
+      { topic: "SWPPP Compliance: Erosion Control Equipment for North Texas Construction Sites", photoMatch: "water truck", category: "Industry" },
+      // Week 30
+      { topic: "CAT 299 Compact Track Loader: The Ultimate Multi-Purpose Machine", photoMatch: "skid steer", category: "Equipment Guides" },
+      { topic: "End Dump vs Belly Dump Trailers: Hauling Efficiency Comparison", photoMatch: "articulated truck", category: "Comparisons" },
+      // Week 31
+      { topic: "Land Clearing Equipment: Trees, Brush, and Vegetation Removal Methods", photoMatch: "skid steer", category: "Use Cases" },
+      { topic: "How Equipment Rental Improves Cash Flow for Small Contractors", photoMatch: "skid steer", category: "Cost/ROI" },
+      // Week 32
+      { topic: "Starting a Dirt Work Business in North Texas: Equipment You Need First", photoMatch: "excavator", category: "Business" },
+      { topic: "Frisco and Little Elm Growth: Commercial Equipment Needs in Booming Markets", photoMatch: "excavator", category: "Regional" },
+      // Week 33
+      { topic: "Understanding Excavator Swing Radius: Tight Access Job Site Solutions", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "CAT Tier 4 vs Tier 4 Final Engines: Emissions and Performance Differences", photoMatch: "excavator", category: "Comparisons" },
+      // Week 34
+      { topic: "Swimming Pool Excavation: Equipment and Techniques for Residential Pools", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "Construction Scheduling Around Texas Weather: Planning for Rain Delays", photoMatch: "skid steer", category: "Seasonal" },
+      // Week 35
+      { topic: "Daily Pre-Operation Equipment Inspection: A Contractor's Checklist", photoMatch: "excavator", category: "Maintenance" },
+      { topic: "Highway 380 Corridor Development: Equipment for North Texas Infrastructure", photoMatch: "roller", category: "Regional" },
+      // Week 36
+      { topic: "CAT Motor Graders: Precision Road Building and Maintenance Applications", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "6-Ton vs 14-Ton Excavators: Matching Machine to Project Scale", photoMatch: "excavator", category: "Comparisons" },
+      // Week 37
+      { topic: "Sewer Line Installation: Equipment Selection for Municipal Utility Projects", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "Cost Per Yard: Calculating Earthmoving Costs for Accurate Project Bids", photoMatch: "excavator", category: "Cost/ROI" },
+      // Week 38
+      { topic: "How General Contractors Choose Equipment Rental Partners", photoMatch: "wheel loader", category: "Business" },
+      { topic: "Weatherford to Sherman: Equipment Rental Coverage Across North Texas", photoMatch: "excavator", category: "Regional" },
+      // Week 39
+      { topic: "Telehandler vs Wheel Loader: Which Lift Machine Fits Your Project?", photoMatch: "wheel loader", category: "Equipment Guides" },
+      { topic: "Tracked Carriers vs Dump Trucks: Moving Material on Soft Ground", photoMatch: "articulated truck", category: "Comparisons" },
+      // Week 40
+      { topic: "Horse Arena and Equestrian Facility Grading: Equipment for North Texas Ranches", photoMatch: "skid steer", category: "Use Cases" },
+      { topic: "Fall Building Season: Why Autumn is Prime Time for North Texas Construction", photoMatch: "excavator", category: "Seasonal" },
+      // Week 41
+      { topic: "CAT 325 Excavator: The Mid-Size Sweet Spot for North Texas Contractors", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "Tax Benefits of Renting vs Buying Construction Equipment", photoMatch: "wheel loader", category: "Cost/ROI" },
+      // Week 42
+      { topic: "Equipment for Building Retaining Walls: Excavation and Backfill Guide", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "North Texas Wind and Dust: How Weather Conditions Affect Equipment Operation", photoMatch: "water truck", category: "Regional" },
+      // Week 43
+      { topic: "Emergency Equipment Rental: When Your Machine Goes Down Mid-Project", photoMatch: "excavator", category: "Business" },
+      { topic: "Vibratory Plate Compactors vs Rollers: Small Area Compaction Guide", photoMatch: "roller", category: "Equipment Guides" },
+      // Week 44
+      { topic: "Backhoe vs Mini Excavator: Which Makes Sense for Small Projects?", photoMatch: "excavator", category: "Comparisons" },
+      { topic: "Farm Pond Construction: Excavation Equipment for North Texas Properties", photoMatch: "excavator", category: "Use Cases" },
+      // Week 45
+      { topic: "Fuel Cost Calculator: Estimating Daily Equipment Operating Expenses", photoMatch: "excavator", category: "Cost/ROI" },
+      { topic: "Lake Lewisville and Lake Ray Roberts: Shoreline Construction Equipment Challenges", photoMatch: "excavator", category: "Regional" },
+      // Week 46
+      { topic: "Track vs Wheel Excavators: Mobility and Application Differences", photoMatch: "excavator", category: "Equipment Guides" },
+      { topic: "Wheel Loader vs Skid Steer for Material Loading: Productivity Analysis", photoMatch: "wheel loader", category: "Comparisons" },
+      // Week 47
+      { topic: "Driveway and Private Road Construction: Equipment for Rural Properties", photoMatch: "roller", category: "Use Cases" },
+      { topic: "Water Truck Rental Guide: Dust Control and Compaction in DFW's Dry Season", photoMatch: "water truck", category: "Equipment Guides" },
+      // Week 48
+      { topic: "Church and School Construction: Equipment Needs for Community Buildings", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "Dozer Blade Types Explained: S-Blade, U-Blade, and SU-Blade Applications", photoMatch: "dozer", category: "Equipment Guides" },
+      // Week 49
+      { topic: "Cell Tower Site Prep: Access Road and Pad Equipment Requirements", photoMatch: "excavator", category: "Use Cases" },
+      { topic: "CAT 259 vs 289 Compact Track Loader: Feature Comparison", photoMatch: "skid steer", category: "Comparisons" },
+      // Week 50
+      { topic: "Solar Farm Site Prep: Grading Equipment for Renewable Energy Projects", photoMatch: "dozer", category: "Use Cases" },
+      { topic: "Excavator Quick Couplers: Faster Attachment Changes on the Job Site", photoMatch: "excavator", category: "Equipment Guides" },
+      // Bonus (if needed)
+      { topic: "Water Truck Operations Guide: Spray Systems, Fill Rates, and Coverage", photoMatch: "water truck", category: "Equipment Guides" },
     ]
 
-    // Find a topic that hasn't been published yet
+    // Generate a deterministic slug from topic title
+    const generateSlug = (topic: string) =>
+      topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+
+    // Find a topic that hasn't been published yet (check both slugs and title keywords)
     const pendingTopics = topicPool.filter(t => {
-      const slug = t.topic.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-      return !publishedSlugs.has(slug)
+      const slug = generateSlug(t.topic)
+      // Check exact slug match
+      if (publishedSlugs.has(slug)) return false
+      // Check if a similar title already exists (first 5 significant words overlap)
+      const topicWords = t.topic.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((w: string) => w.length > 3)
+      for (const title of publishedTitles) {
+        const titleWords = title.replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter((w: string) => w.length > 3)
+        const overlap = topicWords.filter((w: string) => titleWords.includes(w)).length
+        if (overlap >= 5) return false
+      }
+      return true
     })
 
     if (pendingTopics.length === 0) {
@@ -299,7 +418,7 @@ ${generatedContent.faqs.map((faq: { question: string; answer: string }) => `
       category: generatedContent.category || selectedTopic.category,
       image: matchedPhoto,
       read_time: generatedContent.readTime || '8 min read',
-      slug: generatedContent.slug,
+      slug: generateSlug(selectedTopic.topic),
       // Store FAQs and keywords for schema markup (GEO optimization)
       faqs: generatedContent.faqs ? JSON.stringify(generatedContent.faqs) : null,
       keywords: generatedContent.keywords ? JSON.stringify(generatedContent.keywords) : null

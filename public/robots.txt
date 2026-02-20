@@ -82,6 +82,9 @@ Crawl-delay: 1
 # Sitemap location
 Sitemap: https://benchmarkequip.com/sitemap.xml
 
+# LLM-optimized content
+LLMs-Txt: https://benchmarkequip.com/llms.txt
+
 # Clean param for analytics tracking
 Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&gclid&fbclid
 

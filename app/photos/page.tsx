@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     description: 'Browse our construction equipment rental fleet. Excavators, skid steers, track loaders, and attachments available in Denton, TX.',
     url: 'https://benchmarkequip.com/photos',
   },
+  alternates: {
+    canonical: 'https://benchmarkequip.com/photos',
+  },
 }
 
 export default function PhotosPage() {

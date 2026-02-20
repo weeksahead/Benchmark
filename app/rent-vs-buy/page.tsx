@@ -11,6 +11,9 @@ export const metadata: Metadata = {
     description: 'Free calculator to compare renting vs buying construction equipment. Make informed decisions for your project budget.',
     url: 'https://benchmarkequip.com/rent-vs-buy',
   },
+  alternates: {
+    canonical: 'https://benchmarkequip.com/rent-vs-buy',
+  },
 }
 
 export default function RentVsBuyPage() {

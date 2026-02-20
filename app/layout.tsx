@@ -94,10 +94,42 @@ export default function RootLayout({
                 "latitude": 33.2148,
                 "longitude": -97.1331
               },
-              "areaServed": {
-                "@type": "Country",
-                "name": "United States"
-              },
+              "areaServed": [
+                {
+                  "@type": "City",
+                  "name": "Denton",
+                  "containedInPlace": { "@type": "State", "name": "Texas" }
+                },
+                {
+                  "@type": "City",
+                  "name": "Fort Worth",
+                  "containedInPlace": { "@type": "State", "name": "Texas" }
+                },
+                {
+                  "@type": "City",
+                  "name": "Dallas",
+                  "containedInPlace": { "@type": "State", "name": "Texas" }
+                },
+                {
+                  "@type": "City",
+                  "name": "McKinney",
+                  "containedInPlace": { "@type": "State", "name": "Texas" }
+                },
+                {
+                  "@type": "City",
+                  "name": "Frisco",
+                  "containedInPlace": { "@type": "State", "name": "Texas" }
+                },
+                {
+                  "@type": "City",
+                  "name": "Arlington",
+                  "containedInPlace": { "@type": "State", "name": "Texas" }
+                },
+                { "@type": "State", "name": "Texas" },
+                { "@type": "State", "name": "Oklahoma" },
+                { "@type": "State", "name": "Arkansas" },
+                { "@type": "State", "name": "Louisiana" }
+              ],
               "serviceType": ["Equipment Rental", "Heavy Machinery Rental", "Construction Equipment Sales"],
               "openingHoursSpecification": [
                 {

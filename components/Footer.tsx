@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Phone, Mail, MapPin, Clock, Facebook, Linkedin } from 'lucide-react';
 
 const Footer = () => {
@@ -31,12 +32,12 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-6">Quick Links</h3>
             <ul className="space-y-3">
               <li><a href="https://rent.benchmarkequip.com/items" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-red-500 transition-colors">Equipment Rentals</a></li>
-              <li><a href="/contact" className="text-gray-400 hover:text-red-500 transition-colors">Sales</a></li>
-              <li><a href="/photos" className="text-gray-400 hover:text-red-500 transition-colors">Photos</a></li>
-              <li><a href="/blog" className="text-gray-400 hover:text-red-500 transition-colors">Blog</a></li>
-              <li><a href="/about" className="text-gray-400 hover:text-red-500 transition-colors">About</a></li>
-              <li><a href="/faq" className="text-gray-400 hover:text-red-500 transition-colors">FAQ</a></li>
-              <li><a href="/contact" className="text-gray-400 hover:text-red-500 transition-colors">Contact</a></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-red-500 transition-colors">Sales</Link></li>
+              <li><Link href="/photos" className="text-gray-400 hover:text-red-500 transition-colors">Photos</Link></li>
+              <li><Link href="/blog" className="text-gray-400 hover:text-red-500 transition-colors">Blog</Link></li>
+              <li><Link href="/about" className="text-gray-400 hover:text-red-500 transition-colors">About</Link></li>
+              <li><Link href="/faq" className="text-gray-400 hover:text-red-500 transition-colors">FAQ</Link></li>
+              <li><Link href="/contact" className="text-gray-400 hover:text-red-500 transition-colors">Contact</Link></li>
             </ul>
           </div>
 
@@ -98,8 +99,8 @@ const Footer = () => {
               © 2026 Benchmark Equipment Rental & Sales. All rights reserved.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="/privacy" className="text-gray-400 hover:text-red-500 text-sm transition-colors">Privacy Policy</a>
-              <a href="/terms" className="text-gray-400 hover:text-red-500 text-sm transition-colors">Terms of Service</a>
+              <Link href="/privacy" className="text-gray-400 hover:text-red-500 text-sm transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="text-gray-400 hover:text-red-500 text-sm transition-colors">Terms of Service</Link>
             </div>
           </div>
         </div>
